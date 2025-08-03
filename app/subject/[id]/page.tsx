@@ -21,6 +21,7 @@ export default function SubjectPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const subjectData = SUBJECTS_DATA[subjectId as keyof typeof SUBJECTS_DATA];
 
@@ -179,6 +180,12 @@ export default function SubjectPage() {
       window.dispatchEvent(new Event('storage'));
       
       setHasUnsavedChanges(false);
+      setSaveSuccess(true);
+      
+      // Hide success message after 2 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 2000);
     } catch (error) {
       console.error('Error saving progress:', error);
     } finally {
@@ -277,7 +284,9 @@ export default function SubjectPage() {
               onClick={saveAllProgress}
               disabled={!hasUnsavedChanges || saving}
               className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                hasUnsavedChanges && !saving
+                saveSuccess
+                  ? 'bg-green-500 text-white shadow-glow'
+                  : hasUnsavedChanges && !saving
                   ? `bg-gradient-to-r ${colorClass} text-white shadow-glow hover:shadow-lg`
                   : 'bg-gray-700 text-gray-400 cursor-not-allowed'
               }`}
@@ -286,6 +295,11 @@ export default function SubjectPage() {
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Saving...</span>
+                </>
+              ) : saveSuccess ? (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Saved Successfully!</span>
                 </>
               ) : hasUnsavedChanges ? (
                 <>
