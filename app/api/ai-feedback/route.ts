@@ -77,7 +77,7 @@ export async function POST(request: Request) {
           totalHours: subjectSessions.reduce((sum: number, s: any) => sum + s.duration, 0) / 60,
           avgScore: subjectSessions
             .filter((s: any) => s.score)
-            .reduce((sum: number, s: any, _, arr) => sum + s.score / arr.length, 0) || 0,
+            .reduce((sum: number, s: any, _: any, arr: any[]) => sum + s.score / arr.length, 0) || 0,
           chaptersStarted: Array.from(new Set(chapterProgress.map((p: any) => p.chapter_name))).length,
           totalChapters: SUBJECTS_DATA[subjectId as keyof typeof SUBJECTS_DATA].chapters.length,
           lecturesCompleted: chapterProgress.filter((p: any) => p.completed).length
