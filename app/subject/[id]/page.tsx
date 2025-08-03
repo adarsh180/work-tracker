@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, Brain } from 'lucide-react';
+import { ArrowLeft, BarChart3, Brain, Save, CheckCircle } from 'lucide-react';
 import { SUBJECTS_DATA } from '@/lib/subjects-data';
 import ChapterTracker from '@/components/ChapterTracker';
 import SubjectTestTracker from '@/components/SubjectTestTracker';
@@ -19,6 +19,8 @@ export default function SubjectPage() {
   const [subjectTests, setSubjectTests] = useState<any[]>([]);
   const [aiInsights, setAiInsights] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const subjectData = SUBJECTS_DATA[subjectId as keyof typeof SUBJECTS_DATA];
 
@@ -128,26 +130,28 @@ export default function SubjectPage() {
     }
   };
 
-  const updateChapterProgress = async (chapterName: string, updates: any) => {
+  const updateChapterProgress = (chapterName: string, updates: any) => {
+    const chapterIndex = chapters.findIndex(c => c.name === chapterName);
+    if (chapterIndex === -1) return;
+
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex] = { ...updatedChapters[chapterIndex], ...updates };
+    setChapters(updatedChapters);
+    setHasUnsavedChanges(true);
+  };
+
+  const saveAllProgress = async () => {
+    setSaving(true);
     try {
-      const chapterIndex = chapters.findIndex(c => c.name === chapterName);
-      if (chapterIndex === -1) return;
-
-      const updatedChapters = [...chapters];
-      updatedChapters[chapterIndex] = { ...updatedChapters[chapterIndex], ...updates };
-      setChapters(updatedChapters);
-
-      // Update database for each lecture
-      const chapter = updatedChapters[chapterIndex];
-      
-      for (let i = 0; i < chapter.lectures; i++) {
-        try {
+      // Save all chapter progress
+      for (const chapter of chapters) {
+        for (let i = 0; i < chapter.lectures; i++) {
           await fetch('/api/chapter-progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               subject: subjectId,
-              chapterName,
+              chapterName: chapter.name,
               lectureIndex: i,
               completed: chapter.completedLectures?.[i] || false,
               dppCompleted: chapter.dppCompleted?.[i] || false,
@@ -159,45 +163,32 @@ export default function SubjectPage() {
               customTrackers: chapter.customTrackers || {}
             })
           });
-        } catch (error) {
-          console.error(`Error updating lecture ${i}:`, error);
         }
       }
-      generateAIInsights(updatedChapters, subjectTests);
+      
+      // Generate AI insights after saving
+      await generateAIInsights(chapters, subjectTests);
       
       // Trigger dashboard update
       localStorage.setItem('lastUpdate', Date.now().toString());
       window.dispatchEvent(new Event('storage'));
+      
+      setHasUnsavedChanges(false);
     } catch (error) {
-      console.error('Error updating chapter progress:', error);
+      console.error('Error saving progress:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const updateChapterQuestions = async (chapterName: string, questionsSolved: number) => {
-    try {
-      const chapterIndex = chapters.findIndex(c => c.name === chapterName);
-      if (chapterIndex === -1) return;
+  const updateChapterQuestions = (chapterName: string, questionsSolved: number) => {
+    const chapterIndex = chapters.findIndex(c => c.name === chapterName);
+    if (chapterIndex === -1) return;
 
-      const updatedChapters = [...chapters];
-      updatedChapters[chapterIndex].questionsSolved = questionsSolved;
-      setChapters(updatedChapters);
-
-      await fetch('/api/chapter-progress', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: subjectId,
-          chapterName,
-          questionsSolved
-        })
-      });
-      
-      // Trigger dashboard update
-      localStorage.setItem('lastUpdate', Date.now().toString());
-      window.dispatchEvent(new Event('storage'));
-    } catch (error) {
-      console.error('Error updating chapter questions:', error);
-    }
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex].questionsSolved = questionsSolved;
+    setChapters(updatedChapters);
+    setHasUnsavedChanges(true);
   };
 
   const addSubjectTest = async (test: any) => {
@@ -262,19 +253,47 @@ export default function SubjectPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center space-x-4 mb-4">
+          <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => router.push('/')}
               className="p-2 rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-300" />
             </button>
-            <div>
+            <div className="flex-1">
               <h1 className={`text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${colorClass} animate-pulse-glow`}>
                 {subjectData.name}
               </h1>
               <p className="text-gray-300">Detailed chapter and test tracking</p>
             </div>
+            
+            {/* Save Button */}
+            <button
+              onClick={saveAllProgress}
+              disabled={!hasUnsavedChanges || saving}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                hasUnsavedChanges && !saving
+                  ? `bg-gradient-to-r ${colorClass} text-white shadow-glow hover:shadow-lg`
+                  : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {saving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : hasUnsavedChanges ? (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Save Progress</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Saved</span>
+                </>
+              )}
+            </button>
           </div>
         </motion.div>
 

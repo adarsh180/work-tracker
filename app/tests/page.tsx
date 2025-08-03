@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, BarChart3, PieChart, TrendingUp, Trophy, Calendar, Target } from 'lucide-react';
+import { ArrowLeft, Plus, BarChart3, PieChart, TrendingUp, Trophy, Calendar, Target, Save, CheckCircle } from 'lucide-react';
 import TestChart from '@/components/TestChart';
 import FormattedText from '@/components/FormattedText';
 import { getEmojiForPercentage } from '@/lib/subjects-data';
@@ -16,6 +16,8 @@ export default function TestsPage() {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [formData, setFormData] = useState({
     testType: 'weekly',
     testName: '',
@@ -75,6 +77,7 @@ export default function TestsPage() {
 
   const addTest = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     try {
       const response = await fetch('/api/tests', {
         method: 'POST',
@@ -90,10 +93,36 @@ export default function TestsPage() {
       if (response.ok) {
         setFormData({ testType: 'weekly', testName: '', score: '', maxScore: '720' });
         setIsFormOpen(false);
-        fetchTests();
+        await fetchTests();
+        
+        // Trigger dashboard update
+        localStorage.setItem('lastUpdate', Date.now().toString());
+        window.dispatchEvent(new Event('storage'));
+        
+        setHasUnsavedChanges(false);
       }
     } catch (error) {
       console.error('Error adding test:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveAllTests = async () => {
+    setSaving(true);
+    try {
+      // Re-generate AI analysis with current data
+      await generateAIAnalysis(tests);
+      
+      // Trigger dashboard update
+      localStorage.setItem('lastUpdate', Date.now().toString());
+      window.dispatchEvent(new Event('storage'));
+      
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Error saving tests:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -146,13 +175,42 @@ export default function TestsPage() {
                 <p className="text-gray-600">Comprehensive test analysis and tracking</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsFormOpen(true)}
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Add Test</span>
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={saveAllTests}
+                disabled={!hasUnsavedChanges || saving}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  hasUnsavedChanges && !saving
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : hasUnsavedChanges ? (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>Save & Analyze</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Saved</span>
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setIsFormOpen(true)}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add Test</span>
+              </button>
+            </div>
           </div>
         </motion.div>
 
@@ -371,7 +429,7 @@ export default function TestsPage() {
                   <input
                     type="text"
                     value={formData.testName}
-                    onChange={(e) => setFormData({ ...formData, testName: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, testName: e.target.value }); setHasUnsavedChanges(true); }}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="e.g., Physics Weekly Test 1"
                     required
@@ -384,7 +442,7 @@ export default function TestsPage() {
                     <input
                       type="number"
                       value={formData.score}
-                      onChange={(e) => setFormData({ ...formData, score: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, score: e.target.value }); setHasUnsavedChanges(true); }}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                       placeholder="650"
                       required
@@ -396,7 +454,7 @@ export default function TestsPage() {
                     <input
                       type="number"
                       value={formData.maxScore}
-                      onChange={(e) => setFormData({ ...formData, maxScore: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, maxScore: e.target.value }); setHasUnsavedChanges(true); }}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                       placeholder="720"
                       required
@@ -407,9 +465,17 @@ export default function TestsPage() {
                 <div className="flex space-x-3">
                   <button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 font-medium"
+                    disabled={saving}
+                    className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                   >
-                    Add Test
+                    {saving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>Add Test</span>
+                    )}
                   </button>
                   <button
                     type="button"
