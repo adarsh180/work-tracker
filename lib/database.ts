@@ -7,8 +7,7 @@ const pool = new Pool({
   },
   connectionTimeoutMillis: 30000,
   idleTimeoutMillis: 60000,
-  max: 5,
-  acquireTimeoutMillis: 30000
+  max: 5
 });
 
 export async function initDatabase() {
