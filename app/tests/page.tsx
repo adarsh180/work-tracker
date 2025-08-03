@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, BarChart3, PieChart, TrendingUp, Trophy, Calendar, Target, Save, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Plus, BarChart3, PieChart, TrendingUp, Trophy, Calendar, Target, Save, CheckCircle, Trash2 } from 'lucide-react';
 import TestChart from '@/components/TestChart';
 import FormattedText from '@/components/FormattedText';
 import { getEmojiForPercentage } from '@/lib/subjects-data';
@@ -33,10 +33,11 @@ export default function TestsPage() {
     try {
       const response = await fetch('/api/tests');
       const data = await response.json();
-      setTests(data);
-      generateAIAnalysis(data);
+      setTests(Array.isArray(data) ? data : []);
+      generateAIAnalysis(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching tests:', error);
+      setTests([]);
     } finally {
       setLoading(false);
     }
@@ -108,16 +109,28 @@ export default function TestsPage() {
     }
   };
 
+  const deleteTest = async (testId: number) => {
+    try {
+      const response = await fetch(`/api/tests/${testId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await fetchTests();
+        localStorage.setItem('lastUpdate', Date.now().toString());
+        window.dispatchEvent(new Event('storage'));
+      }
+    } catch (error) {
+      console.error('Error deleting test:', error);
+    }
+  };
+
   const saveAllTests = async () => {
     setSaving(true);
     try {
-      // Re-generate AI analysis with current data
       await generateAIAnalysis(tests);
-      
-      // Trigger dashboard update
       localStorage.setItem('lastUpdate', Date.now().toString());
       window.dispatchEvent(new Event('storage'));
-      
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error saving tests:', error);
@@ -214,22 +227,7 @@ export default function TestsPage() {
           </div>
         </motion.div>
 
-        {/* AI Analysis */}
-        {aiAnalysis && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center space-x-2 mb-3">
-                <Trophy className="w-5 h-5" />
-                <h2 className="text-xl font-bold">AI Test Analysis</h2>
-              </div>
-              <FormattedText text={aiAnalysis} className="text-white leading-relaxed" />
-            </div>
-          </motion.div>
-        )}
+
 
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -367,18 +365,27 @@ export default function TestsPage() {
                     </div>
                   </div>
                   
-                  <div className="text-right">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl">{emoji}</span>
-                      <div>
-                        <div className="text-lg font-bold text-white">
-                          {test.score}/{test.max_score}
-                        </div>
-                        <div className="text-sm text-gray-300">
-                          {Math.round(percentage)}%
+                  <div className="flex items-center space-x-4">
+                    <div className="text-right">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-2xl">{emoji}</span>
+                        <div>
+                          <div className="text-lg font-bold text-white">
+                            {test.score}/{test.max_score}
+                          </div>
+                          <div className="text-sm text-gray-300">
+                            {Math.round(percentage)}%
+                          </div>
                         </div>
                       </div>
                     </div>
+                    <button
+                      onClick={() => deleteTest(test.id)}
+                      className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shadow-glow"
+                      title="Delete test"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </motion.div>
               );

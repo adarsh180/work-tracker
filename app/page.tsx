@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, BarChart3, PieChart, TrendingUp, Clock, Target, BookOpen, Sparkles } from 'lucide-react';
+import { Plus, BarChart3, PieChart, TrendingUp, Clock, Target, BookOpen, Sparkles, Brain } from 'lucide-react';
 import CountdownTimer from '@/components/CountdownTimer';
 import DailyQuote from '@/components/DailyQuote';
 import SubjectOverview from '@/components/SubjectOverview';
@@ -118,7 +118,7 @@ export default function Dashboard() {
     );
   }
 
-  const weeklyProgress = (dashboardData.totalStudyHours / dashboardData.weeklyGoal) * 100;
+
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -150,53 +150,11 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6 hover:shadow-glow transition-all duration-300"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Total Study Hours</p>
-                <p className="text-3xl font-bold text-white">{dashboardData.totalStudyHours}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 animate-pulse">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6 hover:shadow-glow transition-all duration-300"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Weekly Progress</p>
-                <p className="text-3xl font-bold text-white">{Math.round(weeklyProgress)}%</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 animate-pulse">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-3 w-full bg-gray-700 rounded-full h-2">
-              <motion.div
-                className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full shadow-glow"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min(weeklyProgress, 100)}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
             className="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6 hover:shadow-glow transition-all duration-300"
           >
             <div className="flex items-center justify-between">
@@ -294,7 +252,57 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <AIFeedbackPanel feedback={aiFeedback} onRefresh={generateAIFeedback} />
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6 hover:shadow-glow transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 animate-pulse">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-white">AI Insights</h2>
+                </div>
+                <button
+                  onClick={generateAIFeedback}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-glow animate-pulse"
+                >
+                  Get Insights
+                </button>
+              </div>
+
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {aiFeedback.length > 0 ? (
+                  aiFeedback.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="p-4 rounded-lg border border-gray-600 bg-gray-700 hover:shadow-glow transition-all duration-200"
+                    >
+                      <p className="text-gray-200 text-sm leading-relaxed">{item.message}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        {item.subject && (
+                          <span className="text-xs px-2 py-1 bg-gray-600 text-gray-200 rounded-full">
+                            {item.subject}
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {new Date(item.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <Brain className="w-12 h-12 mx-auto mb-3 text-gray-600 animate-pulse" />
+                    <p className="text-gray-400">Click "Get Insights" to analyze your progress!</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

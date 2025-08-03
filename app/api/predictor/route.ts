@@ -12,7 +12,25 @@ export async function GET() {
     const totalQuestions = totalTests * 180; // Each main test has 180 questions
     const practiceQuestions = data.progress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0);
     const subjectTestQuestions = data.subjectTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0);
-    const totalQuestionsAttempted = totalQuestions + practiceQuestions + subjectTestQuestions;
+    
+    // Calculate DPP questions (10-15 questions per completed DPP)
+    const dppQuestions = data.progress.reduce((sum: number, p: any) => {
+      if (p.dpp_completed) {
+        return sum + Math.floor(Math.random() * 6) + 10; // Random 10-15 questions per DPP
+      }
+      return sum;
+    }, 0);
+    
+    // Calculate Assignment questions
+    const assignmentQuestions = data.progress.reduce((sum: number, p: any) => {
+      let total = 0;
+      if (p.normal_assignment_1) total += Math.floor(Math.random() * 101) + 100; // 100-200 questions
+      if (p.normal_assignment_2) total += Math.floor(Math.random() * 101) + 100; // 100-200 questions
+      if (p.kattar_assignment) total += Math.floor(Math.random() * 201) + 100; // 100-300 questions
+      return sum + total;
+    }, 0);
+    
+    const totalQuestionsAttempted = totalQuestions + practiceQuestions + subjectTestQuestions + dppQuestions + assignmentQuestions;
     
     const completedLectures = data.progress.filter((p: any) => p.completed).length;
     const completedDPPs = data.progress.filter((p: any) => p.dpp_completed).length;
@@ -40,6 +58,23 @@ export async function GET() {
       const subjectProgress = data.progress.filter((p: any) => p.subject === subject);
       const subjectSpecificTests = data.subjectTests.filter((t: any) => t.subject === subject);
       
+      const practiceQuestions = subjectProgress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0);
+      const subjectTestQuestions = subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0);
+      const dppQuestions = subjectProgress.reduce((sum: number, p: any) => {
+        if (p.dpp_completed) {
+          return sum + Math.floor(Math.random() * 6) + 10; // Random 10-15 questions per DPP
+        }
+        return sum;
+      }, 0);
+      
+      const assignmentQuestions = subjectProgress.reduce((sum: number, p: any) => {
+        let total = 0;
+        if (p.normal_assignment_1) total += Math.floor(Math.random() * 101) + 100; // 100-200 questions
+        if (p.normal_assignment_2) total += Math.floor(Math.random() * 101) + 100; // 100-200 questions
+        if (p.kattar_assignment) total += Math.floor(Math.random() * 201) + 100; // 100-300 questions
+        return sum + total;
+      }, 0);
+      
       return {
         name: subject,
         lectures: subjectProgress.filter((p: any) => p.completed).length,
@@ -47,10 +82,11 @@ export async function GET() {
         assignments: subjectProgress.filter((p: any) => 
           p.normal_assignment_1 || p.normal_assignment_2 || p.kattar_assignment
         ).length,
-        practiceQuestions: subjectProgress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0),
-        subjectTestQuestions: subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0),
-        totalQuestions: subjectProgress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0) + 
-                       subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0),
+        practiceQuestions,
+        subjectTestQuestions,
+        dppQuestions,
+        totalQuestions: practiceQuestions + subjectTestQuestions + dppQuestions + assignmentQuestions,
+        assignmentQuestions,
         subjectTests: subjectSpecificTests.length,
         avgSubjectScore: subjectSpecificTests.length > 0 
           ? subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.score / t.max_score) * 100, 0) / subjectSpecificTests.length 
@@ -64,6 +100,8 @@ export async function GET() {
       totalQuestionsAttempted,
       practiceQuestions,
       subjectTestQuestions,
+      dppQuestions,
+      assignmentQuestions,
       completedLectures,
       completedDPPs,
       completedAssignments,
@@ -109,7 +147,22 @@ export async function POST() {
     const totalQuestions = totalTests * 180;
     const practiceQuestions = data.progress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0);
     const subjectTestQuestions = data.subjectTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0);
-    const totalQuestionsAttempted = totalQuestions + practiceQuestions + subjectTestQuestions;
+    const dppQuestions = data.progress.reduce((sum: number, p: any) => {
+      if (p.dpp_completed) {
+        return sum + Math.floor(Math.random() * 6) + 10;
+      }
+      return sum;
+    }, 0);
+    
+    const assignmentQuestions = data.progress.reduce((sum: number, p: any) => {
+      let total = 0;
+      if (p.normal_assignment_1) total += Math.floor(Math.random() * 101) + 100;
+      if (p.normal_assignment_2) total += Math.floor(Math.random() * 101) + 100;
+      if (p.kattar_assignment) total += Math.floor(Math.random() * 201) + 100;
+      return sum + total;
+    }, 0);
+    
+    const totalQuestionsAttempted = totalQuestions + practiceQuestions + subjectTestQuestions + dppQuestions + assignmentQuestions;
     
     const analysisData = {
       totalTests,
@@ -134,6 +187,23 @@ export async function POST() {
         const subjectProgress = data.progress.filter((p: any) => p.subject === subject);
         const subjectSpecificTests = data.subjectTests.filter((t: any) => t.subject === subject);
         
+        const practiceQuestions = subjectProgress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0);
+        const subjectTestQuestions = subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0);
+        const dppQuestions = subjectProgress.reduce((sum: number, p: any) => {
+          if (p.dpp_completed) {
+            return sum + Math.floor(Math.random() * 6) + 10;
+          }
+          return sum;
+        }, 0);
+        
+        const assignmentQuestions = subjectProgress.reduce((sum: number, p: any) => {
+          let total = 0;
+          if (p.normal_assignment_1) total += Math.floor(Math.random() * 101) + 100;
+          if (p.normal_assignment_2) total += Math.floor(Math.random() * 101) + 100;
+          if (p.kattar_assignment) total += Math.floor(Math.random() * 201) + 100;
+          return sum + total;
+        }, 0);
+        
         return {
           name: subject,
           lectures: subjectProgress.filter((p: any) => p.completed).length,
@@ -141,11 +211,12 @@ export async function POST() {
           assignments: subjectProgress.filter((p: any) => 
             p.normal_assignment_1 || p.normal_assignment_2 || p.kattar_assignment
           ).length,
-          practiceQuestions: subjectProgress.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0),
-          subjectTestQuestions: subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0),
+          practiceQuestions,
+          subjectTestQuestions,
+          dppQuestions,
           subjectTests: subjectSpecificTests.length,
           avgSubjectScore: subjectSpecificTests.length > 0 
-            ? subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.score / t.max_score) * 100, 0) / subjectSpecificTests.length 
+            ? subjectSpecificTests.reduce((sum: number, t: any) => sum + (t.questions_attempted || 0), 0) / subjectSpecificTests.length 
             : 0
         };
       })

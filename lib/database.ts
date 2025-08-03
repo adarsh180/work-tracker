@@ -5,11 +5,10 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false
   },
-  connectionTimeoutMillis: 3000,
-  idleTimeoutMillis: 5000,
-  max: 1,
-  allowExitOnIdle: true,
-  keepAlive: false
+  connectionTimeoutMillis: 30000,
+  idleTimeoutMillis: 60000,
+  max: 5,
+  acquireTimeoutMillis: 30000
 });
 
 export async function initDatabase() {
@@ -132,22 +131,14 @@ export async function initDatabase() {
 export async function getChapterProgress(subject: string) {
   const client = await pool.connect();
   try {
-    const result = await Promise.race([
-      client.query(
-        'SELECT * FROM chapter_progress WHERE subject = $1 ORDER BY chapter_name, lecture_index',
-        [subject]
-      ),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 3000)
-      )
-    ]);
-    return (result as any).rows;
+    const result = await client.query(
+      'SELECT * FROM chapter_progress WHERE subject = $1 ORDER BY chapter_name, lecture_index',
+      [subject]
+    );
+    return result.rows;
   } catch (error: any) {
-    if (error.message === 'Query timeout') {
-      console.warn('Query timeout, returning empty array');
-      return [];
-    }
-    throw error;
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
   } finally {
     client.release();
   }
@@ -192,19 +183,11 @@ export async function updateChapterProgress(data: any) {
 export async function getTests() {
   const client = await pool.connect();
   try {
-    const result = await Promise.race([
-      client.query('SELECT * FROM tests ORDER BY date DESC'),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 3000)
-      )
-    ]);
-    return (result as any).rows;
+    const result = await client.query('SELECT * FROM tests ORDER BY date DESC');
+    return result.rows;
   } catch (error: any) {
-    if (error.message === 'Query timeout') {
-      console.warn('Query timeout, returning empty array');
-      return [];
-    }
-    throw error;
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
   } finally {
     client.release();
   }
@@ -253,21 +236,13 @@ export async function addSubjectTest(test: any) {
 export async function getDailyQuote() {
   const client = await pool.connect();
   try {
-    const result = await Promise.race([
-      client.query(
-        'SELECT quote FROM daily_quotes WHERE date = CURRENT_DATE ORDER BY id DESC LIMIT 1'
-      ),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 3000)
-      )
-    ]);
-    return (result as any).rows[0]?.quote || null;
+    const result = await client.query(
+      'SELECT quote FROM daily_quotes WHERE date = CURRENT_DATE ORDER BY id DESC LIMIT 1'
+    );
+    return result.rows[0]?.quote || null;
   } catch (error: any) {
-    if (error.message === 'Query timeout') {
-      console.warn('Query timeout, returning null');
-      return null;
-    }
-    throw error;
+    console.warn('Database error, returning null:', error.message);
+    return null;
   } finally {
     client.release();
   }
@@ -293,19 +268,11 @@ export async function saveDailyQuote(quote: string) {
 export async function getStudySessions() {
   const client = await pool.connect();
   try {
-    const result = await Promise.race([
-      client.query('SELECT * FROM study_sessions ORDER BY date DESC LIMIT 50'),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 3000)
-      )
-    ]);
-    return (result as any).rows;
+    const result = await client.query('SELECT * FROM study_sessions ORDER BY date DESC LIMIT 50');
+    return result.rows;
   } catch (error: any) {
-    if (error.message === 'Query timeout') {
-      console.warn('Query timeout, returning empty array');
-      return [];
-    }
-    throw error;
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
   } finally {
     client.release();
   }
@@ -327,19 +294,11 @@ export async function addStudySession(session: any) {
 export async function getAIFeedback() {
   const client = await pool.connect();
   try {
-    const result = await Promise.race([
-      client.query('SELECT * FROM ai_feedback ORDER BY timestamp DESC LIMIT 10'),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 3000)
-      )
-    ]);
-    return (result as any).rows;
+    const result = await client.query('SELECT * FROM ai_feedback ORDER BY timestamp DESC LIMIT 10');
+    return result.rows;
   } catch (error: any) {
-    if (error.message === 'Query timeout') {
-      console.warn('Query timeout, returning empty array');
-      return [];
-    }
-    throw error;
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
   } finally {
     client.release();
   }
