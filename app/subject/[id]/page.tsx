@@ -146,7 +146,7 @@ export default function SubjectPage() {
       // Save all chapter progress
       for (const chapter of chapters) {
         for (let i = 0; i < chapter.lectures; i++) {
-          await fetch('/api/chapter-progress', {
+          const response = await fetch('/api/chapter-progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -163,6 +163,11 @@ export default function SubjectPage() {
               customTrackers: chapter.customTrackers || {}
             })
           });
+          
+          if (!response.ok) {
+            console.error(`Failed to save progress for ${chapter.name} lecture ${i}:`, response.status, response.statusText);
+            throw new Error(`API Error: ${response.status}`);
+          }
         }
       }
       

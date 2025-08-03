@@ -22,18 +22,29 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    console.log('POST /api/chapter-progress called');
     await initDatabase();
+    console.log('Database initialized');
+    
     const data = await request.json();
+    console.log('Request data:', data);
     
     const result = await updateChapterProgress(data);
+    console.log('Update result:', result);
     
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Update progress error:', error);
+    console.error('Error stack:', error.stack);
+    
     if (error.message?.includes('connection lost')) {
       return NextResponse.json({ error: 'Connection lost. Please try again.' }, { status: 503 });
     }
-    return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to update progress', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 
