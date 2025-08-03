@@ -16,6 +16,17 @@ export default function PredictorPage() {
 
   useEffect(() => {
     fetchPredictorData();
+    
+    // Listen for chapter updates from subject pages
+    const handleChapterUpdate = () => {
+      fetchPredictorData();
+    };
+    
+    window.addEventListener('chapterUpdate', handleChapterUpdate);
+    
+    return () => {
+      window.removeEventListener('chapterUpdate', handleChapterUpdate);
+    };
   }, []);
 
   const fetchPredictorData = async () => {

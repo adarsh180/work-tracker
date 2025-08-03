@@ -175,9 +175,10 @@ export default function SubjectPage() {
       // Generate AI insights after saving
       await generateAIInsights(chapters, subjectTests);
       
-      // Trigger dashboard update
+      // Trigger dashboard and predictor updates
       localStorage.setItem('lastUpdate', Date.now().toString());
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('chapterUpdate'));
       
       setHasUnsavedChanges(false);
       setSaveSuccess(true);
