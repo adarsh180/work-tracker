@@ -32,39 +32,49 @@ export async function GET() {
         
         const completionPercentage = totalChapters > 0 ? (completedChapters / totalChapters) * 100 : 0;
         
-        // Weekly progress calculation based on chapter completion
+        // Calculate actual progress data for charts
+        const totalLectures = chapterProgressData.filter((p: any) => p.completed).length;
+        const totalDPPs = chapterProgressData.filter((p: any) => p.dpp_completed).length;
+        const totalAssignments = chapterProgressData.filter((p: any) => 
+          p.normal_assignment_1 || p.normal_assignment_2 || p.kattar_assignment
+        ).length;
+        const totalQuestions = chapterProgressData.reduce((sum: number, p: any) => sum + (p.questions_solved || 0), 0);
+        
+        // Weekly progress based on actual data
         const weeklyProgress = Array.from({ length: 7 }, (_, i) => {
           const date = new Date();
-          date.setDate(date.getDate() - i);
+          date.setDate(date.getDate() - 6 + i);
           const dayStart = new Date(date.setHours(0, 0, 0, 0));
           const dayEnd = new Date(date.setHours(23, 59, 59, 999));
           
-          // Count chapters completed on this day
-          const chaptersCompletedToday = chapterProgressData.filter((p: any) => {
-            const updateDate = new Date(p.updated_at || p.date);
-            return updateDate >= dayStart && updateDate <= dayEnd && p.completed;
-          }).length;
+          // Count actual progress made on this day
+          const dayProgress = chapterProgressData.filter((p: any) => {
+            const updateDate = new Date(p.updated_at);
+            return updateDate >= dayStart && updateDate <= dayEnd;
+          });
           
-          // Also include study session hours for better visualization
-          const sessionHours = subjectSessions
-            .filter((s: any) => {
-              const sessionDate = new Date(s.date);
-              return sessionDate >= dayStart && sessionDate <= dayEnd;
-            })
-            .reduce((sum: number, s: any) => sum + s.duration, 0) / 60;
+          const dayLectures = dayProgress.filter((p: any) => p.completed).length;
+          const dayDPPs = dayProgress.filter((p: any) => p.dpp_completed).length;
+          const dayAssignments = dayProgress.filter((p: any) => 
+            p.normal_assignment_1 || p.normal_assignment_2 || p.kattar_assignment
+          ).length;
           
-          return Math.max(chaptersCompletedToday * 2, sessionHours); // Weight chapters more
-        }).reverse();
+          return dayLectures + dayDPPs + dayAssignments;
+        });
 
         return {
-          subject: subjectInfo.name,
+          subject: subjectInfo.name.toLowerCase(),
           totalHours: Math.round(totalHours * 10) / 10,
           completedTopics: completedChapters,
           totalTopics: totalChapters,
           averageScore: Math.round(averageScore),
           weeklyProgress,
           completionPercentage: Math.round(completionPercentage),
-          emoji: getEmojiForPercentage(completionPercentage)
+          emoji: getEmojiForPercentage(completionPercentage),
+          lectures: totalLectures,
+          dpps: totalDPPs,
+          assignments: totalAssignments,
+          questions: totalQuestions
         };
       })
     );
@@ -88,14 +98,18 @@ export async function GET() {
       totalStudyHours: 0,
       weeklyGoal: 40,
       subjectProgress: Object.entries(SUBJECTS_DATA).map(([subjectId, subjectInfo]) => ({
-        subject: subjectInfo.name,
+        subject: subjectInfo.name.toLowerCase(),
         totalHours: 0,
         completedTopics: 0,
         totalTopics: subjectInfo.chapters.length,
         averageScore: 0,
         weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
         completionPercentage: 0,
-        emoji: '📚'
+        emoji: '📚',
+        lectures: 0,
+        dpps: 0,
+        assignments: 0,
+        questions: 0
       })),
       recentSessions: [],
       lastUpdated: new Date().toISOString()

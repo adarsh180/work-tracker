@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, BarChart3, PieChart, TrendingUp, Clock, Target, BookOpen, Sparkles, Brain } from 'lucide-react';
+import DailyDashboard from '@/components/DailyDashboard';
 import CountdownTimer from '@/components/CountdownTimer';
 import DailyQuote from '@/components/DailyQuote';
 import SubjectOverview from '@/components/SubjectOverview';
@@ -10,6 +11,8 @@ import TestOverviewCard from '@/components/TestOverviewCard';
 import PredictorCard from '@/components/PredictorCard';
 import StudyChart from '@/components/StudyChart';
 import AIFeedbackPanel from '@/components/AIFeedbackPanel';
+import CalendarCard from '@/components/CalendarCard';
+import StreakDisplay from '@/components/StreakDisplay';
 
 import { DashboardData, AIFeedback } from '@/types';
 
@@ -20,16 +23,18 @@ export default function Dashboard() {
   const [tests, setTests] = useState<any[]>([]);
   const [predictorData, setPredictorData] = useState<any>(null);
   const [chartType, setChartType] = useState<'line' | 'bar' | 'pie'>('line');
+  const [dailyChartType, setDailyChartType] = useState<'line' | 'bar'>('line');
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
-      const [analyticsRes, feedbackRes, quoteRes, testsRes, predictorRes] = await Promise.all([
+      const [analyticsRes, feedbackRes, quoteRes, testsRes, predictorRes, dailyLogsRes] = await Promise.all([
         fetch('/api/analytics'),
         fetch('/api/ai-feedback'),
         fetch('/api/daily-quote'),
         fetch('/api/tests'),
-        fetch('/api/predictor')
+        fetch('/api/predictor'),
+        fetch('/api/daily-log?days=7')
       ]);
       
       const analytics = await analyticsRes.json();
@@ -37,8 +42,12 @@ export default function Dashboard() {
       const quote = await quoteRes.json();
       const testsData = await testsRes.json();
       const predictor = await predictorRes.json();
+      const dailyLogs = await dailyLogsRes.json();
       
-      setDashboardData(analytics);
+      setDashboardData({
+        ...analytics,
+        dailyLogs
+      });
       setAiFeedback(feedback);
       setDailyQuote(quote.quote);
       setTests(testsData);
@@ -132,9 +141,27 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">
-                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse-glow">Misti!</span>
+                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse-glow">Divyani!</span>
               </h1>
               <p className="text-gray-300">Track your NEET preparation journey with AI-powered insights</p>
+            </div>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={() => window.location.href = '/daily'}
+                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-glow hover:shadow-lg"
+              >
+                <span>📅</span>
+                <span>Daily Tracker</span>
+              </button>
+              
+              <button
+                onClick={() => window.location.href = '/error-log'}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-glow hover:shadow-lg"
+              >
+                <span>⚠️</span>
+                <span>Error Log</span>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -188,6 +215,15 @@ export default function Dashboard() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
+              <h2 className="text-2xl font-bold text-white mb-6">Study Calendar</h2>
+              <CalendarCard />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
               <h2 className="text-2xl font-bold text-white mb-6">Test Overview</h2>
               <TestOverviewCard 
                 totalTests={Array.isArray(tests) ? tests.length : 0}
@@ -197,39 +233,92 @@ export default function Dashboard() {
               />
             </motion.div>
             
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              <h2 className="text-2xl font-bold text-white mb-6">Fire Streak</h2>
+              <StreakDisplay />
+            </motion.div>
+            
             {predictorData && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.8 }}
+                className="cursor-pointer"
+                onClick={() => window.location.href = '/predictor'}
               >
-                <h2 className="text-2xl font-bold text-white mb-6">NEET Predictor</h2>
-                <PredictorCard 
-                  totalQuestions={predictorData.totalQuestionsAttempted}
-                  progressPercentage={predictorData.progressPercentage}
-                  emoji={predictorData.questionEmoji}
-                  daysRemaining={predictorData.daysRemaining}
-                />
+                <h2 className="text-2xl font-bold text-white mb-6">NEET Success Predictor</h2>
+                <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6 hover:shadow-glow transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-3xl">{predictorData.questionEmoji}</span>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">Success Probability</h3>
+                        <p className="text-gray-400 text-sm">AI-Powered Analysis</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-green-400">{predictorData.successProbability}%</div>
+                      <p className="text-xs text-gray-400">NEET Success</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-400 mb-2">
+                      <span>Preparation Level</span>
+                      <span>{predictorData.successProbability}%</span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                        style={{ width: `${predictorData.successProbability}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="bg-gray-700 rounded-lg p-3">
+                      <div className="text-lg font-bold text-blue-400">{predictorData.rankPrediction?.category || 'Calculating...'}</div>
+                      <p className="text-xs text-gray-400">Predicted Rank</p>
+                    </div>
+                    <div className="bg-gray-700 rounded-lg p-3">
+                      <div className="text-lg font-bold text-pink-400">{predictorData.aiimsDelhiProbability}%</div>
+                      <p className="text-xs text-gray-400">AIIMS Delhi</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 text-center">
+                    <span className="text-xs text-gray-500">Click to view detailed analysis</span>
+                  </div>
+                </div>
               </motion.div>
             )}
           </div>
         </div>
 
+        {/* Daily Dashboard */}
+        <div className="mb-8">
+          <DailyDashboard onUpdate={() => fetchData()} />
+        </div>
+
         {/* Charts and AI Feedback */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Subject Progress Charts */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 }}
-              className="mb-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-white">Study Analytics</h2>
+                <h2 className="text-2xl font-bold text-white">Subject Progress Analytics</h2>
                 <div className="flex space-x-2">
                   {[
                     { type: 'line' as const, icon: TrendingUp, label: 'Trend' },
-                    { type: 'bar' as const, icon: BarChart3, label: 'Daily' },
+                    { type: 'bar' as const, icon: BarChart3, label: 'Progress' },
                     { type: 'pie' as const, icon: PieChart, label: 'Distribution' }
                   ].map(({ type, icon: Icon, label }) => (
                     <button
@@ -247,7 +336,38 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-              <StudyChart data={dashboardData.subjectProgress} type={chartType} />
+              <StudyChart data={dashboardData.subjectProgress || []} type={chartType} />
+            </motion.div>
+
+            {/* Daily Logs Charts */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white">Daily Question Analytics</h2>
+                <div className="flex space-x-2">
+                  {[
+                    { type: 'line' as const, icon: TrendingUp, label: 'Trend' },
+                    { type: 'bar' as const, icon: BarChart3, label: 'Daily' }
+                  ].map(({ type, icon: Icon, label }) => (
+                    <button
+                      key={`daily-${type}`}
+                      onClick={() => setDailyChartType(type)}
+                      className={`p-2 rounded-lg transition-all duration-200 ${
+                        dailyChartType === type
+                          ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-glow'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                      title={label}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <StudyChart data={dashboardData.dailyLogs || []} type={dailyChartType} />
             </motion.div>
           </div>
 

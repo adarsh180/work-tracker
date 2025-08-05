@@ -122,6 +122,195 @@ export async function initDatabase() {
         console.log('Daily quotes table creation skipped:', error.message);
       }
     }
+
+    // New tables for Divyani's daily tracking
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          target_college VARCHAR(100) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Users table creation skipped:', error.message);
+      }
+    }
+
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS daily_logs (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER DEFAULT 1,
+          date DATE DEFAULT CURRENT_DATE,
+          bot_qs INTEGER DEFAULT 0,
+          zoo_qs INTEGER DEFAULT 0,
+          phy_qs INTEGER DEFAULT 0,
+          chem_qs INTEGER DEFAULT 0,
+          bot_class BOOLEAN DEFAULT FALSE,
+          zoo_class BOOLEAN DEFAULT FALSE,
+          phy_class BOOLEAN DEFAULT FALSE,
+          chem_class BOOLEAN DEFAULT FALSE,
+          bot_dpp BOOLEAN DEFAULT FALSE,
+          zoo_dpp BOOLEAN DEFAULT FALSE,
+          phy_dpp BOOLEAN DEFAULT FALSE,
+          chem_dpp BOOLEAN DEFAULT FALSE,
+          bot_assignment BOOLEAN DEFAULT FALSE,
+          zoo_assignment BOOLEAN DEFAULT FALSE,
+          phy_assignment BOOLEAN DEFAULT FALSE,
+          chem_assignment BOOLEAN DEFAULT FALSE,
+          revision_done BOOLEAN DEFAULT FALSE,
+          errors_fixed INTEGER DEFAULT 0,
+          total_questions INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id, date)
+        );
+      `);
+      
+      // Add missing columns if they don't exist
+      const columns = [
+        'bot_qs INTEGER DEFAULT 0',
+        'zoo_qs INTEGER DEFAULT 0', 
+        'phy_qs INTEGER DEFAULT 0',
+        'chem_qs INTEGER DEFAULT 0',
+        'total_questions INTEGER DEFAULT 0',
+        'total_lifetime_questions INTEGER DEFAULT 0'
+      ];
+      
+      for (const column of columns) {
+        try {
+          await client.query(`ALTER TABLE daily_logs ADD COLUMN IF NOT EXISTS ${column}`);
+        } catch (e) {}
+      }
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Daily logs table creation skipped:', error.message);
+      }
+    }
+
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS error_logs (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) DEFAULT 1,
+          subject VARCHAR(20) NOT NULL,
+          chapter VARCHAR(255) NOT NULL,
+          mistake TEXT NOT NULL,
+          fix TEXT,
+          reattempted BOOLEAN DEFAULT FALSE,
+          fixed_date DATE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Error logs table creation skipped:', error.message);
+      }
+    }
+
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS mock_tests (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) DEFAULT 1,
+          date DATE DEFAULT CURRENT_DATE,
+          score INTEGER NOT NULL,
+          max_score INTEGER DEFAULT 720,
+          subject_scores JSONB DEFAULT '{}',
+          top_mistakes TEXT[],
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Mock tests table creation skipped:', error.message);
+      }
+    }
+
+    // Calendar entries table
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS calendar_entries (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) DEFAULT 1,
+          date DATE NOT NULL,
+          status VARCHAR(10) CHECK (status IN ('good', 'average', 'bad')) NOT NULL,
+          notes TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id, date)
+        );
+      `);
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Calendar entries table creation skipped:', error.message);
+      }
+    }
+
+    // Streak tracking table
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS streak_tracking (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER DEFAULT 1,
+          current_streak INTEGER DEFAULT 0,
+          longest_streak INTEGER DEFAULT 0,
+          last_streak_date DATE,
+          streak_broken_date DATE,
+          total_fire_days INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id)
+        );
+      `);
+      
+      // Also create streak_data table for compatibility
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS streak_data (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER DEFAULT 1,
+          current_streak INTEGER DEFAULT 0,
+          longest_streak INTEGER DEFAULT 0,
+          last_streak_date DATE,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id)
+        );
+      `);
+    } catch (error: any) {
+      if (error.code !== '42P07') {
+        console.log('Streak tracking table creation skipped:', error.message);
+      }
+    }
+
+    // Insert default user (Divyani)
+    try {
+      await client.query(`
+        INSERT INTO users (name, target_college) 
+        VALUES ('Divyani Tiwari', 'AIIMS Delhi')
+        ON CONFLICT DO NOTHING;
+      `);
+    } catch (error: any) {
+      console.log('Default user insertion skipped:', error.message);
+    }
+
+    // Initialize streak tracking for default user
+    try {
+      await client.query(`
+        INSERT INTO streak_tracking (user_id, current_streak, longest_streak, total_fire_days)
+        VALUES (1, 0, 0, 0)
+        ON CONFLICT (user_id) DO NOTHING;
+      `);
+      
+      await client.query(`
+        INSERT INTO streak_data (user_id, current_streak, longest_streak)
+        VALUES (1, 0, 0)
+        ON CONFLICT (user_id) DO NOTHING;
+      `);
+    } catch (error: any) {
+      console.log('Default streak tracking insertion skipped:', error.message);
+    }
   } finally {
     client.release();
   }
@@ -353,6 +542,342 @@ export async function getPredictorData() {
       subjectTests: subjectTests.rows,
       progress: progress.rows
     };
+  } finally {
+    client.release();
+  }
+}
+
+// New functions for Divyani's daily tracking
+export async function saveDailyLog(logData: any) {
+  const client = await pool.connect();
+  try {
+    const totalQuestions = (logData.botQs || 0) + (logData.zooQs || 0) + (logData.phyQs || 0) + (logData.chemQs || 0);
+    
+    // Get previous total to calculate lifetime total
+    const prevTotal = await client.query(
+      'SELECT COALESCE(SUM(total_questions), 0) as lifetime_total FROM daily_logs WHERE user_id = $1 AND date < $2',
+      [logData.userId || 1, logData.date]
+    );
+    const lifetimeTotal = parseInt(prevTotal.rows[0].lifetime_total) + totalQuestions;
+    
+    const result = await client.query(`
+      INSERT INTO daily_logs 
+      (user_id, date, bot_qs, zoo_qs, phy_qs, chem_qs, 
+       bot_class, zoo_class, phy_class, chem_class,
+       bot_dpp, zoo_dpp, phy_dpp, chem_dpp, 
+       bot_assignment, zoo_assignment, phy_assignment, chem_assignment,
+       revision_done, errors_fixed, total_questions, total_lifetime_questions)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+      ON CONFLICT (user_id, date) 
+      DO UPDATE SET 
+        bot_qs = $3, zoo_qs = $4, phy_qs = $5, chem_qs = $6,
+        bot_class = $7, zoo_class = $8, phy_class = $9, chem_class = $10,
+        bot_dpp = $11, zoo_dpp = $12, phy_dpp = $13, chem_dpp = $14,
+        bot_assignment = $15, zoo_assignment = $16, phy_assignment = $17, chem_assignment = $18,
+        revision_done = $19, errors_fixed = $20, total_questions = $21, total_lifetime_questions = $22
+      RETURNING *
+    `, [
+      logData.userId || 1, logData.date, 
+      logData.botQs || 0, logData.zooQs || 0, logData.phyQs || 0, logData.chemQs || 0,
+      logData.botClass || false, logData.zooClass || false, logData.phyClass || false, logData.chemClass || false,
+      logData.botDpp || false, logData.zooDpp || false, logData.phyDpp || false, logData.chemDpp || false,
+      logData.botAssignment || false, logData.zooAssignment || false, logData.phyAssignment || false, logData.chemAssignment || false,
+      logData.revisionDone || false, logData.errorsFixed || 0, totalQuestions, lifetimeTotal
+    ]);
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function getDailyLogs(userId: number = 1, days: number = 30) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'SELECT * FROM daily_logs WHERE user_id = $1 ORDER BY date DESC LIMIT $2',
+      [userId, days]
+    );
+    return result.rows;
+  } catch (error: any) {
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
+  } finally {
+    client.release();
+  }
+}
+
+export async function getTodayLog(userId: number = 1) {
+  const client = await pool.connect();
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if it's a new day (00:00 IST) and reset daily counters
+    const istTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    const istDate = new Date(istTime).toISOString().split('T')[0];
+    
+    let result = await client.query(
+      'SELECT * FROM daily_logs WHERE user_id = $1 AND date = $2',
+      [userId, istDate]
+    );
+    
+    // If no record for today, create one with reset values
+    if (result.rows.length === 0) {
+      // Get lifetime total from previous days
+      const lifetimeResult = await client.query(
+        'SELECT COALESCE(SUM(total_questions), 0) as lifetime_total FROM daily_logs WHERE user_id = $1 AND date < $2',
+        [userId, istDate]
+      );
+      const lifetimeTotal = parseInt(lifetimeResult.rows[0].lifetime_total);
+      
+      await client.query(`
+        INSERT INTO daily_logs 
+        (user_id, date, bot_qs, zoo_qs, phy_qs, chem_qs, total_questions, total_lifetime_questions)
+        VALUES ($1, $2, 0, 0, 0, 0, 0, $3)
+      `, [userId, istDate, lifetimeTotal]);
+      
+      result = await client.query(
+        'SELECT * FROM daily_logs WHERE user_id = $1 AND date = $2',
+        [userId, istDate]
+      );
+    }
+    
+    return result.rows[0] || null;
+  } catch (error: any) {
+    console.warn('Database error, returning null:', error.message);
+    return null;
+  } finally {
+    client.release();
+  }
+}
+
+export async function addErrorLog(errorData: any) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'INSERT INTO error_logs (user_id, subject, chapter, mistake, fix, reattempted, fixed_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [errorData.userId || 1, errorData.subject, errorData.chapter, errorData.mistake, errorData.fix, errorData.reattempted, errorData.fixedDate]
+    );
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function getErrorLogs(userId: number = 1) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'SELECT * FROM error_logs WHERE user_id = $1 ORDER BY created_at DESC',
+      [userId]
+    );
+    return result.rows;
+  } catch (error: any) {
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
+  } finally {
+    client.release();
+  }
+}
+
+export async function addMockTest(testData: any) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'INSERT INTO mock_tests (user_id, date, score, max_score, subject_scores, top_mistakes) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [testData.userId || 1, testData.date, testData.score, testData.maxScore, JSON.stringify(testData.subjectScores), testData.topMistakes]
+    );
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function getMockTests(userId: number = 1) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'SELECT * FROM mock_tests WHERE user_id = $1 ORDER BY date DESC',
+      [userId]
+    );
+    return result.rows;
+  } catch (error: any) {
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
+  } finally {
+    client.release();
+  }
+}
+
+// Calendar functions
+export async function saveCalendarEntry(entryData: any) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      INSERT INTO calendar_entries (user_id, date, status, notes)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (user_id, date)
+      DO UPDATE SET 
+        status = $3,
+        notes = $4,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `, [entryData.userId || 1, entryData.date, entryData.status, entryData.notes]);
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function getCalendarEntries(userId: number = 1, startDate?: string, endDate?: string) {
+  const client = await pool.connect();
+  try {
+    let query = 'SELECT * FROM calendar_entries WHERE user_id = $1';
+    const params: any[] = [userId];
+    
+    if (startDate && endDate) {
+      query += ' AND date BETWEEN $2 AND $3';
+      params.push(startDate, endDate);
+    }
+    
+    query += ' ORDER BY date DESC';
+    
+    const result = await client.query(query, params);
+    return result.rows;
+  } catch (error: any) {
+    console.warn('Database error, returning empty array:', error.message);
+    return [];
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteCalendarEntry(userId: number, date: string) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'DELETE FROM calendar_entries WHERE user_id = $1 AND date = $2 RETURNING *',
+      [userId, date]
+    );
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateErrorLog(errorId: number, updateData: any) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      UPDATE error_logs 
+      SET subject = $2, chapter = $3, mistake = $4, fix = $5, 
+          reattempted = $6, fixed_date = $7
+      WHERE id = $1
+      RETURNING *
+    `, [errorId, updateData.subject, updateData.chapter, updateData.mistake, 
+        updateData.fix, updateData.reattempted, updateData.fixedDate]);
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteErrorLog(errorId: number) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'DELETE FROM error_logs WHERE id = $1 RETURNING *',
+      [errorId]
+    );
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+// Streak management functions
+export async function getStreakData(userId: number = 1) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      'SELECT * FROM streak_tracking WHERE user_id = $1',
+      [userId]
+    );
+    return result.rows[0] || {
+      current_streak: 0,
+      longest_streak: 0,
+      last_streak_date: null,
+      total_fire_days: 0
+    };
+  } catch (error: any) {
+    return {
+      current_streak: 0,
+      longest_streak: 0,
+      last_streak_date: null,
+      total_fire_days: 0
+    };
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateStreak(userId: number = 1, isFireDay: boolean) {
+  const client = await pool.connect();
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    // Get current streak data
+    const currentStreak = await getStreakData(userId);
+    
+    let newCurrentStreak = 0;
+    let newLongestStreak = currentStreak.longest_streak;
+    let newTotalFireDays = currentStreak.total_fire_days;
+    let streakBrokenDate = null;
+    
+    if (isFireDay) {
+      // Check if this continues a streak
+      if (currentStreak.last_streak_date === yesterday) {
+        newCurrentStreak = currentStreak.current_streak + 1;
+      } else if (currentStreak.last_streak_date === today) {
+        // Same day update, don't increment
+        newCurrentStreak = currentStreak.current_streak;
+      } else {
+        // New streak starts
+        newCurrentStreak = 1;
+      }
+      
+      newTotalFireDays = currentStreak.total_fire_days + 1;
+      
+      // Update longest streak if current is longer
+      if (newCurrentStreak > newLongestStreak) {
+        newLongestStreak = newCurrentStreak;
+      }
+    } else {
+      // Check if streak should be broken
+      if (currentStreak.last_streak_date && currentStreak.last_streak_date < yesterday) {
+        newCurrentStreak = 0;
+        streakBrokenDate = today;
+      } else {
+        newCurrentStreak = currentStreak.current_streak;
+      }
+    }
+    
+    const result = await client.query(`
+      INSERT INTO streak_tracking 
+      (user_id, current_streak, longest_streak, last_streak_date, streak_broken_date, total_fire_days, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+      ON CONFLICT (user_id)
+      DO UPDATE SET 
+        current_streak = $2,
+        longest_streak = $3,
+        last_streak_date = $4,
+        streak_broken_date = $5,
+        total_fire_days = $6,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `, [userId, newCurrentStreak, newLongestStreak, isFireDay ? today : currentStreak.last_streak_date, streakBrokenDate, newTotalFireDays]);
+    
+    return result.rows[0];
   } finally {
     client.release();
   }
