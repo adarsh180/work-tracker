@@ -29,9 +29,11 @@ export default function SignIn() {
         })
 
         if (result?.error) {
-          setError('Authentication failed. Please try again.')
+          console.error('SignIn error:', result.error)
+          setError(`Authentication failed: ${result.error}`)
         } else {
-          router.push('/')
+          console.log('SignIn successful, redirecting to dashboard')
+          router.push('/dashboard')
         }
       } catch (error) {
         setError('Something went wrong. Please try again.')
