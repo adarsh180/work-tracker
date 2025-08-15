@@ -60,12 +60,15 @@ export async function GET(request: NextRequest) {
       new Date(g.date) >= monthStart && new Date(g.date) <= today
     )
 
-    // Calculate chapter-wise questions (DPP + Assignment + Kattar)
-    const chapterQuestions = chapters.reduce((total, chapter) => {
-      const dppCompleted = chapter.dppCompleted.filter(Boolean).length
-      const assignmentCompleted = chapter.assignmentCompleted.filter(Boolean).length
-      const kattarCompleted = chapter.kattarCompleted.filter(Boolean).length
-      return total + dppCompleted + assignmentCompleted + kattarCompleted
+    // Calculate chapter-wise questions from subjects data
+    const chapterQuestions = subjects.reduce((total, subject) => {
+      const subjectTotal = subject.chapters.reduce((chapterSum, chapter) => {
+        const dppCompleted = chapter.dppCompleted.filter(Boolean).length
+        const assignmentCompleted = chapter.assignmentCompleted.filter(Boolean).length
+        const kattarCompleted = chapter.kattarCompleted.filter(Boolean).length
+        return chapterSum + dppCompleted + assignmentCompleted + kattarCompleted
+      }, 0)
+      return total + subjectTotal
     }, 0)
 
     const questionStats = {
