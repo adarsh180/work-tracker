@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     subjectProgress.overall = (subjectProgress.physics + subjectProgress.chemistry + 
                              subjectProgress.botany + subjectProgress.zoology) / 4
 
-    // Calculate question stats
+    // Calculate question stats including chapter-wise questions
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
@@ -60,11 +60,20 @@ export async function GET(request: NextRequest) {
       new Date(g.date) >= monthStart && new Date(g.date) <= today
     )
 
+    // Calculate chapter-wise questions (DPP + Assignment + Kattar)
+    const chapterQuestions = chapters.reduce((total, chapter) => {
+      const dppCompleted = chapter.dppCompleted.filter(Boolean).length
+      const assignmentCompleted = chapter.assignmentCompleted.filter(Boolean).length
+      const kattarCompleted = chapter.kattarCompleted.filter(Boolean).length
+      return total + dppCompleted + assignmentCompleted + kattarCompleted
+    }, 0)
+
     const questionStats = {
       daily: todayGoal?.totalQuestions || 0,
       weekly: weeklyGoals.reduce((sum, g) => sum + g.totalQuestions, 0),
       monthly: monthlyGoals.reduce((sum, g) => sum + g.totalQuestions, 0),
-      lifetime: dailyGoals.reduce((sum, g) => sum + g.totalQuestions, 0)
+      lifetime: dailyGoals.reduce((sum, g) => sum + g.totalQuestions, 0) + chapterQuestions,
+      chapterwise: chapterQuestions
     }
 
     // Calculate test performance

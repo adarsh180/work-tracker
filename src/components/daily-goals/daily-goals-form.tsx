@@ -139,6 +139,9 @@ export default function DailyGoalsForm() {
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
       queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['recent-goals'] })
+      
+      // Sync analytics for real-time updates
+      fetch('/api/sync-analytics', { method: 'POST' })
 
       setTimeout(() => setSubmitStatus('idle'), 3000)
 
@@ -172,6 +175,7 @@ export default function DailyGoalsForm() {
       queryClient.invalidateQueries({ queryKey: ['daily-goal-today'] })
       queryClient.invalidateQueries({ queryKey: ['daily-goal-summary'] })
       queryClient.invalidateQueries({ queryKey: ['question-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
 
     } catch (error) {
       console.error('Error deleting daily goal:', error)

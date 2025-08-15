@@ -18,6 +18,7 @@ type DashboardAnalytics = {
     weekly: number
     monthly: number
     lifetime: number
+    chapterwise: number
   }
   testPerformance: {
     totalTests: number
@@ -41,8 +42,8 @@ export default function RealTimeAnalytics() {
       const result = await response.json()
       return result.data
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
-    staleTime: 10000 // Consider data stale after 10 seconds
+    refetchInterval: 5000, // Refresh every 5 seconds for real-time updates
+    staleTime: 1000 // Consider data stale after 1 second
   })
 
   if (isLoading || !analytics) {
@@ -136,8 +137,12 @@ export default function RealTimeAnalytics() {
               </div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between text-gray-300">
-                  <span>Today</span>
+                  <span>Today (Goals)</span>
                   <span>{analytics.questionStats.daily}</span>
+                </div>
+                <div className="flex justify-between text-gray-300">
+                  <span>Chapter Q's</span>
+                  <span>{analytics.questionStats.chapterwise}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>This Week</span>
