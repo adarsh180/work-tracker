@@ -47,6 +47,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // Redirect to dashboard after login
+      if (url.startsWith(baseUrl)) {
+        return url === baseUrl ? `${baseUrl}/dashboard` : url
+      }
+      return `${baseUrl}/dashboard`
+    },
   },
   debug: process.env.NODE_ENV === 'development',
 }

@@ -7,8 +7,9 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Allow access to landing page and auth pages
-        if (req.nextUrl.pathname.startsWith('/landing') || 
+        // Allow access to landing page, auth pages, and root
+        if (req.nextUrl.pathname === '/' ||
+            req.nextUrl.pathname.startsWith('/landing') || 
             req.nextUrl.pathname.startsWith('/auth')) {
           return true
         }
@@ -22,6 +23,6 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|landing).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|landing|auth).*)',
   ],
 }
