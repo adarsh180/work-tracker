@@ -1,0 +1,226 @@
+import { prisma } from '../prisma'
+import { Subject, Chapter } from '@prisma/client'
+
+export type SubjectWithChapters = Subject & {
+  chapters: Chapter[]
+}
+
+export type ChapterProgress = {
+  lectureProgress: number
+  dppProgress: number
+  assignmentProgress: number
+  kattarProgress: number
+  overallProgress: number
+}
+
+export type SubjectProgress = {
+  totalLectures: number
+  completedLectures: number
+  totalDpp: number
+  completedDpp: number
+  totalAssignments: number
+  completedAssignments: number
+  totalKattar: number
+  completedKattar: number
+  overallCompletion: number
+}
+
+/**
+ * Subject Repository - CRUD operations for subjects
+ */
+export class SubjectRepository {
+  /**
+   * Get all subjects with their chapters
+   */
+  static async getAll(): Promise<SubjectWithChapters[]> {
+    return await prisma.subject.findMany({
+      include: {
+        chapters: {
+          orderBy: { name: 'asc' }
+        }
+      },
+      orderBy: { name: 'asc' }
+    })
+  }
+
+  /**
+   * Get a specific subject by ID with chapters
+   */
+  static async getByIdWithChapters(subjectId: string): Promise<SubjectWithChapters | null> {
+    return await prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: {
+        chapters: {
+          orderBy: { name: 'asc' }
+        }
+      }
+    })
+  }
+
+  /**
+   * Get a subject by name
+   */
+  static async getByName(name: string): Promise<SubjectWithChapters | null> {
+    return await prisma.subject.findFirst({
+      where: {
+        name
+      },
+      include: {
+        chapters: {
+          orderBy: { name: 'asc' }
+        }
+      }
+    })
+  }
+
+  /**
+   * Create a new subject
+   */
+  static async create(data: {
+    name: string
+    totalQuestions?: number
+    completionPercentage?: number
+  }): Promise<Subject> {
+    return await prisma.subject.create({
+      data: {
+        name: data.name,
+        totalQuestions: data.totalQuestions ?? 0,
+        completionPercentage: data.completionPercentage ?? 0
+      }
+    })
+  }
+
+  /**
+   * Update subject completion percentage and total questions
+   */
+  static async updateProgress(subjectId: string, data: {
+    completionPercentage?: number
+    totalQuestions?: number
+  }): Promise<Subject> {
+    return await prisma.subject.update({
+      where: { id: subjectId },
+      data
+    })
+  }
+
+  /**
+   * Calculate and update subject progress based on chapters
+   */
+  static async calculateAndUpdateProgress(subjectId: string): Promise<SubjectProgress> {
+    const chapters = await prisma.chapter.findMany({
+      where: { subjectId }
+    })
+
+    if (chapters.length === 0) {
+      await this.updateProgress(subjectId, { completionPercentage: 0, totalQuestions: 0 })
+      return {
+        totalLectures: 0,
+        completedLectures: 0,
+        totalDpp: 0,
+        completedDpp: 0,
+        totalAssignments: 0,
+        completedAssignments: 0,
+        totalKattar: 0,
+        completedKattar: 0,
+        overallCompletion: 0
+      }
+    }
+
+    let totalLectures = 0
+    let completedLectures = 0
+    let totalDpp = 0
+    let completedDpp = 0
+    let totalAssignments = 0
+    let completedAssignments = 0
+    let totalKattar = 0
+    let completedKattar = 0
+    let totalQuestions = 0
+
+    chapters.forEach(chapter => {
+      // Lectures
+      totalLectures += chapter.lectureCount
+      completedLectures += chapter.lecturesCompleted.filter(Boolean).length
+
+      // DPP (equals lecture count)
+      totalDpp += chapter.lectureCount
+      completedDpp += chapter.dppCompleted.filter(Boolean).length
+
+      // Assignments
+      totalAssignments += chapter.assignmentQuestions
+      completedAssignments += chapter.assignmentCompleted.filter(Boolean).length
+
+      // Kattar questions
+      totalKattar += chapter.kattarQuestions
+      completedKattar += chapter.kattarCompleted.filter(Boolean).length
+
+      // Total questions for analytics
+      totalQuestions += chapter.assignmentQuestions + chapter.kattarQuestions
+    })
+
+    // Calculate overall completion percentage
+    const totalItems = totalLectures + totalDpp + totalAssignments + totalKattar
+    const completedItems = completedLectures + completedDpp + completedAssignments + completedKattar
+    const overallCompletion = totalItems > 0 ? (completedItems / totalItems) * 100 : 0
+
+    // Update subject in database
+    await this.updateProgress(subjectId, {
+      completionPercentage: overallCompletion,
+      totalQuestions
+    })
+
+    return {
+      totalLectures,
+      completedLectures,
+      totalDpp,
+      completedDpp,
+      totalAssignments,
+      completedAssignments,
+      totalKattar,
+      completedKattar,
+      overallCompletion
+    }
+  }
+
+  /**
+   * Delete a subject and all its chapters
+   */
+  static async delete(subjectId: string): Promise<void> {
+    await prisma.subject.delete({
+      where: { id: subjectId }
+    })
+  }
+
+  /**
+   * Get subjects with progress summary for dashboard
+   */
+  static async getDashboardSummary() {
+    const subjects = await this.getAll()
+    
+    return subjects.map(subject => {
+      const totalChapters = subject.chapters.length
+      let totalLectures = 0
+      let completedLectures = 0
+      let totalQuestions = 0
+
+      subject.chapters.forEach(chapter => {
+        totalLectures += chapter.lectureCount
+        completedLectures += chapter.lecturesCompleted.filter(Boolean).length
+        totalQuestions += chapter.assignmentQuestions + chapter.kattarQuestions
+      })
+
+      return {
+        id: subject.id,
+        name: subject.name,
+        totalChapters,
+        completionPercentage: subject.completionPercentage,
+        totalLectures,
+        completedLectures,
+        totalQuestions,
+        // Emoji logic based on completion percentage
+        emoji: subject.completionPercentage < 75 ? '😢' : 
+               subject.completionPercentage < 85 ? '😟' :
+               subject.completionPercentage < 95 ? '😊' : '😘'
+      }
+    })
+  }
+}

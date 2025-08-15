@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subject {
+  id                   String  @id @default(cuid())
+  name                 String  @unique
+  totalQuestions       Int     @default(0) @map("total_questions")
+  completionPercentage Float   @default(0) @map("completion_percentage")
+
+  chapters Chapter[]
+
+  @@map("subjects")
+}
+
+model Chapter {
+  id                    String  @id @default(cuid())
+  subjectId             String  @map("subject_id")
+  name                  String
+  lectureCount          Int     @map("lecture_count")
+  lecturesCompleted     Boolean[] @default([]) @map("lectures_completed")
+  dppCompleted          Boolean[] @default([]) @map("dpp_completed")
+  dppQuestionCounts     Int[]     @default([]) @map("dpp_question_counts")
+  assignmentQuestions   Int     @default(0) @map("assignment_questions")
+  assignmentCompleted   Boolean[] @default([]) @map("assignment_completed")
+  kattarQuestions       Int     @default(0) @map("kattar_questions")
+  kattarCompleted       Boolean[] @default([]) @map("kattar_completed")
+  revisionScore         Int     @default(1) @map("revision_score") @db.SmallInt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, name])
+  @@map("chapters")
+}
+
+model TestPerformance {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  testType   String   @map("test_type")
+  testNumber String   @map("test_number") // e.g., "Test-01", "Test-02"
+  score      Int      @db.SmallInt // 0-720 range
+  testDate   DateTime @map("test_date")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("test_performances")
+}
+
+model MoodEntry {
+  id   String   @id @default(cuid())
+  date DateTime @unique @db.Date
+  mood String   // 'sad', 'neutral', 'happy'
+
+  @@map("mood_entries")
+}
+
+model QuestionAnalytics {
+  id            String   @id @default(cuid())
+  date          DateTime @unique @db.Date
+  dailyCount    Int      @default(0) @map("daily_count")
+  weeklyCount   Int      @default(0) @map("weekly_count")
+  monthlyCount  Int      @default(0) @map("monthly_count")
+  lifetimeCount Int      @default(0) @map("lifetime_count")
+
+  @@map("question_analytics")
+}
+
+model DailyGoal {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  date              DateTime @unique @db.Date
+  physicsQuestions  Int      @default(0) @map("physics_questions")
+  chemistryQuestions Int     @default(0) @map("chemistry_questions")
+  botanyQuestions   Int      @default(0) @map("botany_questions")
+  zoologyQuestions  Int      @default(0) @map("zoology_questions")
+  physicsDpp        Int      @default(0) @map("physics_dpp")
+  chemistryDpp      Int      @default(0) @map("chemistry_dpp")
+  botanyDpp         Int      @default(0) @map("botany_dpp")
+  zoologyDpp        Int      @default(0) @map("zoology_dpp")
+  physicsRevision   Int      @default(0) @map("physics_revision")
+  chemistryRevision Int      @default(0) @map("chemistry_revision")
+  botanyRevision    Int      @default(0) @map("botany_revision")
+  zoologyRevision   Int      @default(0) @map("zoology_revision")
+  totalQuestions    Int      @default(0) @map("total_questions")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_goals")
+}
