@@ -94,9 +94,15 @@ export class AIInsightsService {
         temperature: 0.7,
       });
 
-      // Parse JSON response
-      const insights = this.parseJSONResponse<StudyInsights>(response);
-      return insights;
+      // Parse JSON response with fallback
+      try {
+        const insights = this.parseJSONResponse<StudyInsights>(response);
+        return insights;
+      } catch (parseError) {
+        // Fallback: Return default insights if parsing fails
+        console.warn('AI JSON parsing failed, using fallback:', parseError);
+        return this.getFallbackInsights(data);
+      }
     } catch (error) {
       if (error instanceof RateLimitError || error instanceof GroqError) {
         throw error;
@@ -114,8 +120,13 @@ export class AIInsightsService {
         temperature: 0.6,
       });
 
-      const schedule = this.parseJSONResponse<OptimalSchedule>(response);
-      return schedule;
+      try {
+        const schedule = this.parseJSONResponse<OptimalSchedule>(response);
+        return schedule;
+      } catch (parseError) {
+        console.warn('AI JSON parsing failed, using fallback schedule:', parseError);
+        return this.getFallbackSchedule(data);
+      }
     } catch (error) {
       if (error instanceof RateLimitError || error instanceof GroqError) {
         throw error;
@@ -151,8 +162,13 @@ export class AIInsightsService {
         temperature: 0.5,
       });
 
-      const weakAreaFocus = this.parseJSONResponse<WeakAreaFocus>(response);
-      return weakAreaFocus;
+      try {
+        const weakAreaFocus = this.parseJSONResponse<WeakAreaFocus>(response);
+        return weakAreaFocus;
+      } catch (parseError) {
+        console.warn('AI JSON parsing failed, using fallback weak area focus:', parseError);
+        return this.getFallbackWeakAreaFocus(data);
+      }
     } catch (error) {
       if (error instanceof RateLimitError || error instanceof GroqError) {
         throw error;
@@ -186,10 +202,25 @@ export class AIInsightsService {
   // Helper method to parse JSON responses with error handling
   private parseJSONResponse<T>(response: string): T {
     try {
-      // Clean the response - remove any markdown formatting
-      const cleanResponse = response
+      // Clean the response - remove any markdown formatting and extract JSON
+      let cleanResponse = response
         .replace(/```json\n?/g, '')
         .replace(/```\n?/g, '')
+        .trim();
+      
+      // If response starts with text before JSON, extract JSON part
+      const jsonStart = cleanResponse.indexOf('{');
+      const jsonEnd = cleanResponse.lastIndexOf('}');
+      
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        cleanResponse = cleanResponse.substring(jsonStart, jsonEnd + 1);
+      }
+      
+      // Try to fix common JSON issues
+      cleanResponse = cleanResponse
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']')
+        .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*):/g, '$1"$2":')
         .trim();
 
       return JSON.parse(cleanResponse);
@@ -198,6 +229,107 @@ export class AIInsightsService {
         `Failed to parse AI response as JSON: ${error}. Response: ${response.substring(0, 200)}...`
       );
     }
+  }
+
+  // Fallback methods for when AI parsing fails
+  private getFallbackInsights(data: StudyPatternData): StudyInsights {
+    const avgCompletion = data.subjects.reduce((sum, s) => sum + s.completionPercentage, 0) / data.subjects.length;
+    const weakSubjects = data.subjects.filter(s => s.completionPercentage < 75).map(s => s.name);
+    const strongSubjects = data.subjects.filter(s => s.completionPercentage >= 75).map(s => s.name);
+    
+    return {
+      overallAssessment: `Your current preparation stands at ${Math.round(avgCompletion)}% completion with ${data.timeToExam.days} days remaining. Focus on consistent daily practice to reach your target.`,
+      subjectAnalysis: {
+        strengths: strongSubjects.slice(0, 2),
+        weaknesses: weakSubjects.slice(0, 2),
+        details: `Strong performance in ${strongSubjects.join(', ')}. Need attention in ${weakSubjects.join(', ')}.`
+      },
+      studyPatterns: {
+        consistency: data.questionAnalytics.dailyAverage > 200 ? 'high' : data.questionAnalytics.dailyAverage > 100 ? 'medium' : 'low',
+        questionVolume: data.questionAnalytics.dailyAverage >= 250 ? 'on_target' : 'below_target',
+        revisionQuality: avgCompletion > 80 ? 'excellent' : avgCompletion > 60 ? 'good' : 'needs_improvement',
+        insights: 'Maintain consistent daily practice and focus on weak areas for optimal results.'
+      },
+      performanceTrends: {
+        testTrend: 'stable',
+        moodTrend: data.moodData.moodTrend,
+        correlation: 'Mood and performance show positive correlation. Maintain good mental health.'
+      },
+      recommendations: [
+        {
+          priority: 'high',
+          action: 'Complete pending lectures in weak subjects',
+          timeframe: '2 weeks',
+          expectedImpact: 'Improve foundation and confidence'
+        },
+        {
+          priority: 'medium',
+          action: 'Increase daily question practice to 300+',
+          timeframe: '1 week',
+          expectedImpact: 'Better speed and accuracy'
+        }
+      ],
+      motivationalMessage: `You're making great progress, Misti! With ${data.timeToExam.days} days left, stay focused and believe in yourself. Every question you solve brings you closer to your dream of becoming Dr. Misti! 💕`
+    };
+  }
+  
+  private getFallbackSchedule(data: StudyPatternData): OptimalSchedule {
+    return {
+      dailySchedule: [
+        { timeSlot: '06:00 - 08:00', activity: 'Physics Theory', subject: 'Physics', focus: 'theory', duration: 120 },
+        { timeSlot: '08:30 - 10:30', activity: 'Chemistry Practice', subject: 'Chemistry', focus: 'practice', duration: 120 },
+        { timeSlot: '11:00 - 13:00', activity: 'Biology Theory', subject: 'Biology', focus: 'theory', duration: 120 },
+        { timeSlot: '14:00 - 16:00', activity: 'Physics Practice', subject: 'Physics', focus: 'practice', duration: 120 },
+        { timeSlot: '16:30 - 18:30', activity: 'Chemistry Theory', subject: 'Chemistry', focus: 'theory', duration: 120 },
+        { timeSlot: '19:00 - 21:00', activity: 'Biology Practice', subject: 'Biology', focus: 'practice', duration: 120 },
+        { timeSlot: '21:30 - 22:30', activity: 'Revision', subject: 'Mixed', focus: 'revision', duration: 60 }
+      ],
+      weeklyFocus: {
+        monday: 'Physics',
+        tuesday: 'Chemistry',
+        wednesday: 'Biology',
+        thursday: 'Physics',
+        friday: 'Chemistry',
+        saturday: 'Biology',
+        sunday: 'Revision & Tests'
+      },
+      priorityAdjustments: [
+        {
+          subject: 'Weak Areas',
+          reason: 'Below 75% completion',
+          adjustment: 'Allocate extra 1 hour daily'
+        }
+      ],
+      tips: [
+        'Take 15-minute breaks every 2 hours',
+        'Review previous day topics before starting new ones',
+        'Practice mock tests weekly',
+        'Maintain consistent sleep schedule'
+      ]
+    };
+  }
+  
+  private getFallbackWeakAreaFocus(data: StudyPatternData): WeakAreaFocus {
+    const weakSubjects = data.subjects.filter(s => s.completionPercentage < 75);
+    const avgCompletion = data.subjects.reduce((sum, s) => sum + s.completionPercentage, 0) / data.subjects.length;
+    
+    return {
+      urgentActions: weakSubjects.slice(0, 3).map((subject, index) => ({
+        subject: subject.name,
+        chapter: subject.chapters.find(c => c.lectureProgress < 50)?.name || 'All chapters',
+        issue: 'low_completion' as const,
+        action: `Complete pending lectures and increase practice questions`,
+        timeRequired: '2-3 hours daily',
+        priority: index + 1
+      })),
+      weeklyTargets: {
+        lectureCompletion: Math.max(10, Math.round(20 - avgCompletion / 5)),
+        questionsToSolve: 1800,
+        chaptersToRevise: 5
+      },
+      recoveryStrategy: `Focus on completing lectures in ${weakSubjects.map(s => s.name).join(', ')} while maintaining practice in stronger subjects. Allocate 60% time to weak areas and 40% to revision.`,
+      riskAssessment: avgCompletion < 50 ? 'high' : avgCompletion < 70 ? 'medium' : 'low'
+    };
   }
 
   // Utility method to prepare study data from database entities

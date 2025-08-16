@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useQuestionAnalyticsSync } from '@/hooks/use-question-analytics'
+import { useSubjectChanges } from '@/contexts/subject-changes-context'
 
 interface QuestionsTrackingProps {
   chapterId: string
@@ -24,40 +25,43 @@ export default function QuestionsTracking({
   const [loading, setLoading] = useState<string | null>(null)
   const [assignmentCount, setAssignmentCount] = useState(assignmentQuestions.toString())
   const [kattarCount, setKattarCount] = useState(kattarQuestions.toString())
+  
+  // Local state following same pattern as lectures
+  const [localAssignmentCompleted, setLocalAssignmentCompleted] = useState<boolean[]>(assignmentCompleted)
+  const [localKattarCompleted, setLocalKattarCompleted] = useState<boolean[]>(kattarCompleted)
+  
   const { syncQuestionCounts } = useQuestionAnalyticsSync()
+  const { addChange } = useSubjectChanges()
+  
+  // Update local state when props change
+  useEffect(() => {
+    setLocalAssignmentCompleted(assignmentCompleted)
+    setLocalKattarCompleted(kattarCompleted)
+  }, [assignmentCompleted, kattarCompleted])
 
-  const handleQuestionToggle = async (type: 'assignment' | 'kattar', questionIndex: number) => {
-    try {
-      setLoading(`${type}-${questionIndex}`)
+  const handleQuestionToggle = (type: 'assignment' | 'kattar', questionIndex: number) => {
+    if (type === 'assignment') {
+      const newCompleted = [...localAssignmentCompleted]
+      newCompleted[questionIndex] = !newCompleted[questionIndex]
+      setLocalAssignmentCompleted(newCompleted)
       
-      const response = await fetch(`/api/chapters/${chapterId}/questions`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type,
-          questionIndex,
-          completed: type === 'assignment' 
-            ? !assignmentCompleted[questionIndex]
-            : !kattarCompleted[questionIndex]
-        })
+      // Add to pending changes like lectures
+      addChange({
+        chapterId,
+        field: 'assignmentCompleted',
+        value: newCompleted
       })
-
-      if (!response.ok) {
-        throw new Error(`Failed to update ${type} question status`)
-      }
-
-      // Trigger parent component update
-      onUpdate()
+    } else {
+      const newCompleted = [...localKattarCompleted]
+      newCompleted[questionIndex] = !newCompleted[questionIndex]
+      setLocalKattarCompleted(newCompleted)
       
-      // Sync question analytics
-      await syncQuestionCounts()
-    } catch (error) {
-      console.error(`Error updating ${type} question:`, error)
-      // TODO: Add toast notification for error
-    } finally {
-      setLoading(null)
+      // Add to pending changes like lectures
+      addChange({
+        chapterId,
+        field: 'kattarCompleted',
+        value: newCompleted
+      })
     }
   }
 
@@ -90,10 +94,10 @@ export default function QuestionsTracking({
     }
   }
 
-  const assignmentCompletedCount = assignmentCompleted.filter(Boolean).length
+  const assignmentCompletedCount = localAssignmentCompleted.filter(Boolean).length
   const assignmentProgress = assignmentQuestions > 0 ? (assignmentCompletedCount / assignmentQuestions) * 100 : 0
 
-  const kattarCompletedCount = kattarCompleted.filter(Boolean).length
+  const kattarCompletedCount = localKattarCompleted.filter(Boolean).length
   const kattarProgress = kattarQuestions > 0 ? (kattarCompletedCount / kattarQuestions) * 100 : 0
 
   const renderQuestionSection = (
@@ -164,14 +168,14 @@ export default function QuestionsTracking({
       {count > 0 && (
         <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
           {Array.from({ length: count }, (_, index) => {
-            const isCompleted = completed[index] || false
-            const isLoading = loading === `${type}-${index}`
+            const isCompleted = (type === 'assignment' ? localAssignmentCompleted : localKattarCompleted)[index] || false
+            const isLoading = false // No individual loading states
 
             return (
               <motion.button
                 key={index}
                 onClick={() => handleQuestionToggle(type, index)}
-                disabled={isLoading}
+                disabled={false}
                 className={`
                   relative aspect-square rounded-lg border-2 transition-all duration-200
                   flex items-center justify-center text-sm font-medium
@@ -184,9 +188,7 @@ export default function QuestionsTracking({
                 whileHover={!isLoading ? { scale: 1.05 } : {}}
                 whileTap={!isLoading ? { scale: 0.95 } : {}}
               >
-                {isLoading ? (
-                  <div className={`w-3 h-3 border border-${color.split('-')[1]}-400 border-t-transparent rounded-full animate-spin`} />
-                ) : isCompleted ? (
+                {isCompleted ? (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -208,12 +210,23 @@ export default function QuestionsTracking({
         <div className="flex items-center justify-between pt-2 border-t border-gray-700">
           <div className="flex space-x-2">
             <button
-              onClick={async () => {
+              onClick={() => {
                 // Mark all as complete
-                for (let i = 0; i < count; i++) {
-                  if (!completed[i]) {
-                    await handleQuestionToggle(type, i)
-                  }
+                const newCompleted = new Array(count).fill(true)
+                if (type === 'assignment') {
+                  setLocalAssignmentCompleted(newCompleted)
+                  addChange({
+                    chapterId,
+                    field: 'assignmentCompleted',
+                    value: newCompleted
+                  })
+                } else {
+                  setLocalKattarCompleted(newCompleted)
+                  addChange({
+                    chapterId,
+                    field: 'kattarCompleted',
+                    value: newCompleted
+                  })
                 }
               }}
               className={`text-xs px-3 py-1 ${color.replace('text-', 'bg-')}/20 ${color} rounded-full hover:${color.replace('text-', 'bg-')}/30 transition-colors`}
@@ -221,12 +234,23 @@ export default function QuestionsTracking({
               Mark All Complete
             </button>
             <button
-              onClick={async () => {
+              onClick={() => {
                 // Mark all as incomplete
-                for (let i = 0; i < count; i++) {
-                  if (completed[i]) {
-                    await handleQuestionToggle(type, i)
-                  }
+                const newCompleted = new Array(count).fill(false)
+                if (type === 'assignment') {
+                  setLocalAssignmentCompleted(newCompleted)
+                  addChange({
+                    chapterId,
+                    field: 'assignmentCompleted',
+                    value: newCompleted
+                  })
+                } else {
+                  setLocalKattarCompleted(newCompleted)
+                  addChange({
+                    chapterId,
+                    field: 'kattarCompleted',
+                    value: newCompleted
+                  })
                 }
               }}
               className="text-xs px-3 py-1 bg-gray-600/50 text-gray-400 rounded-full hover:bg-gray-600/70 transition-colors"
@@ -259,7 +283,7 @@ export default function QuestionsTracking({
         '📋',
         'text-purple-400',
         assignmentQuestions,
-        assignmentCompleted,
+        localAssignmentCompleted,
         assignmentProgress,
         assignmentCompletedCount,
         assignmentCount,
@@ -273,12 +297,14 @@ export default function QuestionsTracking({
         '⚡',
         'text-orange-400',
         kattarQuestions,
-        kattarCompleted,
+        localKattarCompleted,
         kattarProgress,
         kattarCompletedCount,
         kattarCount,
         setKattarCount
       )}
+      
+
 
       {/* Info Notes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,7 +313,7 @@ export default function QuestionsTracking({
             <div className="text-purple-400 text-sm">📋</div>
             <div className="text-xs text-purple-400">
               <strong>Assignment Questions:</strong> These are practice problems assigned by your coaching institute or textbook. 
-              Set the count based on your study material and track your completion.
+              Set the count, tick the checkboxes, then use the floating Save button to update your progress.
             </div>
           </div>
         </div>
@@ -297,7 +323,7 @@ export default function QuestionsTracking({
             <div className="text-orange-400 text-sm">⚡</div>
             <div className="text-xs text-orange-400">
               <strong>Kattar Questions:</strong> These are challenging, high-difficulty questions that test your deep understanding. 
-              Perfect for building problem-solving confidence.
+              Perfect for building problem-solving confidence. Use the floating Save button to save changes.
             </div>
           </div>
         </div>

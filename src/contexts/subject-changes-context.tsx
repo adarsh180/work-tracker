@@ -8,10 +8,18 @@ type ChapterUpdate = {
   value: any
 }
 
+type PendingChange = {
+  type: string
+  chapterId: string
+  data: any
+}
+
 type SubjectChangesContextType = {
   pendingChanges: ChapterUpdate[]
   addChange: (change: ChapterUpdate) => void
   removeChange: (chapterId: string, field: string) => void
+  addPendingChange: (key: string, change: PendingChange) => void
+  removePendingChange: (key: string) => void
   clearChanges: () => void
   hasChanges: boolean
   saveAllChanges: () => Promise<void>
@@ -35,6 +43,7 @@ interface SubjectChangesProviderProps {
 
 export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChangesProviderProps) {
   const [pendingChanges, setPendingChanges] = useState<ChapterUpdate[]>([])
+  const [pendingChangeMap, setPendingChangeMap] = useState<Record<string, PendingChange>>({})
   const [isSaving, setIsSaving] = useState(false)
 
   const addChange = useCallback((change: ChapterUpdate) => {
@@ -48,9 +57,22 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
   const removeChange = useCallback((chapterId: string, field: string) => {
     setPendingChanges(prev => prev.filter(c => !(c.chapterId === chapterId && c.field === field)))
   }, [])
+  
+  const addPendingChange = useCallback((key: string, change: PendingChange) => {
+    setPendingChangeMap(prev => ({ ...prev, [key]: change }))
+  }, [])
+  
+  const removePendingChange = useCallback((key: string) => {
+    setPendingChangeMap(prev => {
+      const newMap = { ...prev }
+      delete newMap[key]
+      return newMap
+    })
+  }, [])
 
   const clearChanges = useCallback(() => {
     setPendingChanges([])
+    setPendingChangeMap({})
   }, [])
 
   const saveAllChanges = useCallback(async () => {
@@ -68,20 +90,70 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
       }, {} as Record<string, Record<string, any>>)
 
       // Save all changes in parallel
-      const savePromises = Object.entries(changesByChapter).map(([chapterId, updates]) =>
-        fetch(`/api/chapters/${chapterId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        })
-      )
+      const savePromises = Object.entries(changesByChapter).map(([chapterId, updates]) => {
+        // Handle assignment and kattar questions separately
+        if (updates.assignmentCompleted || updates.kattarCompleted) {
+          const questionPromises = []
+          
+          if (updates.assignmentCompleted) {
+            questionPromises.push(
+              fetch(`/api/chapters/${chapterId}/questions`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'assignment',
+                  completed: updates.assignmentCompleted
+                })
+              })
+            )
+            delete updates.assignmentCompleted
+          }
+          
+          if (updates.kattarCompleted) {
+            questionPromises.push(
+              fetch(`/api/chapters/${chapterId}/questions`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'kattar',
+                  completed: updates.kattarCompleted
+                })
+              })
+            )
+            delete updates.kattarCompleted
+          }
+          
+          // If there are other updates, save them too
+          if (Object.keys(updates).length > 0) {
+            questionPromises.push(
+              fetch(`/api/chapters/${chapterId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+              })
+            )
+          }
+          
+          return Promise.all(questionPromises)
+        } else {
+          // Regular chapter updates
+          return fetch(`/api/chapters/${chapterId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+          })
+        }
+      })
 
       const results = await Promise.all(savePromises)
       
+      // Flatten results in case of nested promises
+      const flatResults = results.flat()
+      
       // Check if all saves were successful
-      const failedSaves = results.filter(r => !r.ok)
+      const failedSaves = flatResults.filter(r => r && !r.ok)
       if (failedSaves.length > 0) {
-        throw new Error(`Failed to save ${failedSaves.length} chapters`)
+        throw new Error(`Failed to save ${failedSaves.length} changes`)
       }
 
       clearChanges()
@@ -101,13 +173,15 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
     }
   }, [pendingChanges, clearChanges, onSaveComplete])
 
-  const hasChanges = pendingChanges.length > 0
+  const hasChanges = pendingChanges.length > 0 || Object.keys(pendingChangeMap).length > 0
 
   return (
     <SubjectChangesContext.Provider value={{
       pendingChanges,
       addChange,
       removeChange,
+      addPendingChange,
+      removePendingChange,
       clearChanges,
       hasChanges,
       saveAllChanges,

@@ -59,6 +59,8 @@ ANALYSIS REQUIREMENTS:
 5. Actionable Recommendations (3-4 specific, time-bound suggestions)
 6. Motivational Message (encouraging but realistic)
 
+IMPORTANT: Respond ONLY with valid JSON. Do not include any text before or after the JSON.
+
 FORMAT YOUR RESPONSE AS JSON:
 {
   "overallAssessment": "string",
@@ -113,6 +115,8 @@ SCHEDULE REQUIREMENTS:
 3. Include buffer time for difficult topics
 4. Consider mood patterns for optimal timing
 5. Account for ${data.timeToExam.days} days remaining
+
+IMPORTANT: Respond ONLY with valid JSON. Do not include any text before or after the JSON.
 
 FORMAT YOUR RESPONSE AS JSON:
 {
@@ -188,6 +192,8 @@ WEAK SUBJECTS: ${weakSubjects.map(s => `${s.name} (${s.completionPercentage}%)`)
 WEAK CHAPTERS: ${weakChapters.slice(0, 5).map(c => `${c.subject}-${c.name} (${c.lectureProgress}% lectures, revision: ${c.revisionScore}/10)`).join(', ')}
 
 TIME REMAINING: ${data.timeToExam.days} days
+
+IMPORTANT: Respond ONLY with valid JSON. Do not include any text before or after the JSON.
 
 Create a focused improvement plan as JSON:
 {

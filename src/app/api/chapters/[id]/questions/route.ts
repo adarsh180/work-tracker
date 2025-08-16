@@ -20,7 +20,35 @@ export async function PUT(
     const chapterId = params.id
     const { type, questionIndex, completed } = await request.json()
 
-    // Validate input
+    // Handle batch update (new format)
+    if (Array.isArray(completed)) {
+      if (!['assignment', 'kattar'].includes(type)) {
+        return NextResponse.json(
+          { error: 'Invalid question type' },
+          { status: 400 }
+        )
+      }
+
+      let updatedChapter
+      if (type === 'assignment') {
+        updatedChapter = await ChapterRepository.update(chapterId, {
+          assignmentCompleted: completed
+        })
+      } else {
+        updatedChapter = await ChapterRepository.update(chapterId, {
+          kattarCompleted: completed
+        })
+      }
+
+      const progress = ChapterRepository.calculateProgress(updatedChapter)
+      return NextResponse.json({
+        success: true,
+        chapter: updatedChapter,
+        progress
+      })
+    }
+
+    // Handle single question update (legacy format)
     if (!['assignment', 'kattar'].includes(type) || 
         typeof questionIndex !== 'number' || 
         typeof completed !== 'boolean') {
@@ -31,8 +59,6 @@ export async function PUT(
     }
 
     let updatedChapter
-
-    // Update question completion status based on type
     if (type === 'assignment') {
       updatedChapter = await ChapterRepository.updateAssignmentCompletion(
         chapterId,
