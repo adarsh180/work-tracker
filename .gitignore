@@ -48,3 +48,5 @@ logs
 # Database verification script
 verify-db.js
 .kiro
+docs
+
