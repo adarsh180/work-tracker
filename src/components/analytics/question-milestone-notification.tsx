@@ -122,7 +122,7 @@ export function QuestionMilestoneNotification() {
           damping: 30,
           duration: 0.6 
         }}
-        className="fixed top-4 right-4 z-50 max-w-sm"
+        className="fixed bottom-4 right-4 z-[9999] max-w-sm"
       >
         <div className={`${currentNotification.bgColor} border-2 rounded-xl p-4 shadow-2xl backdrop-blur-sm`}>
           <div className="flex items-start gap-3">
