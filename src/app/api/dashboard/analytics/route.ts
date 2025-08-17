@@ -63,9 +63,15 @@ export async function GET(request: NextRequest) {
     // Calculate chapter-wise questions from subjects data
     const chapterQuestions = subjects.reduce((total, subject) => {
       const subjectTotal = subject.chapters.reduce((chapterSum, chapter) => {
-        const dppCompleted = chapter.dppCompleted.filter(Boolean).length
-        const assignmentCompleted = chapter.assignmentCompleted.filter(Boolean).length
-        const kattarCompleted = chapter.kattarCompleted.filter(Boolean).length
+        const dppCompleted = Array.isArray(chapter.dppCompleted) 
+          ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+          : 0
+        const assignmentCompleted = Array.isArray(chapter.assignmentCompleted) 
+          ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+          : 0
+        const kattarCompleted = Array.isArray(chapter.kattarCompleted) 
+          ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+          : 0
         return chapterSum + dppCompleted + assignmentCompleted + kattarCompleted
       }, 0)
       return total + subjectTotal

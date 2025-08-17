@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const subjects = [
   {
@@ -106,7 +106,7 @@ const subjects = [
       { name: 'Evolution', lectureCount: 12 },
     ]
   }
-]
+];
 
 async function main() {
   console.log('Start seeding...')
@@ -150,6 +150,7 @@ async function main() {
             lectureCount: chapterData.lectureCount,
             lecturesCompleted: new Array(chapterData.lectureCount).fill(false),
             dppCompleted: new Array(chapterData.lectureCount).fill(false),
+            dppQuestionCounts: new Array(chapterData.lectureCount).fill(0),
             assignmentQuestions: 0,
             assignmentCompleted: [],
             kattarQuestions: 0,

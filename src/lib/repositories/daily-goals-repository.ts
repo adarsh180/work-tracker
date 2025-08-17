@@ -56,7 +56,10 @@ export class DailyGoalsRepository {
 
       return await prisma.dailyGoal.upsert({
       where: {
-        date: data.date
+        userId_date: {
+          userId: data.userId,
+          date: data.date
+        }
       },
       update: {
         physicsQuestions: data.physicsQuestions,
@@ -117,30 +120,41 @@ export class DailyGoalsRepository {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    // Use upsert to avoid unique constraint errors
-    const goal = await prisma.dailyGoal.upsert({
-      where: { date: today },
-      update: {},
-      create: {
-        userId,
-        date: today,
-        physicsQuestions: 0,
-        chemistryQuestions: 0,
-        botanyQuestions: 0,
-        zoologyQuestions: 0,
-        physicsDpp: 0,
-        chemistryDpp: 0,
-        botanyDpp: 0,
-        zoologyDpp: 0,
-        physicsRevision: 0,
-        chemistryRevision: 0,
-        botanyRevision: 0,
-        zoologyRevision: 0,
-        totalQuestions: 0
-      }
-    })
-    
-    return goal
+    try {
+      // Use upsert with proper unique constraint handling
+      const goal = await prisma.dailyGoal.upsert({
+        where: {
+          userId_date: {
+            userId,
+            date: today
+          }
+        },
+        update: {}, // Don't update existing data
+        create: {
+          userId,
+          date: today,
+          physicsQuestions: 0,
+          chemistryQuestions: 0,
+          botanyQuestions: 0,
+          zoologyQuestions: 0,
+          physicsDpp: 0,
+          chemistryDpp: 0,
+          botanyDpp: 0,
+          zoologyDpp: 0,
+          physicsRevision: 0,
+          chemistryRevision: 0,
+          botanyRevision: 0,
+          zoologyRevision: 0,
+          totalQuestions: 0
+        }
+      })
+      return goal
+    } catch (error) {
+      // Fallback to find if upsert fails
+      return await prisma.dailyGoal.findFirst({
+        where: { userId, date: today }
+      })
+    }
   }
 
   /**

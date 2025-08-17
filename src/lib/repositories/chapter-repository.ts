@@ -107,7 +107,10 @@ export class ChapterRepository {
     const chapter = await this.getById(chapterId)
     if (!chapter) throw new Error('Chapter not found')
 
-    const updatedLectures = [...chapter.lecturesCompleted]
+    const currentLectures = Array.isArray(chapter.lecturesCompleted) 
+      ? chapter.lecturesCompleted as boolean[]
+      : []
+    const updatedLectures = [...currentLectures]
     updatedLectures[lectureIndex] = completed
 
     return await this.update(chapterId, { lecturesCompleted: updatedLectures })
@@ -120,7 +123,10 @@ export class ChapterRepository {
     const chapter = await this.getById(chapterId)
     if (!chapter) throw new Error('Chapter not found')
 
-    const updatedDpp = [...chapter.dppCompleted]
+    const currentDpp = Array.isArray(chapter.dppCompleted) 
+      ? chapter.dppCompleted as boolean[]
+      : []
+    const updatedDpp = [...currentDpp]
     updatedDpp[dppIndex] = completed
 
     return await this.update(chapterId, { dppCompleted: updatedDpp })
@@ -144,7 +150,10 @@ export class ChapterRepository {
     const chapter = await this.getById(chapterId)
     if (!chapter) throw new Error('Chapter not found')
 
-    const updatedAssignments = [...chapter.assignmentCompleted]
+    const currentAssignments = Array.isArray(chapter.assignmentCompleted) 
+      ? chapter.assignmentCompleted as boolean[]
+      : []
+    const updatedAssignments = [...currentAssignments]
     updatedAssignments[assignmentIndex] = completed
 
     return await this.update(chapterId, { assignmentCompleted: updatedAssignments })
@@ -168,7 +177,10 @@ export class ChapterRepository {
     const chapter = await this.getById(chapterId)
     if (!chapter) throw new Error('Chapter not found')
 
-    const updatedKattar = [...chapter.kattarCompleted]
+    const currentKattar = Array.isArray(chapter.kattarCompleted) 
+      ? chapter.kattarCompleted as boolean[]
+      : []
+    const updatedKattar = [...currentKattar]
     updatedKattar[kattarIndex] = completed
 
     return await this.update(chapterId, { kattarCompleted: updatedKattar })
@@ -188,28 +200,38 @@ export class ChapterRepository {
    * Calculate chapter progress metrics
    */
   static calculateProgress(chapter: Chapter): ChapterProgress {
+    const lecturesCompleted = Array.isArray(chapter.lecturesCompleted) 
+      ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
+      : 0
+    const dppCompleted = Array.isArray(chapter.dppCompleted) 
+      ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+      : 0
+    const assignmentCompleted = Array.isArray(chapter.assignmentCompleted) 
+      ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+      : 0
+    const kattarCompleted = Array.isArray(chapter.kattarCompleted) 
+      ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+      : 0
+
     const lectureProgress = chapter.lectureCount > 0 
-      ? (chapter.lecturesCompleted.filter(Boolean).length / chapter.lectureCount) * 100 
+      ? (lecturesCompleted / chapter.lectureCount) * 100 
       : 0
 
     const dppProgress = chapter.lectureCount > 0 
-      ? (chapter.dppCompleted.filter(Boolean).length / chapter.lectureCount) * 100 
+      ? (dppCompleted / chapter.lectureCount) * 100 
       : 0
 
     const assignmentProgress = chapter.assignmentQuestions > 0 
-      ? (chapter.assignmentCompleted.filter(Boolean).length / chapter.assignmentQuestions) * 100 
+      ? (assignmentCompleted / chapter.assignmentQuestions) * 100 
       : 0
 
     const kattarProgress = chapter.kattarQuestions > 0 
-      ? (chapter.kattarCompleted.filter(Boolean).length / chapter.kattarQuestions) * 100 
+      ? (kattarCompleted / chapter.kattarQuestions) * 100 
       : 0
 
     // Calculate overall progress (weighted average)
     const totalItems = chapter.lectureCount + chapter.lectureCount + chapter.assignmentQuestions + chapter.kattarQuestions
-    const completedItems = chapter.lecturesCompleted.filter(Boolean).length + 
-                          chapter.dppCompleted.filter(Boolean).length +
-                          chapter.assignmentCompleted.filter(Boolean).length +
-                          chapter.kattarCompleted.filter(Boolean).length
+    const completedItems = lecturesCompleted + dppCompleted + assignmentCompleted + kattarCompleted
 
     const overallProgress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0
 
@@ -289,8 +311,14 @@ export class ChapterRepository {
     const chapter = await this.getById(chapterId)
     if (!chapter) return 0
 
-    return chapter.assignmentCompleted.filter(Boolean).length + 
-           chapter.kattarCompleted.filter(Boolean).length
+    const assignmentCompleted = Array.isArray(chapter.assignmentCompleted) 
+      ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+      : 0
+    const kattarCompleted = Array.isArray(chapter.kattarCompleted) 
+      ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+      : 0
+    
+    return assignmentCompleted + kattarCompleted
   }
 
   /**

@@ -144,9 +144,13 @@ export async function updateSubjectCompletion(subjectId: string) {
 
   chapters.forEach(chapter => {
     totalLectures += chapter.lectureCount
-    completedLectures += chapter.lecturesCompleted.filter(Boolean).length
+    completedLectures += Array.isArray(chapter.lecturesCompleted) 
+      ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
+      : 0
     totalDpp += chapter.lectureCount // DPP count equals lecture count
-    completedDpp += chapter.dppCompleted.filter(Boolean).length
+    completedDpp += Array.isArray(chapter.dppCompleted) 
+      ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+      : 0
   })
 
   // Calculate overall completion percentage (lectures + DPP combined)

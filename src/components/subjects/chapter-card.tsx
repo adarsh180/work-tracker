@@ -206,7 +206,7 @@ export default function ChapterCard({ chapter, onUpdate }: ChapterCardProps) {
                 <LectureTracking
                   chapterId={chapter.id}
                   lectureCount={chapter.lectureCount}
-                  lecturesCompleted={chapter.lecturesCompleted}
+                  lecturesCompleted={Array.isArray(chapter.lecturesCompleted) ? chapter.lecturesCompleted as boolean[] : []}
                   onUpdate={onUpdate}
                 />
 
@@ -214,8 +214,8 @@ export default function ChapterCard({ chapter, onUpdate }: ChapterCardProps) {
                 <DppTracking
                   chapterId={chapter.id}
                   dppCount={chapter.lectureCount} // DPP count equals lecture count
-                  dppCompleted={chapter.dppCompleted}
-                  dppQuestionCounts={chapter.dppQuestionCounts}
+                  dppCompleted={Array.isArray(chapter.dppCompleted) ? chapter.dppCompleted as boolean[] : []}
+                  dppQuestionCounts={Array.isArray(chapter.dppQuestionCounts) ? chapter.dppQuestionCounts as number[] : []}
                   onUpdate={onUpdate}
                 />
 
@@ -223,9 +223,9 @@ export default function ChapterCard({ chapter, onUpdate }: ChapterCardProps) {
                 <QuestionsTracking
                   chapterId={chapter.id}
                   assignmentQuestions={chapter.assignmentQuestions}
-                  assignmentCompleted={chapter.assignmentCompleted}
+                  assignmentCompleted={Array.isArray(chapter.assignmentCompleted) ? chapter.assignmentCompleted as boolean[] : []}
                   kattarQuestions={chapter.kattarQuestions}
-                  kattarCompleted={chapter.kattarCompleted}
+                  kattarCompleted={Array.isArray(chapter.kattarCompleted) ? chapter.kattarCompleted as boolean[] : []}
                   onUpdate={onUpdate}
                 />
 

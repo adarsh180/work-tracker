@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Subject {
@@ -75,7 +76,7 @@ model QuestionAnalytics {
 model DailyGoal {
   id                String   @id @default(cuid())
   userId            String   @map("user_id")
-  date              DateTime @unique @db.Date
+  date              DateTime @db.Date
   physicsQuestions  Int      @default(0) @map("physics_questions")
   chemistryQuestions Int     @default(0) @map("chemistry_questions")
   botanyQuestions   Int      @default(0) @map("botany_questions")
@@ -92,6 +93,7 @@ model DailyGoal {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
+  @@unique([userId, date], name: "userId_date")
   @@map("daily_goals")
 }
 

@@ -64,17 +64,30 @@ export class QuestionAnalyticsRepository {
 
     chapters.forEach(chapter => {
       // DPP questions (sum of question counts for completed DPPs)
-      chapter.dppCompleted.forEach((completed, index) => {
-        if (completed && chapter.dppQuestionCounts[index]) {
-          dppCount += chapter.dppQuestionCounts[index]
+      const dppCompleted = Array.isArray(chapter.dppCompleted) 
+        ? chapter.dppCompleted as boolean[]
+        : []
+      const dppQuestionCounts = Array.isArray(chapter.dppQuestionCounts) 
+        ? chapter.dppQuestionCounts as number[]
+        : []
+      
+      dppCompleted.forEach((completed, index) => {
+        if (completed && dppQuestionCounts[index]) {
+          dppCount += dppQuestionCounts[index]
         }
       })
       
       // Assignment questions (completed count)
-      assignmentCount += chapter.assignmentCompleted.filter(Boolean).length
+      const assignmentCompleted = Array.isArray(chapter.assignmentCompleted) 
+        ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+        : 0
+      assignmentCount += assignmentCompleted
       
       // Kattar questions (completed count)
-      kattarCount += chapter.kattarCompleted.filter(Boolean).length
+      const kattarCompleted = Array.isArray(chapter.kattarCompleted) 
+        ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+        : 0
+      kattarCount += kattarCompleted
     })
 
     const daily = dailyGoalsCount + dppCount + assignmentCount + kattarCount

@@ -139,19 +139,27 @@ export class SubjectRepository {
     chapters.forEach(chapter => {
       // Lectures
       totalLectures += chapter.lectureCount
-      completedLectures += chapter.lecturesCompleted.filter(Boolean).length
+      completedLectures += Array.isArray(chapter.lecturesCompleted) 
+        ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
+        : 0
 
       // DPP (equals lecture count)
       totalDpp += chapter.lectureCount
-      completedDpp += chapter.dppCompleted.filter(Boolean).length
+      completedDpp += Array.isArray(chapter.dppCompleted) 
+        ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+        : 0
 
       // Assignments
       totalAssignments += chapter.assignmentQuestions
-      completedAssignments += chapter.assignmentCompleted.filter(Boolean).length
+      completedAssignments += Array.isArray(chapter.assignmentCompleted) 
+        ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+        : 0
 
       // Kattar questions
       totalKattar += chapter.kattarQuestions
-      completedKattar += chapter.kattarCompleted.filter(Boolean).length
+      completedKattar += Array.isArray(chapter.kattarCompleted) 
+        ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+        : 0
 
       // Total questions for analytics
       totalQuestions += chapter.assignmentQuestions + chapter.kattarQuestions
@@ -204,7 +212,9 @@ export class SubjectRepository {
 
       subject.chapters.forEach(chapter => {
         totalLectures += chapter.lectureCount
-        completedLectures += chapter.lecturesCompleted.filter(Boolean).length
+        completedLectures += Array.isArray(chapter.lecturesCompleted) 
+          ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
+          : 0
         totalQuestions += chapter.assignmentQuestions + chapter.kattarQuestions
       })
 

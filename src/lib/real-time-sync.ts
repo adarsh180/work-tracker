@@ -51,20 +51,28 @@ export class RealTimeSyncService {
       chapters.forEach(chapter => {
         // Lectures
         totalItems += chapter.lectureCount
-        completedItems += chapter.lecturesCompleted.filter(Boolean).length
+        completedItems += Array.isArray(chapter.lecturesCompleted) 
+          ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
+          : 0
 
         // DPP
         totalItems += chapter.lectureCount
-        completedItems += chapter.dppCompleted.filter(Boolean).length
+        completedItems += Array.isArray(chapter.dppCompleted) 
+          ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+          : 0
 
         // Assignments
         totalItems += chapter.assignmentQuestions
-        completedItems += chapter.assignmentCompleted.filter(Boolean).length
+        completedItems += Array.isArray(chapter.assignmentCompleted) 
+          ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+          : 0
         totalQuestions += chapter.assignmentQuestions
 
         // Kattar questions
         totalItems += chapter.kattarQuestions
-        completedItems += chapter.kattarCompleted.filter(Boolean).length
+        completedItems += Array.isArray(chapter.kattarCompleted) 
+          ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+          : 0
         totalQuestions += chapter.kattarQuestions
       })
 
@@ -109,7 +117,12 @@ export class RealTimeSyncService {
                            (updates.zoologyQuestions || 0)
 
       const dailyGoal = await prisma.dailyGoal.upsert({
-        where: { date },
+        where: {
+          userId_date: {
+            userId,
+            date
+          }
+        },
         update: {
           ...updates,
           totalQuestions,

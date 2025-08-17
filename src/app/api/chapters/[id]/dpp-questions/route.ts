@@ -31,7 +31,10 @@ export async function PUT(
     }
 
     // Update DPP question count
-    const updatedCounts = [...chapter.dppQuestionCounts]
+    const currentCounts = Array.isArray(chapter.dppQuestionCounts) 
+      ? chapter.dppQuestionCounts as number[]
+      : []
+    const updatedCounts = [...currentCounts]
     updatedCounts[dppIndex] = questionCount
 
     const updatedChapter = await prisma.chapter.update({
