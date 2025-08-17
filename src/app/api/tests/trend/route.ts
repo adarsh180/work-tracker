@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     let trend
     if (testType) {
-      const tests = await TestPerformanceRepository.getByUserIdAndType(session.user.id, testType)
+      const tests = await TestPerformanceRepository.getByUserIdAndType(session.user.email, testType)
       trend = tests.map(test => ({
         date: test.testDate.toISOString().split('T')[0],
         score: test.score,
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       })).reverse() // Show chronological order
     } else {
       trend = await TestPerformanceRepository.getPerformanceTrend(
-        session.user.id, 
+        session.user.email, 
         limit ? parseInt(limit) : undefined
       )
     }

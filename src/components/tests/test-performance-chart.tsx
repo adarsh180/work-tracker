@@ -29,7 +29,9 @@ export default function TestPerformanceChart() {
       }
       const result = await response.json()
       return result.data
-    }
+    },
+    refetchInterval: 2000,
+    staleTime: 500
   })
 
   const testTypes = ['all', 'Weekly Test', 'Rank Booster', 'Test Series', 'AITS', 'Full Length Test']

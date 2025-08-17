@@ -25,7 +25,9 @@ export default function TestAnalytics() {
       }
       const result = await response.json()
       return result.data
-    }
+    },
+    refetchInterval: 2000,
+    staleTime: 500
   })
 
   if (isLoading) {

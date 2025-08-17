@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const analytics = await TestPerformanceRepository.getAnalytics(session.user.id)
+    const analytics = await TestPerformanceRepository.getAnalytics(session.user.email)
 
     return NextResponse.json({
       success: true,
