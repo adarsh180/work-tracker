@@ -172,7 +172,7 @@ export class SubjectRepository {
 
     // Update subject in database
     await this.updateProgress(subjectId, {
-      completionPercentage: overallCompletion,
+      completionPercentage: Math.round(overallCompletion * 100) / 100, // Round to 2 decimal places
       totalQuestions
     })
 
@@ -208,28 +208,59 @@ export class SubjectRepository {
       const totalChapters = subject.chapters.length
       let totalLectures = 0
       let completedLectures = 0
+      let totalDpp = 0
+      let completedDpp = 0
+      let totalAssignments = 0
+      let completedAssignments = 0
+      let totalKattar = 0
+      let completedKattar = 0
       let totalQuestions = 0
 
       subject.chapters.forEach(chapter => {
+        // Lectures
         totalLectures += chapter.lectureCount
         completedLectures += Array.isArray(chapter.lecturesCompleted) 
           ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length 
           : 0
+
+        // DPP (equals lecture count)
+        totalDpp += chapter.lectureCount
+        completedDpp += Array.isArray(chapter.dppCompleted) 
+          ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
+          : 0
+
+        // Assignments
+        totalAssignments += chapter.assignmentQuestions
+        completedAssignments += Array.isArray(chapter.assignmentCompleted) 
+          ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length 
+          : 0
+
+        // Kattar questions
+        totalKattar += chapter.kattarQuestions
+        completedKattar += Array.isArray(chapter.kattarCompleted) 
+          ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length 
+          : 0
+
         totalQuestions += chapter.assignmentQuestions + chapter.kattarQuestions
       })
+
+      // Calculate real-time completion percentage
+      const totalItems = totalLectures + totalDpp + totalAssignments + totalKattar
+      const completedItems = completedLectures + completedDpp + completedAssignments + completedKattar
+      const realTimeCompletionPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0
 
       return {
         id: subject.id,
         name: subject.name,
         totalChapters,
-        completionPercentage: subject.completionPercentage,
+        completionPercentage: Math.round(realTimeCompletionPercentage * 100) / 100, // Round to 2 decimal places
         totalLectures,
         completedLectures,
         totalQuestions,
         // Emoji logic based on completion percentage
-        emoji: subject.completionPercentage < 75 ? '😢' : 
-               subject.completionPercentage < 85 ? '😟' :
-               subject.completionPercentage < 95 ? '😊' : '😘'
+        emoji: realTimeCompletionPercentage < 75 ? '😢' : 
+               realTimeCompletionPercentage < 85 ? '😟' :
+               realTimeCompletionPercentage < 95 ? '😊' : '😘'
       }
     })
   }

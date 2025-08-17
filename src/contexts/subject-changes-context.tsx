@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ChapterUpdate = {
   chapterId: string
@@ -45,6 +46,7 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
   const [pendingChanges, setPendingChanges] = useState<ChapterUpdate[]>([])
   const [pendingChangeMap, setPendingChangeMap] = useState<Record<string, PendingChange>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const queryClient = useQueryClient()
 
   const addChange = useCallback((change: ChapterUpdate) => {
     setPendingChanges(prev => {
@@ -158,10 +160,19 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
 
       clearChanges()
       
-      // Invalidate all queries for real-time updates
-      const queryClient = (await import('@tanstack/react-query')).useQueryClient
-      if (typeof window !== 'undefined') {
-        window.location.reload() // Force refresh to show saved data
+      // Invalidate React Query cache for real-time updates
+      try {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['subjects'] }),
+          queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] }),
+          queryClient.invalidateQueries({ queryKey: ['chapters'] }),
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+          queryClient.invalidateQueries({ queryKey: ['daily-goals'] }),
+          queryClient.invalidateQueries({ queryKey: ['analytics'] })
+        ])
+        console.log('Cache invalidated successfully')
+      } catch (cacheError) {
+        console.error('Error invalidating cache:', cacheError)
       }
       
       onSaveComplete?.()

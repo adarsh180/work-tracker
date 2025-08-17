@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -16,6 +16,13 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
         },
       })
   )
+
+  // Make query client globally available for cache invalidation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__reactQueryClient = queryClient
+    }
+  }, [queryClient])
 
   return (
     <QueryClientProvider client={queryClient}>

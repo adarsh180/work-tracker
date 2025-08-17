@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/use-auth'
 import SubjectCard from './subject-card'
@@ -18,6 +18,7 @@ interface SubjectSummary {
 
 export default function SubjectsGrid() {
   const { user } = useAuth()
+  const queryClient = useQueryClient()
   
   const { data: subjects = [], isLoading: loading, error } = useQuery<SubjectSummary[]>({
     queryKey: ['subjects-dashboard'],
@@ -26,8 +27,9 @@ export default function SubjectsGrid() {
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: 10000, // Refetch every 10 seconds for real-time updates
-    staleTime: 5000 // Consider data stale after 5 seconds
+    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
+    staleTime: 1000, // Consider data stale after 1 second
+    refetchOnWindowFocus: true // Refetch when window gains focus
   })
 
   if (loading) {
@@ -120,8 +122,19 @@ export default function SubjectsGrid() {
             💕
           </motion.span>
         </motion.h2>
-        <div className="text-sm text-gray-400">
-          {subjects.length} subjects • Click to view details
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-400">
+            {subjects.length} subjects • Click to view details
+          </div>
+          <button
+            onClick={() => {
+              queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+            }}
+            className="text-xs px-3 py-1 bg-primary/20 text-primary rounded-full hover:bg-primary/30 transition-colors"
+            title="Refresh progress data"
+          >
+            🔄 Refresh
+          </button>
         </div>
       </div>
 
