@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Create test performance record
     const testPerformance = await TestPerformanceRepository.create({
-      userId: session.user.id,
+      userId: session.user.email,
       testType: testType as TestType,
       testNumber,
       score,
@@ -84,11 +84,11 @@ export async function GET(request: NextRequest) {
 
     let tests
     if (testType) {
-      tests = await TestPerformanceRepository.getByUserIdAndType(session.user.id, testType)
+      tests = await TestPerformanceRepository.getByUserIdAndType(session.user.email, testType)
     } else if (limit) {
-      tests = await TestPerformanceRepository.getRecentTests(session.user.id, parseInt(limit))
+      tests = await TestPerformanceRepository.getRecentTests(session.user.email, parseInt(limit))
     } else {
-      tests = await TestPerformanceRepository.getAllByUserId(session.user.id)
+      tests = await TestPerformanceRepository.getAllByUserId(session.user.email)
     }
 
     return NextResponse.json({

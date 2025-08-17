@@ -42,8 +42,8 @@ export default function RealTimeAnalytics() {
       const result = await response.json()
       return result.data
     },
-    refetchInterval: 5000, // Refresh every 5 seconds for real-time updates
-    staleTime: 1000 // Consider data stale after 1 second
+    refetchInterval: 2000, // Refresh every 2 seconds for real-time updates
+    staleTime: 500 // Consider data stale after 0.5 seconds
   })
 
   if (isLoading || !analytics) {

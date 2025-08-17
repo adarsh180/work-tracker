@@ -77,11 +77,36 @@ export function useRealTimeSync() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tests'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['test-trend'] })
       console.log('Test score saved successfully! 📊')
     },
     onError: (error) => {
       console.error('Test sync error:', error)
       console.error('Failed to save test score. Please try again.')
+    }
+  })
+
+  // Delete test performance
+  const deleteTestPerformance = useMutation({
+    mutationFn: async (testId: string) => {
+      const response = await fetch(`/api/tests?id=${testId}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) throw new Error('Failed to delete test')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tests'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['test-trend'] })
+      console.log('Test deleted successfully! 🗑️')
+    },
+    onError: (error) => {
+      console.error('Test delete error:', error)
+      console.error('Failed to delete test. Please try again.')
     }
   })
 
@@ -112,9 +137,10 @@ export function useRealTimeSync() {
     syncChapter,
     syncDailyGoals,
     syncTestPerformance,
+    deleteTestPerformance,
     syncMoodEntry,
     isLoading: syncChapter.isPending || syncDailyGoals.isPending || 
-               syncTestPerformance.isPending || syncMoodEntry.isPending
+               syncTestPerformance.isPending || deleteTestPerformance.isPending || syncMoodEntry.isPending
   }
 }
 
