@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const todayGoal = await DailyGoalsRepository.getToday(session.user.id)
+    const todayGoal = await DailyGoalsRepository.getToday(session.user.email)
 
     return NextResponse.json({
       success: true,

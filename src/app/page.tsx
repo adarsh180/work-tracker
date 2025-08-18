@@ -14,6 +14,7 @@ import MistiMotivationCard from '@/components/ui/misti-motivation-card'
 import DailyGoalsCard from '@/components/dashboard/daily-goals-card'
 import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
+import NEETCountdownTimer from '@/components/ui/neet-countdown-timer'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -192,6 +193,7 @@ export default function Home() {
             <SubjectsGrid />
           </div>
           <div className="space-y-6">
+            <NEETCountdownTimer />
             <DailyGoalsCard />
             <YesterdayPerformance />
             <QuestionAnalyticsCard />

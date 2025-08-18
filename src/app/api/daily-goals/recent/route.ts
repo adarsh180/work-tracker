@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '7')
 
-    const recentGoals = await DailyGoalsRepository.getRecentGoals(session.user.id, days)
+    const recentGoals = await DailyGoalsRepository.getRecentGoals(session.user.email, days)
 
     return NextResponse.json({
       success: true,

@@ -33,7 +33,9 @@ export default function RecentGoals() {
       if (!response.ok) throw new Error('Failed to fetch recent goals')
       const result = await response.json()
       return result.data
-    }
+    },
+    refetchInterval: 2000,
+    staleTime: 500
   })
 
   const getPerformanceEmoji = (totalQuestions: number) => {

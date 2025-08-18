@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/dashboard/dashboard-layout'
 import DailyGoalsForm from '@/components/daily-goals/daily-goals-form'
 import QuestionStats from '@/components/daily-goals/question-stats'
 import RecentGoals from '@/components/daily-goals/recent-goals'
+import DailyGoalsCharts from '@/components/daily-goals/daily-goals-charts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PlusIcon, ChartBarIcon, CalendarIcon } from '@heroicons/react/24/outline'
 
@@ -129,6 +130,7 @@ export default function DailyGoalsPage() {
 
         {activeTab === 'history' && (
           <div className="space-y-6">
+            <DailyGoalsCharts />
             <RecentGoals />
           </div>
         )}

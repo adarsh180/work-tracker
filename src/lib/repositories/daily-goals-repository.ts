@@ -117,8 +117,10 @@ export class DailyGoalsRepository {
    * Get today's goal
    */
   static async getToday(userId: string): Promise<DailyGoal | null> {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Get current date in IST
+    const now = new Date()
+    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}))
+    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate())
     
     try {
       // Use upsert with proper unique constraint handling
@@ -170,7 +172,9 @@ export class DailyGoalsRepository {
    * Get daily goal summary with gamification
    */
   static async getDailySummary(userId: string, date: Date): Promise<DailyGoalSummary> {
-    const goal = await this.getByDate(userId, date)
+    // Convert date to IST if needed
+    const istDate = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}))
+    const goal = await this.getByDate(userId, istDate)
     
     if (!goal) {
       return {
@@ -248,8 +252,10 @@ export class DailyGoalsRepository {
    * Get question statistics (daily, weekly, monthly, lifetime)
    */
   static async getQuestionStats(userId: string): Promise<QuestionStats> {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Get current date in IST
+    const now = new Date()
+    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}))
+    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate())
     
     const weekStart = new Date(today)
     weekStart.setDate(today.getDate() - today.getDay())

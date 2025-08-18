@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const comparison = await DailyGoalsRepository.getWeeklyComparison(session.user.id)
+    const comparison = await DailyGoalsRepository.getWeeklyComparison(session.user.email)
 
     return NextResponse.json({
       success: true,

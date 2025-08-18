@@ -14,8 +14,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Get current date in IST
+    const now = new Date()
+    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}))
+    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate())
     
     const summary = await DailyGoalsRepository.getDailySummary(session.user.email, today)
 

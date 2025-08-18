@@ -17,11 +17,7 @@ type QuestionStats = {
   monthlyProgress: number
 }
 
-type WeeklyComparison = {
-  thisWeek: number
-  lastWeek: number
-  improvement: number
-}
+
 
 export default function QuestionStats() {
   const { data: stats, isLoading } = useQuery<QuestionStats>({
@@ -31,18 +27,12 @@ export default function QuestionStats() {
       if (!response.ok) throw new Error('Failed to fetch stats')
       const result = await response.json()
       return result.data
-    }
+    },
+    refetchInterval: 2000,
+    staleTime: 500
   })
 
-  const { data: weeklyComparison } = useQuery<WeeklyComparison>({
-    queryKey: ['weekly-comparison'],
-    queryFn: async () => {
-      const response = await fetch('/api/daily-goals/weekly-comparison')
-      if (!response.ok) throw new Error('Failed to fetch weekly comparison')
-      const result = await response.json()
-      return result.data
-    }
-  })
+
 
   const getProgressColor = (progress: number) => {
     if (progress >= 100) return 'text-green-400'
@@ -223,47 +213,7 @@ export default function QuestionStats() {
         </motion.div>
       </div>
 
-      {/* Weekly Comparison */}
-      {weeklyComparison && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="glass-effect border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Weekly Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-sm text-gray-400 mb-1">This Week</div>
-                  <div className="text-2xl font-bold text-white">{weeklyComparison.thisWeek}</div>
-                  <div className="text-xs text-gray-400">questions</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm text-gray-400 mb-1">Last Week</div>
-                  <div className="text-2xl font-bold text-white">{weeklyComparison.lastWeek}</div>
-                  <div className="text-xs text-gray-400">questions</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm text-gray-400 mb-1">Improvement</div>
-                  <div className={`text-2xl font-bold ${
-                    weeklyComparison.improvement > 0 ? 'text-green-400' : 
-                    weeklyComparison.improvement < 0 ? 'text-red-400' : 'text-gray-400'
-                  }`}>
-                    {weeklyComparison.improvement > 0 ? '+' : ''}{weeklyComparison.improvement.toFixed(1)}%
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {weeklyComparison.improvement > 0 ? 'Great progress!' : 
-                     weeklyComparison.improvement < 0 ? 'Let\'s improve!' : 'Steady pace'}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+
 
       {/* Motivational Milestones */}
       <motion.div
