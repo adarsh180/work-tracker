@@ -20,12 +20,15 @@ export async function GET(request: NextRequest) {
     let trendData = []
 
     if (period === 'daily') {
-      // Get last 30 days of daily goals
+      // Get last 365 days of daily goals (most recent)
       const dailyGoals = await prisma.dailyGoal.findMany({
         where: { userId: session.user.email },
-        orderBy: { date: 'asc' },
-        take: 30
+        orderBy: { date: 'desc' },
+        take: 365
       })
+      
+      // Reverse to show chronological order (oldest to newest)
+      dailyGoals.reverse()
 
       trendData = dailyGoals.map(goal => ({
         date: goal.date.toISOString().split('T')[0],
@@ -38,9 +41,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (period === 'weekly') {
-      // Get weekly aggregated data
+      // Get last 54 weeks of data for weekly aggregation
+      const fiftyFourWeeksAgo = new Date()
+      fiftyFourWeeksAgo.setDate(fiftyFourWeeksAgo.getDate() - (54 * 7))
+      
       const dailyGoals = await prisma.dailyGoal.findMany({
-        where: { userId: session.user.email },
+        where: { 
+          userId: session.user.email,
+          date: { gte: fiftyFourWeeksAgo }
+        },
         orderBy: { date: 'asc' }
       })
 
@@ -65,13 +74,19 @@ export async function GET(request: NextRequest) {
         week.totalQuestions += goal.totalQuestions
       })
 
-      trendData = Array.from(weeklyData.values()).slice(-12) // Last 12 weeks
+      trendData = Array.from(weeklyData.values()).slice(-54) // Last 54 weeks only
     }
 
     if (period === 'monthly') {
-      // Get monthly aggregated data
+      // Get last 12 months of data for monthly aggregation
+      const twelveMonthsAgo = new Date()
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
+      
       const dailyGoals = await prisma.dailyGoal.findMany({
-        where: { userId: session.user.email },
+        where: { 
+          userId: session.user.email,
+          date: { gte: twelveMonthsAgo }
+        },
         orderBy: { date: 'asc' }
       })
 
@@ -94,7 +109,7 @@ export async function GET(request: NextRequest) {
         month.totalQuestions += goal.totalQuestions
       })
 
-      trendData = Array.from(monthlyData.values()).slice(-12) // Last 12 months
+      trendData = Array.from(monthlyData.values()).slice(-12) // Last 12 months only
     }
 
     return NextResponse.json({

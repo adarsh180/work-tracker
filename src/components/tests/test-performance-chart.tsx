@@ -129,8 +129,14 @@ export default function TestPerformanceChart() {
       <CardContent>
         <div className="space-y-4">
           {/* Chart */}
-          <div className="relative">
-            <svg width={chartWidth} height={chartHeight} className="w-full h-auto">
+          <div className="relative overflow-hidden rounded-lg">
+            <svg 
+              width={chartWidth} 
+              height={chartHeight} 
+              className="w-full h-auto max-w-full" 
+              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+              preserveAspectRatio="xMidYMid meet"
+            >
               {/* Grid lines */}
               <defs>
                 <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -174,31 +180,37 @@ export default function TestPerformanceChart() {
                 strokeLinejoin="round"
               />
               
-              {/* Data points */}
-              {points.map((point, index) => (
-                <g key={index}>
-                  <circle
-                    cx={point.x}
-                    cy={point.y}
-                    r="4"
-                    fill="#3B82F6"
-                    stroke="#1E293B"
-                    strokeWidth="2"
-                  />
-                  {/* Tooltip on hover */}
-                  <circle
-                    cx={point.x}
-                    cy={point.y}
-                    r="8"
-                    fill="transparent"
-                    className="hover:fill-blue-500/20 cursor-pointer"
-                  >
-                    <title>
-                      {point.data.testNumber} ({point.data.testType}): {point.data.score}/720 ({point.data.percentage}%) on {new Date(point.data.date).toLocaleDateString()}
-                    </title>
-                  </circle>
-                </g>
-              ))}
+              {/* Data points - ensure they stay within bounds */}
+              {points.map((point, index) => {
+                // Clamp points within chart area
+                const clampedX = Math.max(padding, Math.min(point.x, chartWidth - padding))
+                const clampedY = Math.max(padding, Math.min(point.y, chartHeight - padding))
+                
+                return (
+                  <g key={index}>
+                    <circle
+                      cx={clampedX}
+                      cy={clampedY}
+                      r="4"
+                      fill="#3B82F6"
+                      stroke="#1E293B"
+                      strokeWidth="2"
+                    />
+                    {/* Tooltip on hover */}
+                    <circle
+                      cx={clampedX}
+                      cy={clampedY}
+                      r="8"
+                      fill="transparent"
+                      className="hover:fill-blue-500/20 cursor-pointer"
+                    >
+                      <title>
+                        {point.data.testNumber} ({point.data.testType}): {point.data.score}/720 ({point.data.percentage}%) on {new Date(point.data.date).toLocaleDateString()}
+                      </title>
+                    </circle>
+                  </g>
+                )
+              })}
               
               {/* X-axis */}
               <line 

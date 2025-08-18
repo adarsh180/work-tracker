@@ -116,12 +116,27 @@ export default function DailyGoalsCharts() {
     }
 
     const yAxisTicks = [0, Math.floor(maxQuestions * 0.25), Math.floor(maxQuestions * 0.5), Math.floor(maxQuestions * 0.75), maxQuestions]
-    const xAxisTicks = data.length > 10 ? data.filter((_, i) => i % Math.ceil(data.length / 8) === 0) : data
+    // Smart X-axis labeling based on chart type
+    const getMaxLabels = (chartType: string) => {
+      if (chartType === 'daily') return 12 // Show ~12 labels for 365 days
+      if (chartType === 'weekly') return 10 // Show ~10 labels for 54 weeks  
+      return 8 // Show 8 labels for 12 months
+    }
+    
+    const maxLabels = getMaxLabels(type)
+    const labelStep = Math.max(1, Math.ceil(data.length / maxLabels))
+    const xAxisTicks = data.filter((_, i) => i % labelStep === 0 || i === data.length - 1)
 
     return (
       <div className="bg-gradient-to-br from-background-secondary/20 to-background-secondary/5 rounded-xl p-6">
-        <div className="relative overflow-hidden">
-          <svg width={containerWidth} height={containerHeight} className="w-full h-auto" viewBox={`0 0 ${containerWidth} ${containerHeight}`}>
+        <div className="relative overflow-hidden rounded-lg">
+          <svg 
+            width={containerWidth} 
+            height={containerHeight} 
+            className="w-full h-auto max-w-full" 
+            viewBox={`0 0 ${containerWidth} ${containerHeight}`}
+            preserveAspectRatio="xMidYMid meet"
+          >
             {/* Background gradient */}
             <defs>
               <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -135,6 +150,9 @@ export default function DailyGoalsCharts() {
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <clipPath id="chartClip">
+                <rect x={padding.left} y={padding.top} width={chartWidth} height={chartHeight} />
+              </clipPath>
             </defs>
             
             {/* Chart area background */}
@@ -222,6 +240,7 @@ export default function DailyGoalsCharts() {
               d={`${pathData} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`}
               fill="url(#chartGradient)"
               opacity="0.3"
+              clipPath="url(#chartClip)"
             />
             
             {/* Performance line */}
@@ -233,36 +252,43 @@ export default function DailyGoalsCharts() {
               strokeLinecap="round"
               strokeLinejoin="round"
               filter="url(#glow)"
+              clipPath="url(#chartClip)"
             />
             
-            {/* Data points */}
-            {points.map((point, index) => (
-              <g key={index}>
-                <circle
-                  cx={point.x}
-                  cy={point.y}
-                  r="6"
-                  fill="#1E293B"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                />
-                <circle
-                  cx={point.x}
-                  cy={point.y}
-                  r="3"
-                  fill="#3B82F6"
-                />
-                <circle
-                  cx={point.x}
-                  cy={point.y}
-                  r="12"
-                  fill="transparent"
-                  className="hover:fill-blue-500/20 cursor-pointer transition-all"
-                >
-                  <title>{getTooltip(point.data, type)}</title>
-                </circle>
-              </g>
-            ))}
+            {/* Data points - ensure they stay within bounds */}
+            {points.map((point, index) => {
+              // Clamp points within chart area
+              const clampedX = Math.max(padding.left, Math.min(point.x, padding.left + chartWidth))
+              const clampedY = Math.max(padding.top, Math.min(point.y, padding.top + chartHeight))
+              
+              return (
+                <g key={index}>
+                  <circle
+                    cx={clampedX}
+                    cy={clampedY}
+                    r="6"
+                    fill="#1E293B"
+                    stroke="#3B82F6"
+                    strokeWidth="3"
+                  />
+                  <circle
+                    cx={clampedX}
+                    cy={clampedY}
+                    r="3"
+                    fill="#3B82F6"
+                  />
+                  <circle
+                    cx={clampedX}
+                    cy={clampedY}
+                    r="12"
+                    fill="transparent"
+                    className="hover:fill-blue-500/20 cursor-pointer transition-all"
+                  >
+                    <title>{getTooltip(point.data, type)}</title>
+                  </circle>
+                </g>
+              )
+            })}
             
             {/* Axis labels */}
             <text 

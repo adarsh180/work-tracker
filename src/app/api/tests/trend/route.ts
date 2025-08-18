@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     } else {
       trend = await TestPerformanceRepository.getPerformanceTrend(
         session.user.email, 
-        limit ? parseInt(limit) : undefined
+        limit ? parseInt(limit) : 100 // Default limit of 100 tests
       )
     }
 
