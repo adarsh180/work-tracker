@@ -15,6 +15,7 @@ import DailyGoalsCard from '@/components/dashboard/daily-goals-card'
 import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
 import NEETCountdownTimer from '@/components/ui/neet-countdown-timer'
+import AIR50CycleSummary from '@/components/dashboard/air50-cycle-summary'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -193,6 +194,7 @@ export default function Home() {
             <SubjectsGrid />
           </div>
           <div className="space-y-6">
+            <AIR50CycleSummary />
             <NEETCountdownTimer />
             <DailyGoalsCard />
             <YesterdayPerformance />

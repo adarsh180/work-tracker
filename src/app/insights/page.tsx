@@ -4,6 +4,11 @@ import { useState } from 'react'
 import DashboardLayout from '@/components/dashboard/dashboard-layout'
 import AIRPredictionDashboard from '@/components/ai/air-prediction-dashboard'
 import EnhancedMenstrualTracker from '@/components/ai/enhanced-menstrual-tracker'
+import CycleOptimizedScheduler from '@/components/ai/cycle-optimized-scheduler'
+import EnergyMoodPredictor from '@/components/ai/energy-mood-predictor'
+import CycleStudyTechniques from '@/components/ai/cycle-study-techniques'
+import HormonalOptimizationPanel from '@/components/ai/hormonal-optimization-panel'
+import EmergencySupportSystem from '@/components/ai/emergency-support-system'
 import RigorousRankingDashboard from '@/components/ai/rigorous-ranking-dashboard'
 import AISuggestionsSection from '@/components/ai/ai-suggestions-section'
 import SmartStudyPlanner from '@/components/enhanced/smart-study-planner'
@@ -12,7 +17,7 @@ import ProgressAnalytics from '@/components/enhanced/progress-analytics'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function InsightsPage() {
-  const [activeTab, setActiveTab] = useState<'prediction' | 'biology' | 'ai-suggestions' | 'schedule' | 'memory' | 'progress'>('prediction')
+  const [activeTab, setActiveTab] = useState<'prediction' | 'biology' | 'cycle-schedule' | 'energy-prediction' | 'study-techniques' | 'hormonal' | 'emergency' | 'ai-suggestions' | 'schedule' | 'memory' | 'progress'>('prediction')
 
   return (
     <DashboardLayout 
@@ -40,7 +45,57 @@ export default function InsightsPage() {
                 : 'text-gray-400 hover:text-white hover:bg-background-secondary'
             }`}
           >
-            🌸 Biology Sync
+            🌸 Cycle Tracker
+          </button>
+          <button
+            onClick={() => setActiveTab('cycle-schedule')}
+            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'cycle-schedule'
+                ? 'bg-primary text-white'
+                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
+            }`}
+          >
+            🗓️ AI Schedule
+          </button>
+          <button
+            onClick={() => setActiveTab('energy-prediction')}
+            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'energy-prediction'
+                ? 'bg-primary text-white'
+                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
+            }`}
+          >
+            🔮 Energy Predictor
+          </button>
+          <button
+            onClick={() => setActiveTab('study-techniques')}
+            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'study-techniques'
+                ? 'bg-primary text-white'
+                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
+            }`}
+          >
+            📚 Study Techniques
+          </button>
+          <button
+            onClick={() => setActiveTab('hormonal')}
+            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'hormonal'
+                ? 'bg-primary text-white'
+                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
+            }`}
+          >
+            🧬 Hormonal Boost
+          </button>
+          <button
+            onClick={() => setActiveTab('emergency')}
+            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'emergency'
+                ? 'bg-primary text-white'
+                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
+            }`}
+          >
+            🆘 Emergency Support
           </button>
           <button
             onClick={() => setActiveTab('ai-suggestions')}
@@ -92,6 +147,11 @@ export default function InsightsPage() {
           </div>
         )}
         {activeTab === 'biology' && <EnhancedMenstrualTracker />}
+        {activeTab === 'cycle-schedule' && <CycleOptimizedScheduler />}
+        {activeTab === 'energy-prediction' && <EnergyMoodPredictor />}
+        {activeTab === 'study-techniques' && <CycleStudyTechniques />}
+        {activeTab === 'hormonal' && <HormonalOptimizationPanel />}
+        {activeTab === 'emergency' && <EmergencySupportSystem />}
         {activeTab === 'ai-suggestions' && <AISuggestionsSection predictedAIR={1250} />}
         {activeTab === 'schedule' && <SmartStudyPlanner />}
         {activeTab === 'memory' && <MemoryRetentionSystem />}
