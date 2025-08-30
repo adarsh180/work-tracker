@@ -150,3 +150,159 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verificationtokens")
 }
+
+
+
+model MenstrualCycle {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  cycleStartDate  DateTime @map("cycle_start_date") @db.Date
+  cycleLength     Int      @default(28) @map("cycle_length")
+  periodLength    Int      @default(5) @map("period_length")
+  symptoms        Json     @default("[]") // ["cramps", "mood_swings", "fatigue", "headache"]
+  energyLevel     Int      @default(5) @map("energy_level") // 1-10 scale
+  studyCapacity   Int      @default(5) @map("study_capacity") // 1-10 scale
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("menstrual_cycles")
+}
+
+model BSCSchedule {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  semester      Int
+  subject       String
+  examDate      DateTime @map("exam_date") @db.Date
+  syllabusLoad  Int      @default(5) @map("syllabus_load") // 1-10 scale
+  priority      String   @default("medium") // "high", "medium", "low"
+  status        String   @default("pending") // "pending", "completed", "in_progress"
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("bsc_schedules")
+}
+
+model SmartStudyPlan {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  totalStudyHours Float    @default(0) @map("total_study_hours")
+  energyLevel     Int      @default(5) @map("energy_level") // 1-10
+  focusLevel      Int      @default(5) @map("focus_level") // 1-10
+  schedule        Json     @default("[]") // Array of study blocks
+  completed       Boolean  @default(false)
+  aiGenerated     Boolean  @default(false) @map("ai_generated")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date])
+  @@map("smart_study_plans")
+}
+
+model MemoryItem {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  subject         String
+  chapter         String
+  concept         String
+  content         String
+  itemType        String   @map("item_type") // "formula", "concept", "fact", "diagram"
+  difficulty      Int      @default(3) // 1-5 scale
+  lastReviewed    DateTime? @map("last_reviewed")
+  nextReview      DateTime @map("next_review")
+  reviewCount     Int      @default(0) @map("review_count")
+  retentionScore  Float    @default(0) @map("retention_score") // 0-1
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("memory_items")
+}
+
+model StudySession {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  subject         String
+  chapter         String?
+  startTime       DateTime @map("start_time")
+  endTime         DateTime? @map("end_time")
+  duration        Int      @default(0) // minutes
+  focusScore      Int      @default(5) @map("focus_score") // 1-10
+  productivity    Int      @default(5) // 1-10
+  questionsAttempted Int   @default(0) @map("questions_attempted")
+  questionsCorrect   Int   @default(0) @map("questions_correct")
+  breaksTaken     Int      @default(0) @map("breaks_taken")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("study_sessions")
+}
+
+model SleepData {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  date        DateTime @db.Date
+  bedTime     DateTime @map("bed_time")
+  sleepTime   DateTime @map("sleep_time")
+  wakeTime    DateTime @map("wake_time")
+  duration    Float    @default(0) // hours
+  quality     Int      @default(5) // 1-10 scale
+  remSleep    Float    @default(0) @map("rem_sleep") // hours
+  deepSleep   Float    @default(0) @map("deep_sleep") // hours
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date])
+  @@map("sleep_data")
+}
+
+model IndianFestival {
+  id          String   @id @default(cuid())
+  name        String
+  date        DateTime @db.Date
+  duration    Int      @default(1) // days
+  impact      String   @default("medium") // "high", "medium", "low" - study impact
+  region      String   @default("national")
+  studyAdjust String?  @map("study_adjust") // AI recommendation for study adjustment
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("indian_festivals")
+}
+
+model SmartReminder {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  type          String   // "study", "break", "revision", "test", "health"
+  title         String
+  message       String
+  scheduledFor  DateTime @map("scheduled_for")
+  isRecurring   Boolean  @default(false) @map("is_recurring")
+  recurringType String?  @map("recurring_type") // "daily", "weekly", "monthly"
+  priority      String   @default("medium") // "high", "medium", "low"
+  isCompleted   Boolean  @default(false) @map("is_completed")
+  aiGenerated   Boolean  @default(false) @map("ai_generated")
+  contextData   Json?    @map("context_data") // Additional context for AI
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("smart_reminders")
+}
+
+model AIRPrediction {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  predictedAIR      Int      @map("predicted_air")
+  confidenceScore   Float    @map("confidence_score") // 0-1
+  currentProgress   Float    @map("current_progress") // 0-100
+  requiredProgress  Float    @map("required_progress") // 0-100
+  timeRemaining     Int      @map("time_remaining") // days
+  keyFactors        Json     @map("key_factors") // Factors affecting prediction
+  recommendations   Json     @map("recommendations") // AI recommendations
+  riskAssessment    String   @map("risk_assessment") // "low", "medium", "high"
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("air_predictions")
+}

@@ -182,7 +182,7 @@ export function SubjectChangesProvider({ children, onSaveComplete }: SubjectChan
     } finally {
       setIsSaving(false)
     }
-  }, [pendingChanges, clearChanges, onSaveComplete])
+  }, [pendingChanges, clearChanges, onSaveComplete, queryClient])
 
   const hasChanges = pendingChanges.length > 0 || Object.keys(pendingChangeMap).length > 0
 
