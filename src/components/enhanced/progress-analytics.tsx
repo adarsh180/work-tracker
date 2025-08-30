@@ -116,7 +116,7 @@ export default function ProgressAnalytics() {
 
       {/* Lifetime Stats Overview */}
       {stats?.lifetime && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <Card className="glass-effect border-blue-400/30">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-blue-400 mb-1">
@@ -128,17 +128,17 @@ export default function ProgressAnalytics() {
           <Card className="glass-effect border-green-400/30">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-green-400 mb-1">
-                {stats.lifetime.totalSessions}
+                {stats.lifetime.totalQuestions.toLocaleString()}
               </div>
-              <div className="text-sm text-gray-300">Sessions</div>
+              <div className="text-sm text-gray-300">Questions</div>
             </CardContent>
           </Card>
           <Card className="glass-effect border-yellow-400/30">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-yellow-400 mb-1">
-                {stats.lifetime.totalQuestions.toLocaleString()}
+                {stats.lifetime.avgTestScore}
               </div>
-              <div className="text-sm text-gray-300">Questions</div>
+              <div className="text-sm text-gray-300">Avg Test Score</div>
             </CardContent>
           </Card>
           <Card className="glass-effect border-purple-400/30">
@@ -147,6 +147,22 @@ export default function ProgressAnalytics() {
                 {stats.lifetime.accuracy}%
               </div>
               <div className="text-sm text-gray-300">Accuracy</div>
+            </CardContent>
+          </Card>
+          <Card className="glass-effect border-pink-400/30">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-pink-400 mb-1">
+                {stats.lifetime.totalPlans}
+              </div>
+              <div className="text-sm text-gray-300">Study Plans</div>
+            </CardContent>
+          </Card>
+          <Card className="glass-effect border-indigo-400/30">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-indigo-400 mb-1">
+                {stats.lifetime.goalSuccessRate}%
+              </div>
+              <div className="text-sm text-gray-300">Goals Achieved</div>
             </CardContent>
           </Card>
         </div>

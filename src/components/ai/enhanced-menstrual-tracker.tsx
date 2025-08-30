@@ -316,15 +316,15 @@ export default function EnhancedMenstrualTracker() {
                     </button>
                     <button
                       onClick={() => {
-                        setHasTrackedPeriod(false)
-                        setLastPeriodDate('')
+                        // Add new period entry instead of resetting
+                        const today = new Date().toISOString().split('T')[0]
+                        setLastPeriodDate(today)
                         setPeriodEndDate('')
-                        setIsInitialized(false)
-                        queryClient.invalidateQueries({ queryKey: ['menstrual-cycles'] })
+                        // Keep tracking enabled to add new cycle
                       }}
-                      className="text-gray-400 hover:text-white text-sm underline"
+                      className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded text-sm"
                     >
-                      Reset Tracking
+                      Add New Period
                     </button>
                   </div>
                 </div>

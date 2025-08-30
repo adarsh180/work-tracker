@@ -36,6 +36,19 @@ export class SmartStudyPlanner {
     menstrualPhase?: string
   }): Promise<SmartPlan> {
     try {
+      // Check if plan exists for this date
+      const existingPlan = await prisma.smartStudyPlan.findUnique({
+        where: {
+          userId_date: {
+            userId,
+            date
+          }
+        }
+      })
+
+      // If it's a new day, reset completion status
+      const isNewDay = !existingPlan || new Date(existingPlan.date).toDateString() !== date.toDateString()
+      
       // Get user data for context
       const [subjects, dailyGoals, testPerformances, sleepData] = await Promise.all([
         prisma.subject.findMany({ include: { chapters: true } }),
@@ -58,12 +71,24 @@ export class SmartStudyPlanner {
       ])
 
       // Generate AI-powered schedule
-      const aiSchedule = await this.generateAISchedule(
+      let aiSchedule = await this.generateAISchedule(
         preferences,
         subjects,
         testPerformances,
         sleepData
       )
+
+      // Reset completion status for new day
+      if (isNewDay) {
+        aiSchedule = aiSchedule.map(block => ({ ...block, completed: false }))
+      } else if (existingPlan) {
+        // Preserve existing completion status
+        const existingSchedule = existingPlan.schedule as StudyBlock[]
+        aiSchedule = aiSchedule.map(block => {
+          const existingBlock = existingSchedule.find(eb => eb.id === block.id)
+          return existingBlock ? { ...block, completed: existingBlock.completed } : block
+        })
+      }
 
       // Save to database
       const studyPlan = await prisma.smartStudyPlan.upsert({
@@ -74,7 +99,7 @@ export class SmartStudyPlanner {
           }
         },
         update: {
-          totalStudyHours: preferences.availableHours,
+          totalStudyHours: 14, // Set target to 14 hours
           energyLevel: preferences.energyLevel,
           focusLevel: sleepData?.quality || 5,
           schedule: aiSchedule,
@@ -83,7 +108,7 @@ export class SmartStudyPlanner {
         create: {
           userId,
           date,
-          totalStudyHours: preferences.availableHours,
+          totalStudyHours: 14, // Set target to 14 hours
           energyLevel: preferences.energyLevel,
           focusLevel: sleepData?.quality || 5,
           schedule: aiSchedule,

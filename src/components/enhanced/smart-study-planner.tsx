@@ -59,7 +59,12 @@ export default function SmartStudyPlanner() {
 
   const updateBlock = useMutation({
     mutationFn: async ({ blockId, completed }: { blockId: string; completed: boolean }) => {
-      if (!currentPlan?.id) throw new Error('No plan ID')
+      if (!currentPlan?.id) {
+        console.error('No plan ID available for update')
+        throw new Error('No plan ID')
+      }
+      
+      console.log('Updating block:', { planId: currentPlan.id, blockId, completed })
       
       const response = await fetch('/api/smart-study-plan', {
         method: 'PATCH',
@@ -70,11 +75,23 @@ export default function SmartStudyPlanner() {
           completed
         })
       })
-      if (!response.ok) throw new Error('Failed to update block')
-      return response.json()
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Update failed:', errorText)
+        throw new Error(`Failed to update block: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      console.log('Update successful:', result)
+      return result
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['smart-study-plan', selectedDate] })
+      console.log('Invalidating queries after successful update')
+      queryClient.invalidateQueries({ queryKey: ['smart-study-plan', selectedDate, energyLevel, availableHours, weakAreas] })
+    },
+    onError: (error) => {
+      console.error('Update block mutation error:', error)
     }
   })
 
@@ -182,14 +199,59 @@ export default function SmartStudyPlanner() {
                   transition={{ duration: 0.5 }}
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              {/* Praise Message */}
+              {(() => {
+                const completedHours = currentPlan.schedule
+                  .filter(block => block.completed && block.type === 'study')
+                  .reduce((sum, block) => sum + (block.duration / 60), 0)
+                const targetHours = 14
+                const completionRate = (completedHours / targetHours) * 100
+                
+                let praiseMessage = ''
+                let praiseColor = ''
+                
+                if (completionRate >= 85) {
+                  praiseMessage = `🎉 AMAZING! ${completedHours.toFixed(1)}h/${targetHours}h completed! You're absolutely crushing it, Dr. Misti! 👩⚕️✨`
+                  praiseColor = 'text-green-400'
+                } else if (completionRate >= 70) {
+                  praiseMessage = `🔥 EXCELLENT! ${completedHours.toFixed(1)}h/${targetHours}h completed! You're doing incredibly well! 💪`
+                  praiseColor = 'text-blue-400'
+                } else if (completionRate >= 50) {
+                  praiseMessage = `💪 GREAT WORK! ${completedHours.toFixed(1)}h/${targetHours}h completed! Keep this momentum going! 🌟`
+                  praiseColor = 'text-yellow-400'
+                } else if (completedHours > 0) {
+                  praiseMessage = `🚀 GOOD START! ${completedHours.toFixed(1)}h/${targetHours}h completed! Every hour counts towards your dream! 📚`
+                  praiseColor = 'text-purple-400'
+                }
+                
+                return praiseMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center p-3 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg border border-pink-400/20 mb-4"
+                  >
+                    <div className={`font-medium ${praiseColor}`}>{praiseMessage}</div>
+                  </motion.div>
+                )
+              })()}
+              
+              <div className="grid grid-cols-4 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-blue-400">{currentPlan.totalStudyHours}h</div>
-                  <div className="text-sm text-gray-400">Planned</div>
+                  <div className="text-2xl font-bold text-blue-400">14h</div>
+                  <div className="text-sm text-gray-400">Target</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-400">{Math.round(progressPercentage)}%</div>
-                  <div className="text-sm text-gray-400">Complete</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    {currentPlan.schedule
+                      .filter(block => block.completed && block.type === 'study')
+                      .reduce((sum, block) => sum + (block.duration / 60), 0)
+                      .toFixed(1)}h
+                  </div>
+                  <div className="text-sm text-gray-400">Completed</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-purple-400">{Math.round(progressPercentage)}%</div>
+                  <div className="text-sm text-gray-400">Progress</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-yellow-400">{currentPlan.energyLevel}/10</div>
@@ -255,23 +317,28 @@ export default function SmartStudyPlanner() {
                       }`}>
                         {block.priority}
                       </span>
-                      <button
+                      <div 
                         onClick={(e) => {
                           e.stopPropagation()
-                          console.log('Checkbox clicked:', { planId: currentPlan?.id, blockId: block.id, completed: !block.completed })
-                          if (currentPlan?.id) {
-                            updateBlock.mutate({ blockId: block.id, completed: !block.completed })
-                          } else {
-                            console.error('No plan ID available')
+                          if (currentPlan?.id && !updateBlock.isPending) {
+                            updateBlock.mutate({ 
+                              blockId: block.id, 
+                              completed: !block.completed 
+                            })
                           }
                         }}
-                        disabled={updateBlock.isPending || !currentPlan?.id}
-                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors cursor-pointer hover:scale-110 ${
-                          block.completed ? 'bg-green-500 border-green-500' : 'border-gray-400 hover:border-gray-300'
-                        } ${!currentPlan?.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-6 h-6 rounded border-2 flex items-center justify-center cursor-pointer transition-all ${
+                          block.completed 
+                            ? 'bg-green-500 border-green-500 text-white' 
+                            : 'border-gray-400 hover:border-green-400 hover:bg-green-500/10'
+                        } ${updateBlock.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        {block.completed && <span className="text-white text-sm">✓</span>}
-                      </button>
+                        {block.completed && (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
