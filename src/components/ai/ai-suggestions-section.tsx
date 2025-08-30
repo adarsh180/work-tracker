@@ -136,9 +136,28 @@ export default function AISuggestionsSection({ predictedAIR }: Props) {
                 </CardHeader>
                 <CardContent>
                   <div 
-                    className="text-gray-300 leading-relaxed prose prose-invert max-w-none"
+                    className="text-gray-300 leading-relaxed prose prose-invert max-w-none ai-suggestions-content"
                     dangerouslySetInnerHTML={{ __html: aiSuggestions[activeInsight] }}
                   />
+                  <style jsx>{`
+                    .ai-suggestions-content {
+                      line-height: 1.6;
+                    }
+                    .ai-suggestions-content h3,
+                    .ai-suggestions-content h4,
+                    .ai-suggestions-content h5 {
+                      margin-bottom: 0.75rem;
+                    }
+                    .ai-suggestions-content p {
+                      margin-bottom: 1rem;
+                    }
+                    .ai-suggestions-content ul {
+                      margin-bottom: 1rem;
+                    }
+                    .ai-suggestions-content li {
+                      margin-bottom: 0.25rem;
+                    }
+                  `}</style>
                 </CardContent>
               </Card>
             </motion.div>
