@@ -204,7 +204,12 @@ export class SubjectRepository {
   static async getDashboardSummary() {
     const subjects = await this.getAll()
     
-    return subjects.map(subject => {
+    // Filter out only cardiology and neurology, keep all other subjects
+    const filteredSubjects = subjects.filter(subject => 
+      !['Cardiology', 'Neurology', 'cardiology', 'neurology'].includes(subject.name)
+    )
+    
+    return filteredSubjects.map(subject => {
       const totalChapters = subject.chapters.length
       let totalLectures = 0
       let completedLectures = 0

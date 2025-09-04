@@ -1,13 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -16,8 +13,7 @@ model Subject {
   name                 String  @unique
   totalQuestions       Int     @default(0) @map("total_questions")
   completionPercentage Float   @default(0) @map("completion_percentage")
-
-  chapters Chapter[]
+  chapters             Chapter[]
 
   @@map("subjects")
 }
@@ -35,8 +31,7 @@ model Chapter {
   kattarQuestions       Int     @default(0) @map("kattar_questions")
   kattarCompleted       Json    @default("[]") @map("kattar_completed")
   revisionScore         Int     @default(1) @map("revision_score")
-
-  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject               Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([subjectId, name])
   @@map("chapters")
@@ -46,8 +41,8 @@ model TestPerformance {
   id         String   @id @default(cuid())
   userId     String   @map("user_id")
   testType   String   @map("test_type")
-  testNumber String   @map("test_number") // e.g., "Test-01", "Test-02"
-  score      Int      // 0-720 range
+  testNumber String   @map("test_number")
+  score      Int
   testDate   DateTime @map("test_date")
   createdAt  DateTime @default(now()) @map("created_at")
 
@@ -57,7 +52,7 @@ model TestPerformance {
 model MoodEntry {
   id   String   @id @default(cuid())
   date DateTime @unique @db.Date
-  mood String   // 'sad', 'neutral', 'happy'
+  mood String
 
   @@map("mood_entries")
 }
@@ -105,9 +100,8 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  accounts Account[]
-  sessions Session[]
+  accounts      Account[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -125,8 +119,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -151,37 +144,35 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-
-
 model MenstrualCycle {
-  id              String   @id @default(cuid())
-  userId          String   @map("user_id")
-  cycleStartDate  DateTime @map("cycle_start_date") @db.Date
-  cycleLength     Int      @default(28) @map("cycle_length")
-  periodLength    Int      @default(5) @map("period_length")
-  symptoms        Json     @default("[]") // ["cramps", "mood_swings", "fatigue", "headache"]
-  energyLevel     Int      @default(5) @map("energy_level") // 1-10 scale
-  studyCapacity   Int      @default(5) @map("study_capacity") // 1-10 scale
-  moodLevel       Int      @default(5) @map("mood_level") // 1-10 scale
-  focusLevel      Int      @default(5) @map("focus_level") // 1-10 scale
-  notes           String?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  cycleStartDate DateTime @map("cycle_start_date") @db.Date
+  cycleLength    Int      @default(28) @map("cycle_length")
+  periodLength   Int      @default(5) @map("period_length")
+  symptoms       Json
+  energyLevel    Int      @default(5) @map("energy_level")
+  studyCapacity  Int      @default(5) @map("study_capacity")
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  focusLevel     Int      @default(5) @map("focus_level")
+  moodLevel      Int      @default(5) @map("mood_level")
 
   @@map("menstrual_cycles")
 }
 
 model BSCSchedule {
-  id            String   @id @default(cuid())
-  userId        String   @map("user_id")
-  semester      Int
-  subject       String
-  examDate      DateTime @map("exam_date") @db.Date
-  syllabusLoad  Int      @default(5) @map("syllabus_load") // 1-10 scale
-  priority      String   @default("medium") // "high", "medium", "low"
-  status        String   @default("pending") // "pending", "completed", "in_progress"
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  semester     Int
+  subject      String
+  examDate     DateTime @map("exam_date") @db.Date
+  syllabusLoad Int      @default(5) @map("syllabus_load")
+  priority     String   @default("medium")
+  status       String   @default("pending")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("bsc_schedules")
 }
@@ -191,9 +182,9 @@ model SmartStudyPlan {
   userId          String   @map("user_id")
   date            DateTime @db.Date
   totalStudyHours Float    @default(0) @map("total_study_hours")
-  energyLevel     Int      @default(5) @map("energy_level") // 1-10
-  focusLevel      Int      @default(5) @map("focus_level") // 1-10
-  schedule        Json     @default("[]") // Array of study blocks
+  energyLevel     Int      @default(5) @map("energy_level")
+  focusLevel      Int      @default(5) @map("focus_level")
+  schedule        Json
   completed       Boolean  @default(false)
   aiGenerated     Boolean  @default(false) @map("ai_generated")
   createdAt       DateTime @default(now()) @map("created_at")
@@ -204,58 +195,58 @@ model SmartStudyPlan {
 }
 
 model MemoryItem {
-  id              String   @id @default(cuid())
-  userId          String   @map("user_id")
-  subject         String
-  chapter         String
-  concept         String
-  content         String
-  itemType        String   @map("item_type") // "formula", "concept", "fact", "diagram"
-  difficulty      Int      @default(3) // 1-5 scale
-  lastReviewed    DateTime? @map("last_reviewed")
-  nextReview      DateTime @map("next_review")
-  reviewCount     Int      @default(0) @map("review_count")
-  retentionScore  Float    @default(0) @map("retention_score") // 0-1
-  isActive        Boolean  @default(true) @map("is_active")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(cuid())
+  userId         String    @map("user_id")
+  subject        String
+  chapter        String
+  concept        String
+  content        String
+  itemType       String    @map("item_type")
+  difficulty     Int       @default(3)
+  lastReviewed   DateTime? @map("last_reviewed")
+  nextReview     DateTime  @map("next_review")
+  reviewCount    Int       @default(0) @map("review_count")
+  retentionScore Float     @default(0) @map("retention_score")
+  isActive       Boolean   @default(true) @map("is_active")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("memory_items")
 }
 
 model StudySession {
-  id              String   @id @default(cuid())
-  userId          String   @map("user_id")
-  subject         String
-  chapter         String?
-  startTime       DateTime @map("start_time")
-  endTime         DateTime? @map("end_time")
-  duration        Int      @default(0) // minutes
-  focusScore      Int      @default(5) @map("focus_score") // 1-10
-  productivity    Int      @default(5) // 1-10
-  questionsAttempted Int   @default(0) @map("questions_attempted")
-  questionsCorrect   Int   @default(0) @map("questions_correct")
-  breaksTaken     Int      @default(0) @map("breaks_taken")
-  notes           String?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  subject            String
+  chapter            String?
+  startTime          DateTime  @map("start_time")
+  endTime            DateTime? @map("end_time")
+  duration           Int       @default(0)
+  focusScore         Int       @default(5) @map("focus_score")
+  productivity       Int       @default(5)
+  questionsAttempted Int       @default(0) @map("questions_attempted")
+  questionsCorrect   Int       @default(0) @map("questions_correct")
+  breaksTaken        Int       @default(0) @map("breaks_taken")
+  notes              String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   @@map("study_sessions")
 }
 
 model SleepData {
-  id          String   @id @default(cuid())
-  userId      String   @map("user_id")
-  date        DateTime @db.Date
-  bedTime     DateTime @map("bed_time")
-  sleepTime   DateTime @map("sleep_time")
-  wakeTime    DateTime @map("wake_time")
-  duration    Float    @default(0) // hours
-  quality     Int      @default(5) // 1-10 scale
-  remSleep    Float    @default(0) @map("rem_sleep") // hours
-  deepSleep   Float    @default(0) @map("deep_sleep") // hours
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  date      DateTime @db.Date
+  bedTime   DateTime @map("bed_time")
+  sleepTime DateTime @map("sleep_time")
+  wakeTime  DateTime @map("wake_time")
+  duration  Float    @default(0)
+  quality   Int      @default(5)
+  remSleep  Float    @default(0) @map("rem_sleep")
+  deepSleep Float    @default(0) @map("deep_sleep")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([userId, date])
   @@map("sleep_data")
@@ -265,10 +256,10 @@ model IndianFestival {
   id          String   @id @default(cuid())
   name        String
   date        DateTime @db.Date
-  duration    Int      @default(1) // days
-  impact      String   @default("medium") // "high", "medium", "low" - study impact
+  duration    Int      @default(1)
+  impact      String   @default("medium")
   region      String   @default("national")
-  studyAdjust String?  @map("study_adjust") // AI recommendation for study adjustment
+  studyAdjust String?  @map("study_adjust")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("indian_festivals")
@@ -277,16 +268,16 @@ model IndianFestival {
 model SmartReminder {
   id            String   @id @default(cuid())
   userId        String   @map("user_id")
-  type          String   // "study", "break", "revision", "test", "health"
+  type          String
   title         String
   message       String
   scheduledFor  DateTime @map("scheduled_for")
   isRecurring   Boolean  @default(false) @map("is_recurring")
-  recurringType String?  @map("recurring_type") // "daily", "weekly", "monthly"
-  priority      String   @default("medium") // "high", "medium", "low"
+  recurringType String?  @map("recurring_type")
+  priority      String   @default("medium")
   isCompleted   Boolean  @default(false) @map("is_completed")
   aiGenerated   Boolean  @default(false) @map("ai_generated")
-  contextData   Json?    @map("context_data") // Additional context for AI
+  contextData   Json?    @map("context_data")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
@@ -294,34 +285,34 @@ model SmartReminder {
 }
 
 model AIRPrediction {
-  id                String   @id @default(cuid())
-  userId            String   @map("user_id")
-  predictedAIR      Int      @map("predicted_air")
-  confidenceScore   Float    @map("confidence_score") // 0-1
-  currentProgress   Float    @map("current_progress") // 0-100
-  requiredProgress  Float    @map("required_progress") // 0-100
-  timeRemaining     Int      @map("time_remaining") // days
-  keyFactors        Json     @map("key_factors") // Factors affecting prediction
-  recommendations   Json     @map("recommendations") // AI recommendations
-  riskAssessment    String   @map("risk_assessment") // "low", "medium", "high"
-  createdAt         DateTime @default(now()) @map("created_at")
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  predictedAIR     Int      @map("predicted_air")
+  confidenceScore  Float    @map("confidence_score")
+  currentProgress  Float    @map("current_progress")
+  requiredProgress Float    @map("required_progress")
+  timeRemaining    Int      @map("time_remaining")
+  keyFactors       Json     @map("key_factors")
+  recommendations  Json     @map("recommendations")
+  riskAssessment   String   @map("risk_assessment")
+  createdAt        DateTime @default(now()) @map("created_at")
 
   @@map("air_predictions")
 }
 
 model CycleOptimizedSchedule {
-  id              String   @id @default(cuid())
-  userId          String   @map("user_id")
-  date            DateTime @db.Date
-  cyclePhase      String   @map("cycle_phase") // "menstrual", "follicular", "ovulation", "luteal"
-  energyLevel     Int      @map("energy_level") // 1-10
-  studyBlocks     Json     @map("study_blocks") // Optimized study schedule
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  date            DateTime  @db.Date
+  cyclePhase      String    @map("cycle_phase")
+  energyLevel     Int       @map("energy_level")
+  studyBlocks     Json      @map("study_blocks")
   mockTestSlot    DateTime? @map("mock_test_slot")
-  difficultyFocus String   @map("difficulty_focus") // "light", "moderate", "intense"
-  aiGenerated     Boolean  @default(true) @map("ai_generated")
-  completed       Boolean  @default(false)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  difficultyFocus String    @map("difficulty_focus")
+  aiGenerated     Boolean   @default(true) @map("ai_generated")
+  completed       Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   @@unique([userId, date])
   @@map("cycle_optimized_schedules")
@@ -331,12 +322,12 @@ model EnergyMoodPrediction {
   id              String   @id @default(cuid())
   userId          String   @map("user_id")
   date            DateTime @db.Date
-  predictedEnergy Int      @map("predicted_energy") // 1-10
-  predictedMood   Int      @map("predicted_mood") // 1-10
-  predictedFocus  Int      @map("predicted_focus") // 1-10
+  predictedEnergy Int      @map("predicted_energy")
+  predictedMood   Int      @map("predicted_mood")
+  predictedFocus  Int      @map("predicted_focus")
   cycleDay        Int      @map("cycle_day")
   cyclePhase      String   @map("cycle_phase")
-  confidence      Float    @map("confidence") // 0-1
+  confidence      Float    @map("confidence")
   actualEnergy    Int?     @map("actual_energy")
   actualMood      Int?     @map("actual_mood")
   actualFocus     Int?     @map("actual_focus")
@@ -350,12 +341,12 @@ model EnergyMoodPrediction {
 model StudyTechniqueRecommendation {
   id            String   @id @default(cuid())
   cyclePhase    String   @map("cycle_phase")
-  subject       String   // "Physics", "Chemistry", "Botany", "Zoology"
+  subject       String
   technique     String
   description   String
-  duration      Int      // minutes
-  difficulty    String   // "light", "moderate", "intense"
-  effectiveness Float    // 0-1
+  duration      Int
+  difficulty    String
+  effectiveness Float
   isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now()) @map("created_at")
 
@@ -363,19 +354,19 @@ model StudyTechniqueRecommendation {
 }
 
 model HormonalOptimization {
-  id              String   @id @default(cuid())
-  userId          String   @map("user_id")
-  date            DateTime @db.Date
-  cyclePhase      String   @map("cycle_phase")
-  supplements     Json     @map("supplements") // Recommended supplements
-  nutrition       Json     @map("nutrition") // Nutritional recommendations
-  caffeineTime    String?  @map("caffeine_time") // Optimal caffeine timing
-  nootropics      Json     @map("nootropics") // Natural cognitive enhancers
-  stressManagement Json    @map("stress_management") // Stress reduction techniques
-  implemented     Boolean  @default(false)
-  effectiveness   Int?     // 1-10 user rating
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  date             DateTime @db.Date
+  cyclePhase       String   @map("cycle_phase")
+  supplements      Json     @map("supplements")
+  nutrition        Json     @map("nutrition")
+  caffeineTime     String?  @map("caffeine_time")
+  nootropics       Json     @map("nootropics")
+  stressManagement Json     @map("stress_management")
+  implemented      Boolean  @default(false)
+  effectiveness    Int?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   @@unique([userId, date])
   @@map("hormonal_optimizations")
@@ -383,14 +374,14 @@ model HormonalOptimization {
 
 model EmergencySupport {
   id          String   @id @default(cuid())
-  type        String   // "pain_relief", "energy_boost", "mood_stabilizer", "study_technique"
+  type        String
   title       String
   description String
-  steps       Json     // Step-by-step instructions
-  duration    Int      // minutes to implement
-  cyclePhase  String?  @map("cycle_phase") // Specific to phase or general
-  severity    String   // "mild", "moderate", "severe"
-  category    String   // "physical", "mental", "cognitive"
+  steps       Json
+  duration    Int
+  cyclePhase  String?  @map("cycle_phase")
+  severity    String
+  category    String
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
 

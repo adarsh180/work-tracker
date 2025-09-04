@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 interface SubjectCardProps {
   id: string
@@ -24,6 +24,12 @@ export default function SubjectCard({
   totalQuestions,
   emoji
 }: SubjectCardProps) {
+  const router = useRouter()
+
+  const handleCardClick = () => {
+    router.push(`/subjects/${id}`)
+  }
+
   // Determine colors based on completion percentage
   const getProgressColor = (percentage: number) => {
     if (percentage < 75) return 'text-red-400 border-red-400/30 bg-red-400/10'
@@ -46,10 +52,10 @@ export default function SubjectCard({
   const shouldAnimate = completionPercentage > 95
 
   return (
-    <Link href={`/subjects/${id}`}>
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        onClick={handleCardClick}
         className={`
           glass-effect rounded-xl p-6 transition-all duration-300 hover:shadow-lg cursor-pointer
           border ${progressColorClass.split(' ')[1]} ${progressColorClass.split(' ')[2]}
@@ -154,6 +160,5 @@ export default function SubjectCard({
           </p>
         </div>
       </motion.div>
-    </Link>
   )
 }
