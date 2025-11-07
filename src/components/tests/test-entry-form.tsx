@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TestType } from '@/lib/repositories/test-performance-repository'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import MistakeAnalysisPopup from '@/components/ai/mistake-analysis-popup'
 
 const testTypes: { value: TestType; label: string; description: string }[] = [
   { value: 'Weekly Test', label: 'Weekly Test', description: 'Regular weekly assessment' },
@@ -27,6 +28,9 @@ export default function TestEntryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [showMistakePopup, setShowMistakePopup] = useState(false)
+  const [testSessionData, setTestSessionData] = useState<any>(null)
+  const [pendingSave, setPendingSave] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,29 +72,29 @@ export default function TestEntryForm() {
         }),
       })
 
+      const result = await response.json()
+      
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save test score')
+        throw new Error(result.error || 'Failed to save test score')
       }
 
-      setSubmitStatus('success')
-      
-      // Invalidate and refetch analytics data
-      queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
-      queryClient.invalidateQueries({ queryKey: ['test-performance-trend'] })
-      
-      // Reset form
-      setFormData({
-        testType: '',
-        testNumber: '',
-        score: '',
-        testDate: new Date().toISOString().split('T')[0]
+      // MANDATORY popup for all test scores
+      setPendingSave(true)
+      setTestSessionData({
+        testType: formData.testType,
+        testScore: parseInt(formData.score)
       })
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSubmitStatus('idle')
-      }, 3000)
+      setShowMistakePopup(true)
+      
+      console.log('🚀 POPUP TRIGGERED:', {
+        showMistakePopup: true,
+        testSessionData: {
+          testType: formData.testType,
+          testScore: parseInt(formData.score)
+        }
+      })
+      
+      return // Don't complete save until popup is filled
 
     } catch (error) {
       console.error('Error saving test score:', error)
@@ -124,165 +128,217 @@ export default function TestEntryForm() {
   }
 
   return (
-    <Card className="glass-effect border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center space-x-2">
-          <span>Add Test Score</span>
-          {formData.score && (
-            <span className={`text-2xl ${getPerformanceColor()}`}>
-              {getPerformanceEmoji()}
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Test Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">
-              Test Type
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {testTypes.map((type) => (
-                <label
-                  key={type.value}
-                  className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                    formData.testType === type.value
-                      ? 'border-primary bg-primary/10 text-white'
-                      : 'border-gray-600 bg-background-secondary/30 text-gray-300 hover:border-gray-500 hover:bg-background-secondary/50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="testType"
-                    value={type.value}
-                    checked={formData.testType === type.value}
-                    onChange={(e) => setFormData({ ...formData, testType: e.target.value as TestType })}
-                    className="sr-only"
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium">{type.label}</div>
-                    <div className="text-sm opacity-70">{type.description}</div>
-                  </div>
-                  {formData.testType === type.value && (
-                    <CheckCircleIcon className="h-5 w-5 text-primary" />
-                  )}
-                </label>
-              ))}
+    <>
+      <Card className="glass-effect border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <span>Add Test Score</span>
+            {formData.score && (
+              <span className={`text-2xl ${getPerformanceColor()}`}>
+                {getPerformanceEmoji()}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Test Type Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                Test Type
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {testTypes.map((type) => (
+                  <label
+                    key={type.value}
+                    className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                      formData.testType === type.value
+                        ? 'border-primary bg-primary/10 text-white'
+                        : 'border-gray-600 bg-background-secondary/30 text-gray-300 hover:border-gray-500 hover:bg-background-secondary/50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="testType"
+                      value={type.value}
+                      checked={formData.testType === type.value}
+                      onChange={(e) => setFormData({ ...formData, testType: e.target.value as TestType })}
+                      className="sr-only"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">{type.label}</div>
+                      <div className="text-sm opacity-70">{type.description}</div>
+                    </div>
+                    {formData.testType === type.value && (
+                      <CheckCircleIcon className="h-5 w-5 text-primary" />
+                    )}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Test Number Input */}
-          <div>
-            <label htmlFor="testNumber" className="block text-sm font-medium text-gray-300 mb-2">
-              Test Number
-            </label>
-            <input
-              type="text"
-              id="testNumber"
-              value={formData.testNumber}
-              onChange={(e) => setFormData({ ...formData, testNumber: e.target.value })}
-              className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-              placeholder="e.g., Test-01, Test-02, RB-05"
-            />
-            <div className="mt-2">
-              <p className="text-xs text-gray-400 mb-2">
-                Enter test identifier (e.g., Test-01, RB-05, AITS-03)
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {formData.testType && (
-                  <div className="text-xs text-gray-500">
-                    Suggestions: 
-                    {formData.testType === 'Weekly Test' && (
-                      <span className="text-blue-400">Test-01, Test-02, Test-03...</span>
-                    )}
-                    {formData.testType === 'Rank Booster' && (
-                      <span className="text-blue-400">RB-01, RB-02, RB-03...</span>
-                    )}
-                    {formData.testType === 'Test Series' && (
-                      <span className="text-blue-400">TS-01, TS-02, TS-03...</span>
-                    )}
-                    {formData.testType === 'AITS' && (
-                      <span className="text-blue-400">AITS-01, AITS-02, AITS-03...</span>
-                    )}
-                    {formData.testType === 'Full Length Test' && (
-                      <span className="text-blue-400">FL-01, FL-02, FL-03...</span>
-                    )}
+            {/* Test Number Input */}
+            <div>
+              <label htmlFor="testNumber" className="block text-sm font-medium text-gray-300 mb-2">
+                Test Number
+              </label>
+              <input
+                type="text"
+                id="testNumber"
+                value={formData.testNumber}
+                onChange={(e) => setFormData({ ...formData, testNumber: e.target.value })}
+                className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                placeholder="e.g., Test-01, Test-02, RB-05"
+              />
+              <div className="mt-2">
+                <p className="text-xs text-gray-400 mb-2">
+                  Enter test identifier (e.g., Test-01, RB-05, AITS-03)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {formData.testType && (
+                    <div className="text-xs text-gray-500">
+                      Suggestions: 
+                      {formData.testType === 'Weekly Test' && (
+                        <span className="text-blue-400">Test-01, Test-02, Test-03...</span>
+                      )}
+                      {formData.testType === 'Rank Booster' && (
+                        <span className="text-blue-400">RB-01, RB-02, RB-03...</span>
+                      )}
+                      {formData.testType === 'Test Series' && (
+                        <span className="text-blue-400">TS-01, TS-02, TS-03...</span>
+                      )}
+                      {formData.testType === 'AITS' && (
+                        <span className="text-blue-400">AITS-01, AITS-02, AITS-03...</span>
+                      )}
+                      {formData.testType === 'Full Length Test' && (
+                        <span className="text-blue-400">FL-01, FL-02, FL-03...</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Score Input */}
+            <div>
+              <label htmlFor="score" className="block text-sm font-medium text-gray-300 mb-2">
+                Score (out of 720)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="score"
+                  min="0"
+                  max="720"
+                  value={formData.score}
+                  onChange={(e) => setFormData({ ...formData, score: e.target.value })}
+                  className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                  placeholder="Enter your score (0-720)"
+                />
+                {formData.score && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                    <span className={`text-sm font-medium ${getPerformanceColor()}`}>
+                      {getScorePercentage()}%
+                    </span>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Score Input */}
-          <div>
-            <label htmlFor="score" className="block text-sm font-medium text-gray-300 mb-2">
-              Score (out of 720)
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                id="score"
-                min="0"
-                max="720"
-                value={formData.score}
-                onChange={(e) => setFormData({ ...formData, score: e.target.value })}
-                className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-                placeholder="Enter your score (0-720)"
-              />
-              {formData.score && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-                  <span className={`text-sm font-medium ${getPerformanceColor()}`}>
-                    {getScorePercentage()}%
-                  </span>
-                </div>
+              {formData.score && (parseInt(formData.score) < 0 || parseInt(formData.score) > 720) && (
+                <p className="mt-1 text-sm text-red-400">Score must be between 0 and 720</p>
               )}
             </div>
-            {formData.score && (parseInt(formData.score) < 0 || parseInt(formData.score) > 720) && (
-              <p className="mt-1 text-sm text-red-400">Score must be between 0 and 720</p>
+
+            {/* Test Date */}
+            <div>
+              <label htmlFor="testDate" className="block text-sm font-medium text-gray-300 mb-2">
+                Test Date
+              </label>
+              <input
+                type="date"
+                id="testDate"
+                value={formData.testDate}
+                onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
+                max={new Date().toISOString().split('T')[0]} // Can't select future dates
+                className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+              />
+            </div>
+
+            {/* Status Messages */}
+            {submitStatus === 'success' && (
+              <div className="flex items-center space-x-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <CheckCircleIcon className="h-5 w-5 text-green-400" />
+                <span className="text-green-400 text-sm">Test score saved successfully!</span>
+              </div>
             )}
-          </div>
 
-          {/* Test Date */}
-          <div>
-            <label htmlFor="testDate" className="block text-sm font-medium text-gray-300 mb-2">
-              Test Date
-            </label>
-            <input
-              type="date"
-              id="testDate"
-              value={formData.testDate}
-              onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
-              max={new Date().toISOString().split('T')[0]} // Can't select future dates
-              className="w-full px-4 py-3 bg-background-secondary border border-gray-600 rounded-lg text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-            />
-          </div>
+            {submitStatus === 'error' && errorMessage && (
+              <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
+                <span className="text-red-400 text-sm">{errorMessage}</span>
+              </div>
+            )}
 
-          {/* Status Messages */}
-          {submitStatus === 'success' && (
-            <div className="flex items-center space-x-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-              <CheckCircleIcon className="h-5 w-5 text-green-400" />
-              <span className="text-green-400 text-sm">Test score saved successfully!</span>
-            </div>
-          )}
-
-          {submitStatus === 'error' && errorMessage && (
-            <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
-              <span className="text-red-400 text-sm">{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting || !formData.testType || !formData.testNumber || !formData.score || !formData.testDate}
-            className="w-full bg-primary hover:bg-primary-hover disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors"
-          >
-            {isSubmitting ? 'Saving...' : 'Save Test Score'}
-          </button>
-        </form>
-      </CardContent>
-    </Card>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || !formData.testType || !formData.testNumber || !formData.score || !formData.testDate}
+              className="w-full bg-primary hover:bg-primary-hover disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors"
+            >
+              {isSubmitting ? 'Saving...' : 'Save Test Score'}
+            </button>
+          </form>
+        </CardContent>
+      </Card>
+      
+      {/* Mistake Analysis Popup */}
+      <MistakeAnalysisPopup
+        isOpen={showMistakePopup}
+        onClose={() => {
+          alert('⚠️ MANDATORY: You must complete the learning analysis to save your test score!')
+        }}
+        sessionType="test"
+        sessionData={testSessionData || {}}
+        onSubmit={async (mistakeData) => {
+          // Validate "no mistakes" option for tests
+          if (mistakeData.mistakeCategories.includes('no_mistakes') && testSessionData?.testScore < 710) {
+            alert('❌ "No Mistakes" is only valid for scores 710+ (98.6%+). Please select actual mistakes made.')
+            return
+          }
+          
+          try {
+            await fetch('/api/mistakes/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sessionType: 'test',
+                sessionData: testSessionData,
+                mistakeData
+              })
+            })
+            
+            // Complete the save process
+            setSubmitStatus('success')
+            setPendingSave(false)
+            
+            // Invalidate queries
+            queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['test-performance-trend'] })
+            
+            // Reset form
+            setFormData({
+              testType: '',
+              testNumber: '',
+              score: '',
+              testDate: new Date().toISOString().split('T')[0]
+            })
+            
+            setTimeout(() => setSubmitStatus('idle'), 3000)
+            
+          } catch (error) {
+            console.error('Error analyzing mistakes:', error)
+          }
+        }}
+      />
+    </>
   )
 }

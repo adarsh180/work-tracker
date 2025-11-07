@@ -70,7 +70,7 @@ export default function PomodoroTimer({ subject = '', chapter = '', onSessionCom
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, timeLeft])
+  }, [isActive, timeLeft]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSessionComplete = async () => {
     setIsActive(false)

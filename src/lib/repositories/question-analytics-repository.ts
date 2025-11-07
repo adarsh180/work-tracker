@@ -9,12 +9,12 @@ export class QuestionAnalyticsRepository {
   static async updateDailyCount(date: Date, count: number): Promise<QuestionAnalytics> {
     const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
-    // Get or create today's entry
+    // Use upsert to handle create or update atomically
     const today = await prisma.questionAnalytics.upsert({
       where: { date: dateOnly },
       update: { dailyCount: count },
-      create: { 
-        date: dateOnly, 
+      create: {
+        date: dateOnly,
         dailyCount: count,
         weeklyCount: 0,
         monthlyCount: 0,
@@ -25,9 +25,7 @@ export class QuestionAnalyticsRepository {
     // Recalculate aggregates
     await this.recalculateAggregates(dateOnly)
     
-    return await prisma.questionAnalytics.findUnique({
-      where: { date: dateOnly }
-    }) as QuestionAnalytics
+    return today
   }
 
   /**

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircleIcon, ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
 
+
 type DailyGoalFormData = {
   physicsQuestions: number
   chemistryQuestions: number
@@ -53,6 +54,7 @@ export default function DailyGoalsForm() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
 
   // Fetch today's goal
   const { data: todayGoal, isLoading } = useQuery({
@@ -123,11 +125,45 @@ export default function DailyGoalsForm() {
         body: JSON.stringify(formData)
       })
 
+      const result = await response.json()
+      
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save daily goals')
+        throw new Error(result.error || 'Failed to save daily goals')
       }
 
+      // Run background analysis if flagged
+      if (result.showMistakePopup) {
+        // Run silent analysis in background
+        fetch('/api/mistakes/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionType: 'daily_study',
+            sessionData: {
+              physicsQuestions: formData.physicsQuestions,
+              chemistryQuestions: formData.chemistryQuestions,
+              botanyQuestions: formData.botanyQuestions,
+              zoologyQuestions: formData.zoologyQuestions
+            },
+            mistakeData: {
+              mistakeCategories: [],
+              specificMistakes: [],
+              improvementAreas: [],
+              timeWasted: 0,
+              stressLevel: 5,
+              energyLevel: 7,
+              focusLevel: 6,
+              subjectSpecificMistakes: {},
+              mistakeContext: {
+                timeOfDay: new Date().getHours() < 12 ? 'morning' : 'afternoon',
+                questionDifficulty: 'medium',
+                topicArea: 'General'
+              }
+            }
+          })
+        }).catch(console.error)
+      }
+      
       setSubmitStatus('success')
       setHasUnsavedChanges(false)
       
@@ -381,6 +417,8 @@ export default function DailyGoalsForm() {
           </form>
         </CardContent>
       </Card>
+      
+
     </div>
   )
 }

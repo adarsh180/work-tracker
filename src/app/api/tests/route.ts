@@ -55,7 +55,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: testPerformance
+      data: testPerformance,
+      showMistakePopup: true // Trigger mistake analysis popup
     })
 
   } catch (error) {

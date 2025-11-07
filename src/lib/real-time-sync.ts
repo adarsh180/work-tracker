@@ -111,46 +111,57 @@ export class RealTimeSyncService {
     zoologyRevision?: number
   }) {
     try {
+      const normalizedDate = new Date(date)
+      normalizedDate.setHours(0, 0, 0, 0)
+      
       const totalQuestions = (updates.physicsQuestions || 0) + 
                            (updates.chemistryQuestions || 0) + 
                            (updates.botanyQuestions || 0) + 
                            (updates.zoologyQuestions || 0)
 
-      const dailyGoal = await prisma.dailyGoal.upsert({
+      // Use raw SQL to handle race conditions
+      const result = await prisma.$executeRaw`
+        INSERT INTO daily_goals (
+          id, user_id, date, physics_questions, chemistry_questions, 
+          botany_questions, zoology_questions, physics_dpp, chemistry_dpp,
+          botany_dpp, zoology_dpp, physics_revision, chemistry_revision,
+          botany_revision, zoology_revision, total_questions, created_at, updated_at
+        ) VALUES (
+          ${Math.random().toString(36)}, ${userId}, ${normalizedDate}, 
+          ${updates.physicsQuestions || 0}, ${updates.chemistryQuestions || 0},
+          ${updates.botanyQuestions || 0}, ${updates.zoologyQuestions || 0},
+          ${updates.physicsDpp || 0}, ${updates.chemistryDpp || 0},
+          ${updates.botanyDpp || 0}, ${updates.zoologyDpp || 0},
+          ${updates.physicsRevision || 0}, ${updates.chemistryRevision || 0},
+          ${updates.botanyRevision || 0}, ${updates.zoologyRevision || 0},
+          ${totalQuestions}, NOW(), NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+          physics_questions = physics_questions + VALUES(physics_questions),
+          chemistry_questions = chemistry_questions + VALUES(chemistry_questions),
+          botany_questions = botany_questions + VALUES(botany_questions),
+          zoology_questions = zoology_questions + VALUES(zoology_questions),
+          physics_dpp = physics_dpp + VALUES(physics_dpp),
+          chemistry_dpp = chemistry_dpp + VALUES(chemistry_dpp),
+          botany_dpp = botany_dpp + VALUES(botany_dpp),
+          zoology_dpp = zoology_dpp + VALUES(zoology_dpp),
+          physics_revision = physics_revision + VALUES(physics_revision),
+          chemistry_revision = chemistry_revision + VALUES(chemistry_revision),
+          botany_revision = botany_revision + VALUES(botany_revision),
+          zoology_revision = zoology_revision + VALUES(zoology_revision),
+          total_questions = total_questions + VALUES(total_questions),
+          updated_at = NOW()
+      `
+
+      // Return the updated record
+      return await prisma.dailyGoal.findUnique({
         where: {
           userId_date: {
             userId,
-            date
+            date: normalizedDate
           }
-        },
-        update: {
-          ...updates,
-          totalQuestions,
-          updatedAt: new Date()
-        },
-        create: {
-          userId,
-          date,
-          physicsQuestions: updates.physicsQuestions || 0,
-          chemistryQuestions: updates.chemistryQuestions || 0,
-          botanyQuestions: updates.botanyQuestions || 0,
-          zoologyQuestions: updates.zoologyQuestions || 0,
-          physicsDpp: updates.physicsDpp || 0,
-          chemistryDpp: updates.chemistryDpp || 0,
-          botanyDpp: updates.botanyDpp || 0,
-          zoologyDpp: updates.zoologyDpp || 0,
-          physicsRevision: updates.physicsRevision || 0,
-          chemistryRevision: updates.chemistryRevision || 0,
-          botanyRevision: updates.botanyRevision || 0,
-          zoologyRevision: updates.zoologyRevision || 0,
-          totalQuestions
         }
       })
-
-      // Update question analytics
-      await this.updateQuestionAnalytics(date, totalQuestions)
-
-      return dailyGoal
     } catch (error) {
       console.error('Error syncing daily goals:', error)
       throw error

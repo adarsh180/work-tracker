@@ -388,6 +388,66 @@ model EmergencySupport {
   @@map("emergency_supports")
 }
 
+model StudyMistakeLog {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  sessionType     String   @map("session_type") // "daily_study" or "test"
+  
+  // Study Session Data
+  physicsQuestions Int?    @map("physics_questions")
+  chemistryQuestions Int?  @map("chemistry_questions")
+  botanyQuestions Int?     @map("botany_questions")
+  zoologyQuestions Int?    @map("zoology_questions")
+  
+  // Test Data
+  testScore       Int?     @map("test_score")
+  testType        String?  @map("test_type")
+  
+  // Mistake Analysis
+  mistakeCategories Json   @map("mistake_categories") // ["silly_mistakes", "conceptual_gaps", etc.]
+  specificMistakes  Json   @map("specific_mistakes")  // Detailed mistake descriptions
+  improvementAreas  Json   @map("improvement_areas")  // Areas where she could improve
+  timeWasted       Int?    @map("time_wasted")       // Minutes wasted
+  stressLevel      Int     @map("stress_level")      // 1-10
+  energyLevel      Int     @map("energy_level")      // 1-10
+  focusLevel       Int     @map("focus_level")       // 1-10
+  
+  // AI Analysis Results
+  aiAnalysis       Json?   @map("ai_analysis")       // AI generated insights
+  recommendations  Json?   @map("recommendations")   // AI recommendations
+  riskScore        Float?  @map("risk_score")        // Risk of repeating mistakes
+  
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date, sessionType])
+  @@map("study_mistake_logs")
+}
+
+model MistakePattern {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  mistakeType     String   @map("mistake_type")     // "silly_mistakes", "conceptual_gaps", etc.
+  subject         String   // "Physics", "Chemistry", "Biology"
+  topic           String?  // Specific topic
+  frequency       Int      @default(1)              // How many times repeated
+  severity        String   @default("medium")       // "low", "medium", "high"
+  lastOccurrence  DateTime @map("last_occurrence")
+  isResolved      Boolean  @default(false) @map("is_resolved")
+  resolutionDate  DateTime? @map("resolution_date")
+  
+  // Pattern Analysis
+  triggerFactors  Json     @map("trigger_factors")  // What causes this mistake
+  solutions       Json     @map("solutions")        // Recommended solutions
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, mistakeType, subject, topic])
+  @@map("mistake_patterns")
+}
+
 model PomodoroSession {
   id              String    @id @default(cuid())
   userId          String    @map("user_id")
