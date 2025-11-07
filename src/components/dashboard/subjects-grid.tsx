@@ -27,9 +27,11 @@ export default function SubjectsGrid() {
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
-    staleTime: 1000, // Consider data stale after 1 second
-    refetchOnWindowFocus: true // Refetch when window gains focus
+    refetchInterval: 3000, // Refetch every 3 seconds for real-time updates
+    staleTime: 500, // Consider data stale after 0.5 seconds
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Always refetch on mount
+    refetchIntervalInBackground: true // Continue refetching in background
   })
 
   if (loading) {

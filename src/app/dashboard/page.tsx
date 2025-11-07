@@ -89,22 +89,26 @@ export default function Dashboard() {
           </div>
 
           {/* Analytics and Progress Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-3">
               <SubjectsGrid />
             </div>
             <div className="space-y-6">
               <DailyGoalsCard />
               <YesterdayPerformance />
-              <QuestionAnalyticsCard />
-              <MistiMotivationCard showName={false} />
             </div>
+          </div>
+
+          {/* Additional Analytics Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <QuestionAnalyticsCard />
+            <MistiMotivationCard showName={false} />
           </div>
 
           {/* Quick Actions */}
           <div className="glass-effect rounded-xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Link href="/daily-goals" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
                 <h4 className="font-medium text-white mb-2">🎯 Daily Goals</h4>
                 <p className="text-gray-400 text-sm mb-3">Track today's questions, DPPs, and revision progress.</p>
@@ -124,6 +128,11 @@ export default function Dashboard() {
                 <h4 className="font-medium text-white mb-2">📅 Track Mood</h4>
                 <p className="text-gray-400 text-sm mb-3">Log your daily mood and maintain mental well-being.</p>
                 <span className="text-primary hover:text-primary-hover text-sm font-medium">Mood Calendar →</span>
+              </Link>
+              <Link href="/pomodoro" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
+                <h4 className="font-medium text-white mb-2">🍅 Pomodoro Timer</h4>
+                <p className="text-gray-400 text-sm mb-3">Focus with customizable study sessions and track productivity.</p>
+                <span className="text-primary hover:text-primary-hover text-sm font-medium">Start Timer →</span>
               </Link>
             </div>
           </div>

@@ -64,25 +64,27 @@ export class RankingAnalyticsEngine {
 
   private static calculateRigorousMetrics(subjects: any[], dailyGoals: any[], tests: any[], menstrualData: any[]) {
     // Syllabus completion with 97%+ target
-    const syllabusCompletion = subjects.reduce((sum, subject) => {
+    const syllabusCompletion = subjects.length > 0 ? subjects.reduce((sum, subject) => {
+      if (!subject.chapters || subject.chapters.length === 0) return sum
+      
       const chapterCompletion = subject.chapters.reduce((chapterSum: number, chapter: any) => {
-        const lectureProgress = Array.isArray(chapter.lecturesCompleted) 
+        const lectureProgress = Array.isArray(chapter.lecturesCompleted) && chapter.lectureCount > 0
           ? (chapter.lecturesCompleted as boolean[]).filter(Boolean).length / chapter.lectureCount
           : 0
-        const dppProgress = Array.isArray(chapter.dppCompleted)
+        const dppProgress = Array.isArray(chapter.dppCompleted) && chapter.lectureCount > 0
           ? (chapter.dppCompleted as boolean[]).filter(Boolean).length / chapter.lectureCount
           : 0
-        const assignmentProgress = Array.isArray(chapter.assignmentCompleted)
+        const assignmentProgress = Array.isArray(chapter.assignmentCompleted) && chapter.assignmentQuestions > 0
           ? (chapter.assignmentCompleted as boolean[]).filter(Boolean).length / chapter.assignmentQuestions
           : 0
-        const kattarProgress = Array.isArray(chapter.kattarCompleted)
+        const kattarProgress = Array.isArray(chapter.kattarCompleted) && chapter.kattarQuestions > 0
           ? (chapter.kattarCompleted as boolean[]).filter(Boolean).length / chapter.kattarQuestions
           : 0
         
         return chapterSum + ((lectureProgress + dppProgress + assignmentProgress + kattarProgress) / 4)
       }, 0)
       return sum + (chapterCompletion / subject.chapters.length)
-    }, 0) / subjects.length * 100
+    }, 0) / subjects.length * 100 : 0
 
     // Test average with rigorous scoring
     const testAverage = tests.length > 0 
@@ -90,16 +92,17 @@ export class RankingAnalyticsEngine {
       : 0
 
     // Daily consistency (harsh penalty for missed days)
-    const activeDays = dailyGoals.filter(g => g.totalQuestions >= 250).length
-    const dailyConsistency = (activeDays / Math.min(30, dailyGoals.length)) * 100
+    const activeDays = dailyGoals.filter(g => g && g.totalQuestions >= 250).length
+    const totalDays = Math.max(1, Math.min(30, dailyGoals.length))
+    const dailyConsistency = (activeDays / totalDays) * 100
 
     // Weekly target achievement
-    const weeklyQuestions = dailyGoals.slice(0, 7).reduce((sum, g) => sum + g.totalQuestions, 0)
+    const weeklyQuestions = dailyGoals.slice(0, 7).reduce((sum, g) => sum + (g?.totalQuestions || 0), 0)
     const weeklyTarget = Math.min(100, (weeklyQuestions / 2000) * 100) // 2000 questions/week target
 
     // Monthly growth rate
-    const recentMonth = dailyGoals.slice(0, 15).reduce((sum, g) => sum + g.totalQuestions, 0)
-    const previousMonth = dailyGoals.slice(15, 30).reduce((sum, g) => sum + g.totalQuestions, 0)
+    const recentMonth = dailyGoals.slice(0, 15).reduce((sum, g) => sum + (g?.totalQuestions || 0), 0)
+    const previousMonth = dailyGoals.slice(15, 30).reduce((sum, g) => sum + (g?.totalQuestions || 0), 0)
     const monthlyGrowth = previousMonth > 0 ? ((recentMonth - previousMonth) / previousMonth) * 100 : 0
 
     return {

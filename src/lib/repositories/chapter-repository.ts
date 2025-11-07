@@ -97,6 +97,18 @@ export class ChapterRepository {
     // Trigger subject progress recalculation
     await SubjectRepository.calculateAndUpdateProgress(chapter.subjectId)
 
+    // Trigger real-time UI updates
+    try {
+      const { QueryInvalidationService } = await import('@/lib/query-invalidation-service')
+      await QueryInvalidationService.invalidateChapterQueries(chapterId)
+      
+      // Update achievements based on new progress
+      const { AchievementTracker } = await import('@/lib/achievement-tracker')
+      // Note: We can't get userId here, so achievements will update on next API call
+    } catch (error) {
+      console.log('Query invalidation skipped (client-side only)')
+    }
+
     return chapter
   }
 

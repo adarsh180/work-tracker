@@ -16,6 +16,10 @@ import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
 import NEETCountdownTimer from '@/components/ui/neet-countdown-timer'
 import AIR50CycleSummary from '@/components/dashboard/air50-cycle-summary'
+import StudyStreakTracker from '@/components/enhanced/study-streak-tracker'
+import PomodoroTimer from '@/components/enhanced/pomodoro-timer'
+import WeakTopicIdentifier from '@/components/enhanced/weak-topic-identifier'
+import QuestionProgressTracker from '@/components/enhanced/question-progress-tracker'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -194,7 +198,9 @@ export default function Home() {
             <SubjectsGrid />
           </div>
           <div className="space-y-6">
+            <QuestionProgressTracker />
             <AIR50CycleSummary />
+            <StudyStreakTracker />
             <NEETCountdownTimer />
             <DailyGoalsCard />
             <YesterdayPerformance />
@@ -208,6 +214,24 @@ export default function Home() {
             >
               <MistiMotivationCard showName={false} />
             </motion.div>
+          </div>
+        </div>
+
+        {/* Enhanced Features Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <span>🍅</span>
+              <span>Focus Timer</span>
+            </h3>
+            <PomodoroTimer />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <span>🎯</span>
+              <span>Weak Areas</span>
+            </h3>
+            <WeakTopicIdentifier />
           </div>
         </div>
 

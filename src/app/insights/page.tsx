@@ -26,117 +26,119 @@ export default function InsightsPage() {
     >
       <div className="space-y-6">
         {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-background-secondary/50 p-1 rounded-lg">
-          <button
-            onClick={() => setActiveTab('prediction')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'prediction'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🎯 AIR Prediction
-          </button>
-          <button
-            onClick={() => setActiveTab('biology')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'biology'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🌸 Cycle Tracker
-          </button>
-          <button
-            onClick={() => setActiveTab('cycle-schedule')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'cycle-schedule'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🗓️ AI Schedule
-          </button>
-          <button
-            onClick={() => setActiveTab('energy-prediction')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'energy-prediction'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🔮 Energy Predictor
-          </button>
-          <button
-            onClick={() => setActiveTab('study-techniques')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'study-techniques'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            📚 Study Techniques
-          </button>
-          <button
-            onClick={() => setActiveTab('hormonal')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'hormonal'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🧬 Hormonal Boost
-          </button>
-          <button
-            onClick={() => setActiveTab('emergency')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'emergency'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🆘 Emergency Support
-          </button>
-          <button
-            onClick={() => setActiveTab('ai-suggestions')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'ai-suggestions'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🤖 AI Suggestions
-          </button>
-          <button
-            onClick={() => setActiveTab('schedule')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'schedule'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            📅 Smart Schedule
-          </button>
-          <button
-            onClick={() => setActiveTab('memory')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'memory'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            🧠 Memory System
-          </button>
-          <button
-            onClick={() => setActiveTab('progress')}
-            className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'progress'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            📈 Progress Analytics
-          </button>
+        <div className="w-full">
+          <div className="flex flex-wrap justify-stretch bg-gray-800/40 p-2 rounded-xl border border-gray-600/30 shadow-lg">
+            <button
+              onClick={() => setActiveTab('prediction')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'prediction'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🎯 AIR Prediction
+            </button>
+            <button
+              onClick={() => setActiveTab('biology')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'biology'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🌸 Cycle Tracker
+            </button>
+            <button
+              onClick={() => setActiveTab('cycle-schedule')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'cycle-schedule'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🗓️ AI Schedule
+            </button>
+            <button
+              onClick={() => setActiveTab('energy-prediction')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'energy-prediction'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🔮 Energy Predictor
+            </button>
+            <button
+              onClick={() => setActiveTab('study-techniques')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'study-techniques'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              📚 Study Techniques
+            </button>
+            <button
+              onClick={() => setActiveTab('hormonal')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'hormonal'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🧬 Hormonal Boost
+            </button>
+            <button
+              onClick={() => setActiveTab('emergency')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'emergency'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🆘 Emergency Support
+            </button>
+            <button
+              onClick={() => setActiveTab('ai-suggestions')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'ai-suggestions'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🤖 AI Suggestions
+            </button>
+            <button
+              onClick={() => setActiveTab('schedule')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'schedule'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              📅 Smart Schedule
+            </button>
+            <button
+              onClick={() => setActiveTab('memory')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'memory'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🧠 Memory System
+            </button>
+            <button
+              onClick={() => setActiveTab('progress')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'progress'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              📈 Progress Analytics
+            </button>
+          </div>
         </div>
 
         {/* Content */}

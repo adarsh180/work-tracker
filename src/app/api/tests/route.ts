@@ -45,6 +45,14 @@ export async function POST(request: NextRequest) {
       testDate: new Date(testDate)
     })
 
+    // Update achievements (test adds 180 questions to total)
+    try {
+      const { AchievementTracker } = await import('@/lib/achievement-tracker')
+      await AchievementTracker.checkAndUpdateAchievements(session.user.email)
+    } catch (error) {
+      console.log('Achievement update failed:', error)
+    }
+
     return NextResponse.json({
       success: true,
       data: testPerformance

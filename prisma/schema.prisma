@@ -387,3 +387,84 @@ model EmergencySupport {
 
   @@map("emergency_supports")
 }
+
+model PomodoroSession {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  subject         String
+  chapter         String?
+  startTime       DateTime  @map("start_time")
+  endTime         DateTime? @map("end_time")
+  duration        Int       @default(25) // minutes
+  breakDuration   Int       @default(5) @map("break_duration")
+  completed       Boolean   @default(false)
+  interrupted     Boolean   @default(false)
+  focusScore      Int       @default(5) @map("focus_score")
+  productivity    Int       @default(5)
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("pomodoro_sessions")
+}
+
+model StudyStreak {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  currentStreak Int      @default(0) @map("current_streak")
+  longestStreak Int      @default(0) @map("longest_streak")
+  lastStudyDate DateTime @map("last_study_date") @db.Date
+  totalDays     Int      @default(0) @map("total_days")
+  streakType    String   @default("daily") @map("streak_type")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, streakType])
+  @@map("study_streaks")
+}
+
+model Achievement {
+  id               String            @id @default(cuid())
+  name             String
+  description      String
+  category         String
+  icon             String
+  condition        Json
+  points           Int               @default(0)
+  rarity           String            @default("common")
+  isActive         Boolean           @default(true) @map("is_active")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String      @map("user_id")
+  achievementId String      @map("achievement_id")
+  unlockedAt    DateTime    @default(now()) @map("unlocked_at")
+  progress      Float       @default(0)
+  isCompleted   Boolean     @default(false) @map("is_completed")
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model WeakTopic {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  subject         String
+  chapter         String
+  topic           String
+  weaknessScore   Float    @map("weakness_score")
+  attempts        Int      @default(0)
+  correctAnswers  Int      @default(0) @map("correct_answers")
+  lastAttempt     DateTime @map("last_attempt")
+  improvementPlan Json?    @map("improvement_plan")
+  isResolved      Boolean  @default(false) @map("is_resolved")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, subject, chapter, topic])
+  @@map("weak_topics")
+}

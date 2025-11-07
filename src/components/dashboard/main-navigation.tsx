@@ -8,7 +8,8 @@ import {
   LightBulbIcon,
   HomeIcon,
   AcademicCapIcon,
-  FlagIcon
+  FlagIcon,
+  TrophyIcon
 } from '@heroicons/react/24/outline'
 
 const navigationItems = [
@@ -47,6 +48,12 @@ const navigationItems = [
     href: '/insights',
     icon: LightBulbIcon,
     description: 'Smart recommendations'
+  },
+  {
+    name: 'Achievements',
+    href: '/achievements',
+    icon: TrophyIcon,
+    description: 'Badges & rewards'
   }
 ]
 
@@ -55,7 +62,7 @@ export default function MainNavigation() {
 
   return (
     <nav className="glass-effect rounded-xl p-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
         {navigationItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon

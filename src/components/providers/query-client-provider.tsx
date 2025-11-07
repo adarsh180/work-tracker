@@ -21,6 +21,11 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).__reactQueryClient = queryClient
+      
+      // Initialize query invalidation service
+      import('@/lib/query-invalidation-service').then(({ QueryInvalidationService }) => {
+        QueryInvalidationService.setQueryClient(queryClient)
+      })
     }
   }, [queryClient])
 
