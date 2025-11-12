@@ -9,6 +9,7 @@ import { Trophy, TrendingUp, Target, Zap, Crown, Star, Brain, Heart, Sparkles, R
 import { getRandomMotivationalQuote, getMotivationalQuotesByCategory } from '@/lib/motivational-quotes';
 import { motion, AnimatePresence } from 'framer-motion';
 
+
 interface CompetitiveData {
   currentRank: number;
   targetRank: number;
@@ -33,12 +34,12 @@ interface CompetitiveData {
 
 export function CompetitiveEdgeSystem() {
   const [competitiveData, setCompetitiveData] = useState<CompetitiveData>({
-    currentRank: 1500,
+    currentRank: 0, // Will be calculated dynamically
     targetRank: 50,
     gapAnalysis: {
-      questionsGap: 150,
-      hoursGap: 2,
-      accuracyGap: 15
+      questionsGap: 0,
+      hoursGap: 0,
+      accuracyGap: 0
     },
     topperPatterns: {
       dailyQuestions: 400,
@@ -47,59 +48,41 @@ export function CompetitiveEdgeSystem() {
       revisionCycles: 3
     },
     mistiProgress: {
-      dailyQuestions: 250,
-      studyHours: 10,
-      accuracy: 70,
-      revisionCycles: 2
+      dailyQuestions: 0,
+      studyHours: 0,
+      accuracy: 0,
+      revisionCycles: 0
     }
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load real data from AI insights
+  // Load real-time data from API
   useEffect(() => {
     const loadRealData = async () => {
       try {
-        const [questionsResponse, rankingResponse] = await Promise.all([
-          fetch('/api/analytics/questions'),
-          fetch('/api/ranking-analytics')
-        ]);
+        setIsLoading(true);
         
-        const questionsData = await questionsResponse.json();
-        const rankingData = await rankingResponse.json();
+        const response = await fetch('/api/competitive-edge-data');
+        const result = await response.json();
         
-        if (questionsData.success && rankingData.success) {
-          const currentRank = rankingData.data?.currentRank || 1500;
-          const dailyQuestions = questionsData.dailyAverage || 250;
-          const testAverage = rankingData.data?.rigorousMetrics?.testAverage || 450;
-          const syllabusCompletion = rankingData.data?.rigorousMetrics?.syllabusCompletion || 60;
-          
-          setCompetitiveData({
-            currentRank,
-            targetRank: 50,
-            gapAnalysis: {
-              questionsGap: Math.max(0, 400 - dailyQuestions),
-              hoursGap: Math.max(0, 12 - Math.round(dailyQuestions / 30)),
-              accuracyGap: Math.max(0, 85 - Math.round((testAverage / 720) * 100))
-            },
-            topperPatterns: {
-              dailyQuestions: 400,
-              studyHours: 12,
-              accuracy: 85,
-              revisionCycles: 3
-            },
-            mistiProgress: {
-              dailyQuestions,
-              studyHours: Math.round(dailyQuestions / 30),
-              accuracy: Math.round((testAverage / 720) * 100),
-              revisionCycles: Math.round(syllabusCompletion / 30)
-            }
-          });
+        if (result.success) {
+          setCompetitiveData(result.data.competitiveData);
+        } else {
+          console.error('Failed to load competitive data:', result.error);
         }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error('Failed to load real competitive data:', error);
+        setIsLoading(false);
       }
     };
     
     loadRealData();
+    
+    // Refresh data every 10 seconds for real-time updates
+    const interval = setInterval(loadRealData, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const [showMotivation, setShowMotivation] = useState(false);
@@ -199,12 +182,20 @@ export function CompetitiveEdgeSystem() {
         <CardContent className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="text-center p-4 bg-red-900/20 border border-red-500/20 rounded-lg">
-              <div className="text-3xl font-bold text-red-400">#{competitiveData.currentRank}</div>
+              {isLoading ? (
+                <div className="text-3xl font-bold text-gray-400 animate-pulse">Calculating...</div>
+              ) : (
+                <div className="text-3xl font-bold text-red-400">#{competitiveData.currentRank.toLocaleString()}</div>
+              )}
               <div className="text-sm text-gray-300">Current Predicted Rank</div>
+              {!isLoading && (
+                <div className="text-xs text-gray-400 mt-1">Based on real performance</div>
+              )}
             </div>
             <div className="text-center p-4 bg-green-900/20 border border-green-500/20 rounded-lg">
               <div className="text-3xl font-bold text-green-400">#{competitiveData.targetRank}</div>
               <div className="text-sm text-gray-300">Target Rank</div>
+              <div className="text-xs text-gray-400 mt-1">AIR 1-50 Goal</div>
             </div>
           </div>
 
@@ -247,11 +238,11 @@ export function CompetitiveEdgeSystem() {
                 <span className="text-gray-300">Accuracy</span>
                 <div className="flex items-center gap-2">
                   <Progress 
-                    value={calculateProgress(competitiveData.mistiProgress.accuracy, competitiveData.topperPatterns.accuracy)} 
+                    value={competitiveData.mistiProgress.accuracy} 
                     className="w-32" 
                   />
                   <span className="text-white text-sm">
-                    {competitiveData.mistiProgress.accuracy}/{competitiveData.topperPatterns.accuracy}%
+                    {competitiveData.mistiProgress.accuracy}/100%
                   </span>
                   <Badge className="bg-red-600">-{competitiveData.gapAnalysis.accuracyGap}%</Badge>
                 </div>
