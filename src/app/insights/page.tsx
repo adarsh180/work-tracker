@@ -14,10 +14,11 @@ import AISuggestionsSection from '@/components/ai/ai-suggestions-section'
 import SmartStudyPlanner from '@/components/enhanced/smart-study-planner'
 import MemoryRetentionSystem from '@/components/enhanced/memory-retention-system'
 import ProgressAnalytics from '@/components/enhanced/progress-analytics'
+import { CompetitiveEdgeSystem } from '@/components/competitive/edge-system'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function InsightsPage() {
-  const [activeTab, setActiveTab] = useState<'prediction' | 'biology' | 'cycle-schedule' | 'energy-prediction' | 'study-techniques' | 'hormonal' | 'emergency' | 'ai-suggestions' | 'schedule' | 'memory' | 'progress'>('prediction')
+  const [activeTab, setActiveTab] = useState<'prediction' | 'biology' | 'cycle-schedule' | 'energy-prediction' | 'study-techniques' | 'hormonal' | 'emergency' | 'ai-suggestions' | 'schedule' | 'memory' | 'progress' | 'competitive'>('prediction')
 
   return (
     <DashboardLayout 
@@ -138,6 +139,16 @@ export default function InsightsPage() {
             >
               📈 Progress Analytics
             </button>
+            <button
+              onClick={() => setActiveTab('competitive')}
+              className={`flex-1 min-w-0 px-4 py-3 mx-1 rounded-lg transition-all duration-300 text-sm font-semibold text-center ${
+                activeTab === 'competitive'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl transform scale-105 border border-blue-400/50'
+                  : 'text-gray-300 bg-gray-700/50 hover:text-white hover:bg-gray-600/70 hover:shadow-md hover:scale-102 border border-gray-600/30'
+              }`}
+            >
+              🏆 Competitive Edge
+            </button>
           </div>
         </div>
 
@@ -158,6 +169,7 @@ export default function InsightsPage() {
         {activeTab === 'schedule' && <SmartStudyPlanner />}
         {activeTab === 'memory' && <MemoryRetentionSystem />}
         {activeTab === 'progress' && <ProgressAnalytics />}
+        {activeTab === 'competitive' && <CompetitiveEdgeSystem />}
       </div>
     </DashboardLayout>
   )

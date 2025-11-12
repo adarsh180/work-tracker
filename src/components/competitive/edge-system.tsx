@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, TrendingUp, Target, Zap, Crown, Star } from 'lucide-react';
+import { Trophy, TrendingUp, Target, Zap, Crown, Star, Brain, Heart, Sparkles, Rocket } from 'lucide-react';
+import { getRandomMotivationalQuote, getMotivationalQuotesByCategory } from '@/lib/motivational-quotes';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CompetitiveData {
   currentRank: number;
@@ -101,64 +103,99 @@ export function CompetitiveEdgeSystem() {
   }, []);
 
   const [showMotivation, setShowMotivation] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState('');
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [actionPlan, setActionPlan] = useState('');
+  const [showActionPlan, setShowActionPlan] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [displayedQuote, setDisplayedQuote] = useState('');
 
-  const topperSuccessStories = [
-    {
-      name: "Ananya Sharma",
-      air: 1,
-      story: "Started with 40% accuracy, reached 95% through consistent practice",
-      keyTip: "Never skip revision - it's what separates toppers from others"
-    },
-    {
-      name: "Priya Patel", 
-      air: 15,
-      story: "Solved 500+ questions daily in last 6 months",
-      keyTip: "Quality over quantity, but quantity also matters for speed"
-    },
-    {
-      name: "Kavya Reddy",
-      air: 32,
-      story: "Maintained 14-hour study schedule with proper breaks",
-      keyTip: "Consistency beats intensity - small daily improvements compound"
-    }
-  ];
+
 
   const calculateProgress = (current: number, target: number): number => {
     return Math.min(100, (current / target) * 100);
   };
 
-  const getMotivationalMessage = (): string => {
-    const messages = [
-      "🔥 You're 150 questions away from topper level! Push harder, Misti!",
-      "💪 Every question you solve closes the gap with AIR 1-50 students!",
-      "🎯 Toppers aren't superhuman - they just practice more consistently!",
-      "⚡ Your accuracy is improving! Keep this momentum going!",
-      "👑 Future Dr. Misti is emerging - I can see her!"
-    ];
-    return messages[Math.floor(Math.random() * messages.length)];
+  const generateMotivationalBoost = () => {
+    setIsThinking(true);
+    setShowMotivation(true);
+    setDisplayedQuote('');
+    
+    // Thinking delay (1-2 seconds)
+    setTimeout(() => {
+      setIsThinking(false);
+      const quote = getRandomMotivationalQuote();
+      setCurrentQuote(quote);
+      
+      // Typewriter effect
+      let i = 0;
+      const typeWriter = () => {
+        if (i < quote.length) {
+          setDisplayedQuote(quote.substring(0, i + 1));
+          i++;
+          setTimeout(typeWriter, 30); // 30ms per character
+        }
+      };
+      typeWriter();
+      
+      // Auto-hide after quote is fully typed + 4 seconds
+      setTimeout(() => {
+        setShowMotivation(false);
+      }, quote.length * 30 + 4000);
+    }, 1500); // 1.5 second thinking delay
   };
 
-  const generateActionPlan = () => {
-    const plan = [
-      `📈 Increase daily questions from ${competitiveData.mistiProgress.dailyQuestions} to ${competitiveData.topperPatterns.dailyQuestions}`,
-      `⏰ Add ${competitiveData.gapAnalysis.hoursGap} more study hours daily`,
-      `🎯 Improve accuracy by ${competitiveData.gapAnalysis.accuracyGap}% through focused practice`,
-      `🔄 Add one more revision cycle per chapter`,
-      `📊 Weekly mock tests to track improvement`
-    ];
-    
-    alert(`Action Plan Generated:\n\n${plan.join('\n')}`);
+  const generateActionPlan = async () => {
+    setIsGeneratingPlan(true);
+    try {
+      const response = await fetch('/api/competitive-edge/action-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setActionPlan(data.actionPlan);
+        setShowActionPlan(true);
+      } else {
+        // Fallback to basic plan
+        const basicPlan = [
+          `📈 Increase daily questions from ${competitiveData.mistiProgress.dailyQuestions} to ${competitiveData.topperPatterns.dailyQuestions}`,
+          `⏰ Add ${competitiveData.gapAnalysis.hoursGap} more study hours daily`,
+          `🎯 Improve accuracy by ${competitiveData.gapAnalysis.accuracyGap}% through focused practice`,
+          `🔄 Add one more revision cycle per chapter`,
+          `📊 Weekly mock tests to track improvement`
+        ].join('\n\n');
+        setActionPlan(basicPlan);
+        setShowActionPlan(true);
+      }
+    } catch (error) {
+      console.error('Failed to generate action plan:', error);
+      // Fallback plan
+      const basicPlan = `🎯 IMMEDIATE ACTION PLAN\n\n📈 Increase daily practice\n⏰ Optimize study schedule\n🎯 Focus on weak areas\n🔄 Regular revision cycles`;
+      setActionPlan(basicPlan);
+      setShowActionPlan(true);
+    } finally {
+      setIsGeneratingPlan(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-500/20">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-400" />
-            Competitive Edge Analysis
-          </CardTitle>
-        </CardHeader>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-500/20 shadow-2xl">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Trophy className="h-6 w-6 text-yellow-400" />
+              Competitive Edge Analysis
+              <Sparkles className="h-4 w-4 text-yellow-300 animate-pulse" />
+            </CardTitle>
+          </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="text-center p-4 bg-red-900/20 border border-red-500/20 rounded-lg">
@@ -225,49 +262,117 @@ export function CompetitiveEdgeSystem() {
           <div className="grid md:grid-cols-2 gap-4">
             <Button 
               onClick={generateActionPlan}
-              className="bg-blue-600 hover:bg-blue-700"
+              disabled={isGeneratingPlan}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <Zap className="h-4 w-4 mr-2" />
-              Generate Action Plan
+              {isGeneratingPlan ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Brain className="h-4 w-4 mr-2" />
+                  AI Action Plan
+                </>
+              )}
             </Button>
             
             <Button 
-              onClick={() => setShowMotivation(!showMotivation)}
-              className="bg-purple-600 hover:bg-purple-700"
+              onClick={generateMotivationalBoost}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <Star className="h-4 w-4 mr-2" />
+              <Heart className="h-4 w-4 mr-2" />
               Motivational Boost
             </Button>
           </div>
 
-          {showMotivation && (
-            <div className="p-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/20 rounded-lg">
-              <p className="text-purple-300 font-medium">{getMotivationalMessage()}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {showMotivation && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6 bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-xl shadow-2xl"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <Rocket className="h-6 w-6 text-pink-400 animate-bounce" />
+                  <h3 className="text-lg font-semibold text-white">Motivational Boost</h3>
+                </div>
+                {isThinking ? (
+                  <div className="flex items-center gap-2 text-purple-200">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <span className="text-sm">Thinking of something special for you...</span>
+                  </div>
+                ) : (
+                  <p className="text-purple-200 font-medium text-lg leading-relaxed min-h-[2rem]">
+                    {displayedQuote}
+                    <span className="animate-pulse">|</span>
+                  </p>
+                )}
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    onClick={generateMotivationalBoost}
+                    size="sm"
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                  >
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Another Quote
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
-      </Card>
+        </Card>
+      </motion.div>
 
-      <Card className="bg-gray-800/50 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Crown className="h-5 w-5 text-yellow-400" />
-            Topper Success Stories
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {topperSuccessStories.map((story, index) => (
-            <div key={index} className="p-4 bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/20 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-white font-medium">{story.name}</h4>
-                <Badge className="bg-yellow-600">AIR {story.air}</Badge>
+      {/* AI Action Plan Modal */}
+      <AnimatePresence>
+        {showActionPlan && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowActionPlan(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-blue-400" />
+                  AI-Generated Action Plan
+                </h2>
+                <Button
+                  onClick={() => setShowActionPlan(false)}
+                  size="sm"
+                  className="bg-gray-700 hover:bg-gray-600"
+                >
+                  ✕
+                </Button>
               </div>
-              <p className="text-gray-300 text-sm mb-2">{story.story}</p>
-              <p className="text-green-400 text-sm font-medium">💡 {story.keyTip}</p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+              <div className="prose prose-invert max-w-none">
+                <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">
+                  {actionPlan}
+                </pre>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
     </div>
   );
 }
