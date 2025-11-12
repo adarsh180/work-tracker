@@ -528,3 +528,41 @@ model WeakTopic {
   @@unique([userId, subject, chapter, topic])
   @@map("weak_topics")
 }
+
+model GratitudeEntry {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  date      DateTime @db.Date
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("gratitude_entries")
+}
+
+model SpiritualActivity {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  date        DateTime @db.Date
+  activityType String  @map("activity_type") // "prayer", "meditation", "gratitude", "reflection"
+  duration    Int      @default(0) // in minutes
+  completed   Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date, activityType])
+  @@map("spiritual_activities")
+}
+
+model DailyWisdom {
+  id          String   @id @default(cuid())
+  date        DateTime @unique @db.Date
+  quote       String   @db.Text
+  translation String   @db.Text
+  source      String   // "Bhagavad Gita", "Ramayana", "Upanishads", etc.
+  relevance   String   @db.Text // NEET-specific relevance
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("daily_wisdom")
+}

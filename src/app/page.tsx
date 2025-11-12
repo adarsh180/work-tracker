@@ -20,6 +20,9 @@ import StudyStreakTracker from '@/components/enhanced/study-streak-tracker'
 import PomodoroTimer from '@/components/enhanced/pomodoro-timer'
 import WeakTopicIdentifier from '@/components/enhanced/weak-topic-identifier'
 import QuestionProgressTracker from '@/components/enhanced/question-progress-tracker'
+import { CompetitiveEdgeSystem } from '@/components/competitive/edge-system'
+import { SpiritualBalanceSystem } from '@/components/spiritual/balance-system'
+import { DailyWisdom } from '@/components/spiritual/daily-wisdom'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -183,6 +186,29 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Spiritual Wisdom Section - Above NEET Timer */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-2xl">🕉️</span>
+            <span>आध्यात्मिक ज्ञान</span>
+          </h2>
+          <DailyWisdom />
+        </div>
+
+        {/* NEET Countdown Timer */}
+        <div className="mb-8">
+          <NEETCountdownTimer />
+        </div>
+
+        {/* Spiritual Balance Section - Below NEET Timer */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-2xl">🧘‍♀️</span>
+            <span>आध्यात्मिक संतुलन और आंतरिक शांति</span>
+          </h2>
+
+        </div>
+
         {/* Motivational Messages */}
         <MotivationalMessages />
 
@@ -201,7 +227,6 @@ export default function Home() {
             <QuestionProgressTracker />
             <AIR50CycleSummary />
             <StudyStreakTracker />
-            <NEETCountdownTimer />
             <DailyGoalsCard />
             <YesterdayPerformance />
             <QuestionAnalyticsCard />
@@ -233,6 +258,24 @@ export default function Home() {
             </h3>
             <WeakTopicIdentifier />
           </div>
+        </div>
+
+        {/* Spiritual Balance Section - Below Pomodoro Timer */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-2xl">🧘♀️</span>
+            <span>आध्यात्मिक संतुलन और आंतरिक शांति</span>
+          </h2>
+          <SpiritualBalanceSystem />
+        </div>
+
+        {/* Competitive Edge Analysis */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <span>🏆</span>
+            <span>Competitive Edge Analysis</span>
+          </h2>
+          <CompetitiveEdgeSystem />
         </div>
 
         {/* Getting Started */}

@@ -49,4 +49,5 @@ logs
 verify-db.js
 .kiro
 docs
-
+#
+SETUP_NEW_FEATURES.md
