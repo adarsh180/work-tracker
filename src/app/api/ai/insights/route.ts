@@ -30,22 +30,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Gather user data
-    const [subjects, testPerformances] = await Promise.all([
+    // Gather user data (live)
+    const [subjects, testPerformances, questionStats, moodStats] = await Promise.all([
       SubjectRepository.getAll(),
       TestPerformanceRepository.getAllByUserId(session.user.email),
+      QuestionAnalyticsRepository.getCurrentStats(),
+      (async () => {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - 30);
+        const analytics = await MoodRepository.getMoodAnalytics(session.user.email, start, end);
+        return analytics;
+      })(),
     ]);
-    
-    // Get basic analytics
-    const questionAnalytics = { daily: 0, weekly: 0, monthly: 0, lifetime: 0 };
-    const moodAnalytics = { totalEntries: 0, happyDays: 0, currentStreak: 0 };
 
-    // Prepare data for AI analysis
+    // Prepare data for AI analysis (live)
     const studyData = AIInsightsService.prepareStudyData(
       subjects,
       testPerformances,
-      questionAnalytics,
-      moodAnalytics
+      {
+        dailyAverage: Math.round(questionStats.daily),
+        weeklyTotal: Math.round(questionStats.weekly),
+        monthlyTotal: Math.round(questionStats.monthly),
+        lifetimeTotal: Math.round(questionStats.lifetime),
+      },
+      {
+        moodTrend: moodStats.averageHappinessScore >= 2.5 ? 'improving' : moodStats.averageHappinessScore >= 2 ? 'stable' : 'declining',
+        currentStreak: moodStats.streakData.currentStreak,
+        longestStreak: moodStats.streakData.longestStreak,
+      }
     );
 
     // Generate insights based on type

@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db-utils'
+import { prisma } from '@/lib/prisma'
 import { MoodEntry } from '@prisma/client'
 
 export interface MoodAnalytics {

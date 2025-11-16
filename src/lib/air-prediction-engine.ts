@@ -18,9 +18,9 @@ export class AIRPredictionEngine {
   static async generatePrediction(userId: string): Promise<AIRPredictionResult> {
     try {
       // Get user data
-      const [subjects, dailyGoals, testPerformances, menstrualData] = await Promise.all([
+      const [subjects, dailyGoals, testPerformances, menstrualData, studySessions] = await Promise.all([
         prisma.subject.findMany({ include: { chapters: true } }),
-        prisma.dailyGoal.findMany({ 
+        prisma.dailyGoal.findMany({
           where: { userId },
           orderBy: { date: 'desc' },
           take: 30
@@ -30,16 +30,22 @@ export class AIRPredictionEngine {
           orderBy: { testDate: 'desc' },
           take: 10
         }),
-prisma.menstrualCycle.findMany({
+        prisma.menstrualCycle.findMany({
           where: { userId },
           orderBy: { cycleStartDate: 'desc' },
           take: 7
+        }),
+        prisma.studySession.findMany({
+          where: { userId },
+          orderBy: { startTime: 'desc' },
+          take: 30
         })
       ])
 
       // Calculate factors
       const progressScore = this.calculateProgressScore(subjects)
-      const testTrend = this.calculateTestTrend(testPerformances)
+      const afternoonAdjustment = this.calculateAfternoonAdjustment(studySessions)
+      const testTrend = this.calculateTestTrend(testPerformances, afternoonAdjustment)
       const consistency = this.calculateConsistency(dailyGoals)
       const biologicalFactor = this.calculateBiologicalFactor(menstrualData)
       const externalFactor = this.calculateExternalFactor()
@@ -138,35 +144,54 @@ prisma.menstrualCycle.findMany({
   
   private static getSubjectWeight(subjectName: string): number {
     const weights = {
-      'Physics': 1.2,    // Higher weightage in NEET
-      'Chemistry': 1.2,  // Higher weightage in NEET
-      'Botany': 1.0,
-      'Zoology': 1.0
+      Physics: 1.0,
+      Chemistry: 1.0,
+      Botany: 2.0,
+      Zoology: 2.0,
     }
-    return weights[subjectName as keyof typeof weights] || 1.0
+    return weights[subjectName as keyof typeof weights] ?? 1.0
   }
 
-  private static calculateTestTrend(tests: any[]): number {
+  private static calculateTestTrend(tests: any[], afternoonAdj: number = 0): number {
     if (!tests || tests.length === 0) return 25 // Harsh default for no test practice
-    if (tests.length === 1) return Math.min(70, Math.max(15, (tests[0].score / 720) * 100))
-    
-    // Calculate recent performance (last 3 tests)
-    const recentTests = tests.slice(0, Math.min(3, tests.length))
-    const recentAvg = recentTests.reduce((sum, t) => sum + (t.score || 0), 0) / recentTests.length
+    if (tests.length === 1) {
+      const base = Math.min(70, Math.max(15, (tests[0].score / 720) * 100))
+      return Math.max(10, base + afternoonAdj)
+    }
+    // Exponential time-decay weighted average over recent tests
+    const k = 0.25 // decay factor
+    let weightedSum = 0
+    let weightTotal = 0
+    const n = Math.min(10, tests.length)
+    for (let i = 0; i < n; i++) {
+      const w = Math.exp(-k * i)
+      weightedSum += ((tests[i].score || 0)) * w
+      weightTotal += w
+    }
+    const recentAvg = weightedSum / Math.max(1e-6, weightTotal)
     
     // Calculate trend if we have enough data
+    // Trend bonus comparing older cohort
     let trendBonus = 0
-    if (tests.length >= 3) {
-      const olderTests = tests.slice(3, Math.min(6, tests.length))
+    if (tests.length >= 4) {
+      const olderSliceStart = Math.min(n, 4)
+      const olderSliceEnd = Math.min(n, 8)
+      const olderTests = tests.slice(olderSliceStart, olderSliceEnd)
       if (olderTests.length > 0) {
         const olderAvg = olderTests.reduce((sum, t) => sum + (t.score || 0), 0) / olderTests.length
-        trendBonus = Math.max(-20, Math.min(10, (recentAvg - olderAvg) / 25)) // Stricter trend impact
+        trendBonus = Math.max(-20, Math.min(10, (recentAvg - olderAvg) / 25))
       }
     }
+    // Volatility penalty (higher stddev → lower score)
+    const vols = tests.slice(0, n).map(t => t.score || 0)
+    const mean = recentAvg
+    const variance = vols.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / Math.max(1, vols.length)
+    const stddev = Math.sqrt(variance)
+    const volatilityPenalty = Math.min(15, Math.max(0, (stddev - 20) / 4))
     
     // RIGOROUS 2024-2026 Test Scoring - 650+ needed for AIR 50!
     const baseScore = (recentAvg / 720) * 100
-    let rigorousScore = baseScore + trendBonus
+    let rigorousScore = baseScore + trendBonus - volatilityPenalty + afternoonAdj
     
     // Apply NEET 2026 reality check
     if (recentAvg >= 680) rigorousScore = Math.min(95, rigorousScore) // 680+ is excellent
@@ -305,5 +330,28 @@ prisma.menstrualCycle.findMany({
     if (predictedAIR <= 50 && confidence > 0.80) return 'medium' // AIR 50 is now medium risk
     if (predictedAIR <= 100 && confidence > 0.70) return 'medium' // AIR 100 is risky
     return 'high' // Everything else is high risk in NEET 2026
+  }
+  private static calculateAfternoonAdjustment(studySessions: any[]): number {
+    if (!studySessions || studySessions.length === 0) return 0
+    const isAfternoon = (d: Date) => {
+      const h = d.getHours()
+      return h >= 14 && h <= 17
+    }
+    const isMorning = (d: Date) => {
+      const h = d.getHours()
+      return h >= 6 && h <= 11
+    }
+    const afternoon = studySessions.filter(s => isAfternoon(s.startTime))
+    const morning = studySessions.filter(s => isMorning(s.startTime))
+    if (afternoon.length === 0 || morning.length === 0) return 0
+    const acc = (arr: any[]) => arr.reduce((sum, s) => sum + ((s.questionsAttempted > 0 ? (s.questionsCorrect / s.questionsAttempted) : 0) * 100), 0) / arr.length
+    const focus = (arr: any[]) => arr.reduce((sum, s) => sum + (s.focusScore || 0), 0) / arr.length
+    const afternoonScore = (acc(afternoon) * 0.7 + focus(afternoon) * 0.3)
+    const morningScore = (acc(morning) * 0.7 + focus(morning) * 0.3)
+    const delta = afternoonScore - morningScore
+    // Map delta to a modest adjustment
+    if (delta >= 5) return 5
+    if (delta <= -5) return -7
+    return delta * 0.8
   }
 }
