@@ -79,11 +79,11 @@ export default function DailyGoalsPage() {
                     </div>
                     <div className="flex items-center justify-between p-3 bg-background-secondary/30 rounded-lg">
                       <span className="text-gray-300">Weekly Goal</span>
-                      <span className="text-green-400 font-semibold">2000+</span>
+                      <span className="text-green-400 font-semibold">6800+</span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-background-secondary/30 rounded-lg">
                       <span className="text-gray-300">Monthly Goal</span>
-                      <span className="text-yellow-400 font-semibold">7500+</span>
+                      <span className="text-yellow-400 font-semibold">27500+</span>
                     </div>
                   </div>
                   

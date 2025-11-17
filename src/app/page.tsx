@@ -213,10 +213,7 @@ export default function Home() {
         {/* Motivational Messages */}
         <MotivationalMessages />
 
-        {/* Question Heatmap */}
-        <div className="mb-8">
-          <QuestionHeatmap compact={true} />
-        </div>
+
 
         {/* Real-time Analytics */}
         <div className="mb-8">

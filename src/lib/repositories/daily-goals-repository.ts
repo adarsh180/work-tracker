@@ -298,8 +298,8 @@ export class DailyGoalsRepository {
     const lifetime = allGoals.reduce((sum, goal) => sum + goal.totalQuestions, 0)
 
     // Calculate progress
-    const weeklyGoal = 2000 // Target: 2000 questions per week
-    const monthlyGoal = 7500 // Target: 7500 questions per month
+    const weeklyGoal = 6800 // Target: 6800 questions per week
+    const monthlyGoal = 27500 // Target: 27500 questions per month
     const dailyGoalAchieved = daily >= 250
     const weeklyProgress = Math.min((weekly / weeklyGoal) * 100, 100)
     const monthlyProgress = Math.min((monthly / monthlyGoal) * 100, 100)

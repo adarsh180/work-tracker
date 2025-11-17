@@ -93,7 +93,7 @@ function getMotivationalMessage(dailyCount: number, weeklyCount: number, monthly
     }
   }
 
-  if (monthlyCount >= 7500) {
+  if (monthlyCount >= 27500) {
     return {
       type: 'milestone' as const,
       title: '🌟 MONTHLY SUPERSTAR!',

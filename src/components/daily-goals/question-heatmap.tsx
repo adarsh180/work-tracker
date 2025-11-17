@@ -82,27 +82,32 @@ export default function QuestionHeatmap({ compact = false }: QuestionHeatmapProp
 
   const cellSize = compact ? 'w-2 h-2' : 'w-3 h-3'
   const spacing = compact ? 'mb-0.5 mr-0.5' : 'mb-1 mr-1'
-  const maxWeeks = compact ? 52 : weekNumbers.length
-  const displayWeeks = weekNumbers.slice(0, maxWeeks)
+  const maxWeeks = compact ? 40 : weekNumbers.length
+  const displayWeeks = weekNumbers.slice(-maxWeeks)
 
   return (
-    <div className="glass-effect rounded-xl p-6">
-      {!compact && (
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
-            <span>🔥</span>
-            <span>Question Streak Heatmap</span>
-          </h3>
+    <div className={`glass-effect rounded-xl ${compact ? 'p-4' : 'p-6'}`}>
+      <div className={`${compact ? 'mb-3' : 'mb-4'}`}>
+        <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-semibold text-white mb-2 flex items-center gap-2`}>
+          <span>🔥</span>
+          <span>Question Streak Heatmap</span>
+        </h3>
+        {!compact && (
           <p className="text-gray-400 text-sm">
             May 4, 2025 - December 31, 2026 • Daily question progress visualization
           </p>
-        </div>
-      )}
+        )}
+        {compact && (
+          <p className="text-gray-400 text-xs">
+            Recent progress • Click for full view
+          </p>
+        )}
+      </div>
 
-      <div className="overflow-x-auto">
-        <div className="min-w-max">
+      <div className={`${compact ? '' : 'overflow-x-auto'}`}>
+        <div className={`${compact ? 'w-full' : 'min-w-max'}`}>
           {/* Month labels */}
-          <div className={`flex mb-2 ${compact ? 'ml-6' : 'ml-8'}`}>
+          <div className={`flex mb-2 ${compact ? 'ml-3' : 'ml-8'}`}>
             {displayWeeks.map((weekNum, index) => {
               const firstDayOfWeek = weeks[weekNum]?.find(day => day !== null)
               const cellWidth = compact ? 'w-2' : 'w-3'
@@ -131,14 +136,14 @@ export default function QuestionHeatmap({ compact = false }: QuestionHeatmapProp
 
           <div className="flex">
             {/* Day labels */}
-            <div className="flex flex-col mr-2">
+            <div className="flex flex-col mr-1">
               {dayLabels.map((day, index) => {
                 const cellHeight = compact ? 'h-2' : 'h-3'
                 const marginBottom = compact ? 'mb-0.5' : 'mb-1'
-                const width = compact ? 'w-4' : 'w-6'
+                const width = compact ? 'w-2' : 'w-6'
                 
                 return (
-                  <div key={day} className={`${cellHeight} ${marginBottom} text-xs text-gray-400 ${width} flex items-center`}>
+                  <div key={day} className={`${cellHeight} ${marginBottom} text-xs text-gray-400 ${width} flex items-center justify-end pr-1`}>
                     {index % 2 === 1 ? (compact ? day.slice(0, 1) : day) : ''}
                   </div>
                 )
@@ -159,8 +164,8 @@ export default function QuestionHeatmap({ compact = false }: QuestionHeatmapProp
                       return (
                         <motion.div
                           key={`${weekNum}-${dayIndex}`}
-                          className={`${cellSize} rounded-sm ${marginBottom} ${colorClass} cursor-pointer border border-gray-700/50`}
-                          whileHover={{ scale: compact ? 1.5 : 1.3 }}
+                          className={`${cellSize} rounded-sm ${marginBottom} ${colorClass} cursor-pointer border border-gray-700/30 hover:border-gray-500/50 transition-colors`}
+                          whileHover={{ scale: compact ? 1.4 : 1.3 }}
                           title={dayData ? `${dayData.date}: ${dayData.count} questions` : 'No data'}
                         />
                       )
@@ -172,11 +177,11 @@ export default function QuestionHeatmap({ compact = false }: QuestionHeatmapProp
           </div>
 
           {/* Legend */}
-          <div className={`flex items-center justify-between ${compact ? 'mt-2' : 'mt-4'} text-xs text-gray-400`}>
+          <div className={`flex items-center justify-between ${compact ? 'mt-3' : 'mt-4'} text-xs text-gray-400`}>
             <span>Less</span>
             <div className="flex items-center gap-1">
               {Object.entries(colorMap).filter(([key]) => key !== 'blank').map(([key, colorClass]) => (
-                <div key={key} className={`${compact ? 'w-2 h-2' : 'w-3 h-3'} rounded-sm ${colorClass}`}></div>
+                <div key={key} className={`${compact ? 'w-2 h-2' : 'w-3 h-3'} rounded-sm ${colorClass} border border-gray-700/30`}></div>
               ))}
             </div>
             <span>More</span>

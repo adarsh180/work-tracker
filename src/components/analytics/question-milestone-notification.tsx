@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useQuestionAnalytics } from '@/hooks/use-question-analytics'
 import { X, Trophy, Target, Sparkles } from 'lucide-react'
 
-type MilestoneType = 'daily-250' | 'daily-300' | 'daily-500' | 'weekly-2000' | 'monthly-7500'
+type MilestoneType = 'daily-250' | 'daily-300' | 'daily-500' | 'weekly-2000' | 'monthly-27500'
 
 interface Milestone {
   type: MilestoneType
@@ -49,10 +49,10 @@ const milestones: Record<MilestoneType, Milestone> = {
     color: 'text-purple-400',
     bgColor: 'bg-gradient-to-r from-purple-500/20 to-violet-500/20 border-purple-500'
   },
-  'monthly-7500': {
-    type: 'monthly-7500',
+  'monthly-27500': {
+    type: 'monthly-27500',
     title: '🌟 Monthly Superstar!',
-    message: '7500+ questions this month! You\'re demonstrating the dedication of a future doctor!',
+    message: '27500+ questions this month! You\'re demonstrating the dedication of a future doctor!',
     icon: <Sparkles className="h-6 w-6" />,
     color: 'text-pink-400',
     bgColor: 'bg-gradient-to-r from-pink-500/20 to-rose-500/20 border-pink-500'
@@ -91,9 +91,9 @@ export function QuestionMilestoneNotification() {
 
     // Check for monthly milestones
     const monthKey = `${new Date().getFullYear()}-${new Date().getMonth()}`
-    if (today.monthly >= 7500 && !achievedMilestones.has(`monthly-7500-${monthKey}`)) {
-      setCurrentNotification(milestones['monthly-7500'])
-      setAchievedMilestones(prev => new Set(prev).add(`monthly-7500-${monthKey}`))
+    if (today.monthly >= 27500 && !achievedMilestones.has(`monthly-27500-${monthKey}`)) {
+      setCurrentNotification(milestones['monthly-27500'])
+      setAchievedMilestones(prev => new Set(prev).add(`monthly-27500-${monthKey}`))
     }
   }, [analytics, achievedMilestones])
 

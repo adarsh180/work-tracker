@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircleIcon, ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
 import AchievementPopup from './achievement-popup'
+import WeeklyAchievementPopup from './weekly-achievement-popup'
 import { useAchievementPopup } from '@/hooks/use-achievement-popup'
+import { useWeeklyAchievementPopup } from '@/hooks/use-weekly-achievement-popup'
 
 
 type DailyGoalFormData = {
@@ -58,6 +60,13 @@ export default function DailyGoalsForm() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   
   const { showPopup, achievementLevel, questionCount, checkAchievement, closePopup } = useAchievementPopup()
+  const { 
+    showPopup: showWeeklyPopup, 
+    achievementLevel: weeklyAchievementLevel, 
+    questionCount: weeklyQuestionCount, 
+    checkWeeklyAchievement, 
+    closePopup: closeWeeklyPopup 
+  } = useWeeklyAchievementPopup()
 
 
   // Fetch today's goal
@@ -177,6 +186,18 @@ export default function DailyGoalsForm() {
         .reduce((sum, [, value]) => sum + value, 0)
       checkAchievement(totalQuestions)
       
+      // Check for weekly achievement
+      try {
+        const weeklyResponse = await fetch('/api/daily-goals/weekly-comparison')
+        if (weeklyResponse.ok) {
+          const weeklyData = await weeklyResponse.json()
+          const currentWeekQuestions = weeklyData.data?.currentWeek?.totalQuestions || 0
+          checkWeeklyAchievement(currentWeekQuestions)
+        }
+      } catch (error) {
+        console.log('Weekly achievement check failed:', error)
+      }
+      
       // Invalidate all related queries for real-time updates
       queryClient.invalidateQueries({ queryKey: ['daily-goal-today'] })
       queryClient.invalidateQueries({ queryKey: ['daily-goal-summary'] })
@@ -189,9 +210,14 @@ export default function DailyGoalsForm() {
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
       queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['recent-goals'] })
+      queryClient.invalidateQueries({ queryKey: ['study-streaks'] })
       
       // Sync analytics for real-time updates
       fetch('/api/sync-analytics', { method: 'POST' })
+      
+      // Auto-update study streak
+      fetch('/api/study-streaks', { method: 'POST' })
+        .catch(error => console.log('Study streak update failed:', error))
 
       setTimeout(() => setSubmitStatus('idle'), 3000)
 
@@ -230,6 +256,7 @@ export default function DailyGoalsForm() {
       queryClient.invalidateQueries({ queryKey: ['monthly-goals-trend'] })
       queryClient.invalidateQueries({ queryKey: ['question-stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['study-streaks'] })
 
     } catch (error) {
       console.error('Error deleting daily goal:', error)
@@ -447,6 +474,16 @@ export default function DailyGoalsForm() {
         onClose={closePopup}
         achievementLevel={achievementLevel}
         questionCount={questionCount}
+      />
+    )}
+    
+    {/* Weekly Achievement Popup */}
+    {showWeeklyPopup && weeklyAchievementLevel && (
+      <WeeklyAchievementPopup
+        isOpen={showWeeklyPopup}
+        onClose={closeWeeklyPopup}
+        achievementLevel={weeklyAchievementLevel}
+        questionCount={weeklyQuestionCount}
       />
     )}
     </>
