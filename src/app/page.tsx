@@ -23,6 +23,7 @@ import QuestionProgressTracker from '@/components/enhanced/question-progress-tra
 import { CompetitiveEdgeSystem } from '@/components/competitive/edge-system'
 import { SpiritualBalanceSystem } from '@/components/spiritual/balance-system'
 import { DailyWisdom } from '@/components/spiritual/daily-wisdom'
+import QuestionHeatmap from '@/components/daily-goals/question-heatmap'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -211,6 +212,11 @@ export default function Home() {
 
         {/* Motivational Messages */}
         <MotivationalMessages />
+
+        {/* Question Heatmap */}
+        <div className="mb-8">
+          <QuestionHeatmap compact={true} />
+        </div>
 
         {/* Real-time Analytics */}
         <div className="mb-8">

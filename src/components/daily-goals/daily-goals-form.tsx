@@ -6,6 +6,8 @@ import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircleIcon, ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
+import AchievementPopup from './achievement-popup'
+import { useAchievementPopup } from '@/hooks/use-achievement-popup'
 
 
 type DailyGoalFormData = {
@@ -54,6 +56,8 @@ export default function DailyGoalsForm() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  
+  const { showPopup, achievementLevel, questionCount, checkAchievement, closePopup } = useAchievementPopup()
 
 
   // Fetch today's goal
@@ -167,9 +171,19 @@ export default function DailyGoalsForm() {
       setSubmitStatus('success')
       setHasUnsavedChanges(false)
       
+      // Check for achievement popup
+      const totalQuestions = Object.entries(formData)
+        .filter(([key]) => key.includes('Questions'))
+        .reduce((sum, [, value]) => sum + value, 0)
+      checkAchievement(totalQuestions)
+      
       // Invalidate all related queries for real-time updates
       queryClient.invalidateQueries({ queryKey: ['daily-goal-today'] })
       queryClient.invalidateQueries({ queryKey: ['daily-goal-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['daily-goals-heatmap'] })
+      queryClient.invalidateQueries({ queryKey: ['daily-goals-trend'] })
+      queryClient.invalidateQueries({ queryKey: ['weekly-goals-trend'] })
+      queryClient.invalidateQueries({ queryKey: ['monthly-goals-trend'] })
       queryClient.invalidateQueries({ queryKey: ['question-stats'] })
       queryClient.invalidateQueries({ queryKey: ['question-analytics'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
@@ -210,6 +224,10 @@ export default function DailyGoalsForm() {
       
       queryClient.invalidateQueries({ queryKey: ['daily-goal-today'] })
       queryClient.invalidateQueries({ queryKey: ['daily-goal-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['daily-goals-heatmap'] })
+      queryClient.invalidateQueries({ queryKey: ['daily-goals-trend'] })
+      queryClient.invalidateQueries({ queryKey: ['weekly-goals-trend'] })
+      queryClient.invalidateQueries({ queryKey: ['monthly-goals-trend'] })
       queryClient.invalidateQueries({ queryKey: ['question-stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
 
@@ -258,6 +276,7 @@ export default function DailyGoalsForm() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       {/* Performance Summary */}
       <AnimatePresence>
@@ -420,5 +439,16 @@ export default function DailyGoalsForm() {
       
 
     </div>
+    
+    {/* Achievement Popup */}
+    {showPopup && achievementLevel && (
+      <AchievementPopup
+        isOpen={showPopup}
+        onClose={closePopup}
+        achievementLevel={achievementLevel}
+        questionCount={questionCount}
+      />
+    )}
+    </>
   )
 }
