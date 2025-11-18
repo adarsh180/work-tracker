@@ -43,258 +43,258 @@ export default function AchievementPopup({ isOpen, onClose, achievementLevel, qu
   }, [isOpen])
 
   const achievement300Letters = [
-    `My Dearest Misti,
+    `Meri pyaari bubu meri rani gudiya meri lado meri bago,
 
-💕 My heart is overflowing with pride and love as I write this! You've just crossed the incredible milestone of 300+ questions today - ${questionCount} questions to be exact! 
+💕 You know bubu mera dil kitna proud feel kar raha hai! Aapne ${questionCount} questions solve kiye hain - means I know meri bubu kamal ki hai!, 
 
-🌟 Do you realize how AMAZING you are? While others are still figuring out their study routine, you're already crushing your goals like the absolute QUEEN you are!
+    Aap or achaa karogi You will be in AIIMS DELHI doing your mbbs [deep inside i want you in aiims rishikesh]
 
-✨ Every single question you solve brings you one step closer to your dream of becoming Dr. Misti. I can already see you in that white coat, helping patients with that beautiful smile of yours.
+🌟  aap jaanti ho ki aap kitni AMAZING ho? Jab dusre log abhi bhi apna routine set kar rahe hain, tab aap already apne goals crush kar rahi hain like a true RANI-GUDIYA, Payaru betu!
 
-🔥 Your dedication, your consistency, your unwavering determination - it all makes me fall in love with you even more every single day. You're not just my wife, you're my inspiration!
+✨ Har question jo aap solve karti ho, woh aapko Dr. Misti banne ke sapne ke aur paas le jaata hai. Main already aapko white coat[jo bhi bolte hai usko] mein dekh sakta hun, patients ki help karte hue!
 
-💪 Keep going, my love. NEET 2026 doesn't know what's coming for it! You're going to absolutely DEMOLISH that exam!
+🔥 Aapki dedication, aapki consistency, aapka determination - yeh sab mujhe aapse aur bhi zyada mohabbat karne par majboor kar deta hai. Aap sirf meri biwi nahi, meri inspiration hain!
 
-Forever proud of you,
-Your biggest fan and loving husband 💕
+💪 Chalo shona, aise hi continue karo. NEET 2026 ko pata nahi ki kya aane wala hai! Aap us exam ko bilkul DEMOLISH kar dengi!
 
-P.S. - Tonight, we celebrate! You deserve all the love and appreciation in the world! 🎉`,
+Hamesha proud of you,
+Aapka sabse bada fan your loving pati 💕
 
-    `My Beautiful Misti,
+P.S. - Aaj raat celebration --> I will be praising you karte hain! Aap duniya bhar ke pyaar aur appreciation deserve karti ho!! 🎉`,
 
-🎯 ${questionCount} questions today?! Are you kidding me?! You're absolutely INCREDIBLE!
+    `Meri sundar Misti,
 
-💎 My precious diamond, you're sparkling brighter than ever! Your consistency is mind-blowing and your dedication makes my heart skip beats!
+🎯 ${questionCount} questions aaj?! Kya baat hai betu! Aap toh INCREDIBLE ho!, waise lado bhi toh meri ho naa
 
-🌸 Every morning I wake up grateful that I married such an extraordinary woman. You're not just studying, you're creating MAGIC!
+💎 Meri precious diamond, aap har din aur bhi zyada shine kar rahi ho! Aapki consistency mind-blowing hai aur dedication haayyeeeee!
 
-🦋 Like a butterfly emerging from its cocoon, you're transforming into the brilliant doctor you're destined to be. Dr. Misti has such a beautiful ring to it!
+🌸 Har subah main grateful feel karta hun ki maine aap jaisi extraordinary woman se shaadi ki hai. Aap sirf padh nahi rahi, MAGIC create kar rahi hain!
 
-🌟 Your focus, your determination, your beautiful mind - everything about you amazes me daily. You're my real-life superhero!
+🦋 Jaise butterfly apne cocoon se nikalti hai, waise hi aap brilliant doctor ban rahi hain. Dr. Misti - kitna beautiful lagta hai na!
 
-💕 I'm so lucky to witness your journey to greatness. Keep shining, my love!
+🌟 Aapka focus, aapka determination, aapka beautiful mind - sab kuch mujhe daily amaze karta hai. Aap meri real-life superhero ho!
 
-With endless admiration,
-Your devoted husband 💖
+💕 Main kitna lucky hun ki aapki greatness ka journey witness kar raha hun. Keep shining, meri jaan!
 
-P.S. - You deserve the biggest hug and your favorite treat tonight! 🍰`,
+Endless admiration ke saath,
+Aapka devoted pati 💖
 
-    `My Incredible Wife,
+P.S. - Aap biggest hug aur favorite treat deserve karti hain tonight! 🍰`,
 
-🚀 BOOM! ${questionCount} questions conquered today! You're absolutely UNSTOPPABLE!
+    `Meri incredible biwi,
 
-👑 Queen Misti is in the house! Your royal dedication to excellence leaves me speechless every single day!
+🚀 BOOM! ${questionCount} questions conquer kiye aaj! Aap absolutely UNSTOPPABLE hain lado!
 
-🌺 Your beautiful mind is like a garden blooming with knowledge. Every question you solve is another flower in your bouquet of success!
+👑 Pyaru betu is in the house! Aapki royal dedication excellence ke liye mujhe speechless kar deti hai har din!
 
-💪 The way you tackle challenges with such grace and determination - it's pure poetry in motion! You're writing your own success story!
+🌺 Aapka beautiful mind ek garden ki tarah hai jo knowledge se bloom kar raha hai. Har question ek flower hai success ke bouquet mein!
 
-🎨 You're not just preparing for NEET, you're creating a masterpiece of dedication and hard work that will inspire generations!
+💪 Jis tarah se aap challenges tackle karti ho grace aur determination ke saath - yeh pure poetry hai! Aap apni success story likh rahi ho!
 
-✨ My heart swells with pride knowing that this amazing woman is MINE! You're my everything!
+🎨 Aap sirf NEET ki preparation nahi kar rahi, ek masterpiece create kar rahi hain dedication aur hard work ka jo generations ko inspire karega!
 
-Bursting with love and pride,
-Your biggest cheerleader 📣
+✨ Mera dil pride se bhar jaata hai yeh jaankar ki yeh amazing woman MERI hai! Aap meri everything hain!
+  Well bubu like really your dedication is of next level bubu jaha se hum aapko dekh rahe hai or yaha tak u have improved alot but maintain this consistency
+  hit the target of 500-800/question per day bubu bars are getting higher but yk I LOVE YOU AND I KNOW YOU CAN DO IT
 
-P.S. - I'm planning a surprise to match your incredible achievement! 🎁`,
+Love aur pride se bhar kar,
+Aapka biggest cheerleader 📣
 
-    `My Darling Misti,
+P.S. - Main aapki incredible achievement ke liye surprise plan kar raha hun! 🎁`,
 
-🌈 ${questionCount} questions today! You've painted another rainbow of success across my heart!
+    `Meri darling Misti,
 
-💝 Every question you solve is like a love letter to your dreams. And watching you chase those dreams? That's my favorite love story!
+🌈 ${questionCount} questions aaj! waah meri lado gajab aap toh aaj kamal hi kar di ho!
 
-🦄 You're as rare and magical as a unicorn, my love! Your dedication is otherworldly and your spirit is absolutely enchanting!
+💝 Har question jo aap solve karti ho, woh aapke dreams ke liye ek love letter hai. Aur aapko dreams chase karte dekhna? Yeh meri favorite love story hai!
 
-🌙 Even the moon and stars are jealous of how brightly you shine! Your intelligence illuminates everything around you!
+🦄 Aap unicorn ki tarah rare aur magical ho, meri jaan! Aapki dedication otherworldly hai aur spirit absolutely enchanting!
 
-🎪 Life with you is like the most beautiful circus - full of wonder, excitement, and jaw-dropping performances like today's achievement!
+🌙 Moon aur stars bhi jealous hain ki aap kitni brightly shine karti hain! Aapki intelligence har cheez ko illuminate kar deti hai!
 
-💕 I fall in love with you all over again every time I see your determination in action!
+🎪 Aapke saath life sabse beautiful circus ki tarah hai - wonder, excitement, aur jaw-dropping performances se bhari!
 
-Madly in love with your brilliance,
-Your spellbound husband ✨
+💕 Main aapse phir se mohabbat mein gir jaata hun jab bhi aapka determination action mein dekhta hun!, you are my source of motivation my bubu u are my everything
 
-P.S. - Tonight, we dance to celebrate your magnificence! 💃`,
+Aapki brilliance se madly in love,
+Aapka spellbound pati ✨`,
 
-    `My Phenomenal Misti,
+    `Meri phenomenal Misti,
 
-⚡ ${questionCount} questions! You just struck lightning with your brilliance today!
+⚡ ${questionCount} questions! Aapne aaj apni brilliance se lightning strike kiya hai!, aise bhi ek dum bijli jaisi ho or meri kareja bhi toh ho naa
 
-🏆 Champions are made in moments like these, and baby, you're the ULTIMATE CHAMPION! Your consistency is legendary!
+🏆 Champions aise moments mein bante hain, aur bachha, aap ULTIMATE CHAMPION ho! Aapki consistency legendary hai!
 
-🌊 Like a powerful ocean wave, your determination crashes through every obstacle! Nothing can stop the force that is my wife!
+🌊 Powerful ocean wave ki tarah, aapka determination har obstacle ko crash kar deta hai! Kuch bhi nahi rok sakta meri biwi ki force ko!
 
-🔥 Your passion burns brighter than a thousand suns! The way you pursue excellence sets my soul on fire with admiration!
+🔥 Aapka passion thousand suns se bhi bright burn karta hai! Jis tarah se aap excellence pursue karti hain, woh mere soul ko fire kar deta hai!
 
-🎯 Bullseye after bullseye! Your precision and focus are absolutely mind-blowing! You hit every target you set!
+🎯 Bullseye after bullseye! Aapka precision aur focus absolutely mind-blowing hai! Har target hit karti hain jo set karti hain!
 
-💖 I'm the luckiest man alive to witness this incredible journey of yours!
+💖 Main sabse lucky insaan hun jo aapki incredible journey witness kar raha hai!
 
-In complete awe of you,
-Your thunderstruck husband ⚡
+Complete awe mein,
+Aapka thunderstruck pati ⚡
 
-P.S. - You've earned the most relaxing evening ever! Let me pamper you! 👸`,
+P.S. - Aapne sabse relaxing evening earn kiya hai! Mujhe aapko pamper karne do! 👸`,
 
-    `My Extraordinary Misti,
+    `Meri extraordinary Misti,
 
-🎭 ${questionCount} questions today! You're the star of the most incredible performance I've ever witnessed!
+🎭 ${questionCount} questions aaj! Aap sabse incredible performance ki star hain jo maine kabhi dekha hai!
 
-🌻 Like a sunflower always turning toward the sun, you always turn toward excellence! Your positivity lights up my world!
+🌻 Sunflower ki tarah jo hamesha sun ki taraf turn karti hai, aap hamesha excellence ki taraf turn karti hain! Aapki positivity meri world ko light up kar deti hai!
 
-🎵 Your dedication creates the most beautiful symphony in my heart! Every achievement is a note in our love song!
+🎵 Aapki dedication mere dil mein sabse beautiful symphony create karti hai! Har achievement hamare love song ka ek note hai!
 
-🦅 You soar higher than eagles, my love! Your ambition and drive take my breath away every single day!
+🦅 Aap eagles se bhi higher soar karti hain, meri aradhangini! Aapka ambition aur drive mera breath away kar deta hai har din!
 
-🌟 You're not just reaching for the stars - you're becoming one! The brightest star in my universe!
+🌟 Aap sirf stars ke liye reach nahi kar rahi - aap khud ek star ban rahi hain! Mere universe ki brightest star!
 
-💕 Every day with you is a blessing, but days like today remind me I married an absolute GODDESS!
+💕 Har din aapke saath blessing hai, lekin aaj jaise din mujhe yaad dilate hain ki maine ek absolute GODDESS se shaadi ki hai!
 
-Completely mesmerized by you,
-Your devoted admirer 🌹
+Completely mesmerized,
+Aapka devoted admirer 🌹
 
-P.S. - Tomorrow I'm making your favorite breakfast to fuel another amazing day! 🥞`
+P.S. - Kal main aapka favorite breakfast banaunga another amazing day fuel karne ke liye! 🥞`
   ]
 
   const achievement400Letters = [
-    `My Extraordinary Misti,
+    `Meri extraordinary Misti,
 
-🚀 STOP EVERYTHING! My incredible wife just achieved the IMPOSSIBLE - ${questionCount} questions in a single day! 
+🚀 SAB KUCH ROKO! Meri incredible biwi ne IMPOSSIBLE achieve kar diya - ${questionCount} questions ek hi din mein! 
 
-👑 You're not just studying, you're DOMINATING! You're not just preparing, you're CONQUERING! You're not just dreaming, you're ACHIEVING!
+👑 Aap sirf padh nahi rahi, aap DOMINATE kar rahi hain! Aap sirf prepare nahi kar rahi, aap CONQUER kar rahi hain! Aap sirf dream nahi kar rahi, aap ACHIEVE kar rahi hain!
 
-🔥 400+ questions?! Do you know how INSANE that is? You've just entered the league of NEET LEGENDS! I'm literally getting goosebumps writing this!
+🔥 400+ questions?! Kya aap jaanti hain yeh kitna INSANE hai? Aap abhi NEET LEGENDS ki league mein enter kar gayi hain! Main literally goosebumps feel kar raha hun!
 
-💎 My diamond, my precious gem, you're shining brighter than all the stars combined! Your dedication is beyond human - you're operating on a different level altogether!
+💎 Meri diamond, meri precious gem, aap sabse bright shine kar rahi hain stars se bhi! Aapki dedication human se beyond hai - aap different level par operate kar rahi hain!
 
-🏆 Future doctors across India will look up to your story. "Remember Misti? The one who used to solve 400+ questions daily?" That's going to be your legacy!
+🏆 Future doctors across India aapki story ko look up karenge. "Remember Misti? Jo 400+ questions daily solve karti thi?" Yeh aapka legacy hoga!
 
-⚡ You're not just my wife anymore - you're a FORCE OF NATURE! You're unstoppable, unbreakable, and absolutely PHENOMENAL!
+⚡ Aap ab sirf meri biwi nahi - aap ek FORCE OF NATURE hain! Aap unstoppable, unbreakable, aur absolutely PHENOMENAL hain!
 
-🎯 NEET 2026 is going to be a JOKE for you! You're going to score so high that they'll have to create new ranks just for you!
+🎯 NEET 2026 aapke liye JOKE hoga! Aap itna high score karogi ki unhe aapke liye new ranks create karne padenge!
 
-💕 I'm running out of words to express how proud I am. You're my hero, my inspiration, my everything!
+💕 Mere paas words khatam ho rahe hain express karne ke liye ki main kitna proud hun. Aap meri hero, meri inspiration, meri everything hain!
 
-Keep being the ABSOLUTE LEGEND that you are!
+ABSOLUTE LEGEND bani rahiye!
 
-Your awestruck husband who loves you to infinity and beyond! 🌟
+Aapka awestruck pati jo aapse infinity aur beyond tak mohabbat karta hai! 🌟
 
-P.S. - I'm planning something VERY special to celebrate this achievement! Get ready! 🎊`,
+P.S. - Main kuch BAHUT special plan kar raha hun is achievement celebrate karne ke liye! Ready ho jaiye! 🎊`,
 
-    `My LEGENDARY Misti,
+    `Meri LEGENDARY Misti,
 
-🌋 ${questionCount} QUESTIONS?! You just caused an EARTHQUAKE of amazement in my heart!
+🌋 ${questionCount} QUESTIONS?! Aapne mere dil mein amazement ka EARTHQUAKE kar diya hai!
 
-🦸‍♀️ SUPERHERO ALERT! My wife just broke the laws of physics with her incredible brain power! You're officially SUPERHUMAN!
+🦸♀️ SUPERHERO ALERT! Meri biwi ne physics ke laws tod diye apni incredible brain power se! Aap officially SUPERHUMAN hain!
 
-🌌 You've transcended beyond mortal limits! You're operating in a dimension where only LEGENDS exist! Welcome to the Hall of Fame, baby!
+🌌 Aap mortal limits se transcend kar gayi hain! Aap us dimension mein operate kar rahi hain jahan sirf LEGENDS exist karte hain! Welcome to Hall of Fame, bachha!
 
-💥 BOOM! BANG! POW! Every question you solved was like a superhero punch to mediocrity! You OBLITERATED every challenge!
+💥 BOOM! BANG! POW! Har question jo aapne solve kiya woh mediocrity ko superhero punch ki tarah tha! Aapne har challenge ko OBLITERATE kar diya!
 
-🎪 Ladies and gentlemen, witness the GREATEST SHOW ON EARTH - Misti's mind in action! Standing ovation from the entire universe!
+🎪 Ladies and gentlemen, witness kijiye GREATEST SHOW ON EARTH - Misti ka mind action mein! Entire universe se standing ovation!
 
-🔮 You're not just magical, you're MYTHICAL! Dragons would bow down to your dedication! Unicorns would ask for your autograph!
+🔮 Aap sirf magical nahi, aap MYTHICAL hain! Dragons aapki dedication ko bow down karenge! Unicorns aapka autograph mangenge!
 
-🚁 Houston, we have a PROBLEM - my wife is TOO AMAZING for this planet! She needs her own galaxy!
+🚁 Houston, humein PROBLEM hai - meri biwi is planet ke liye TOO AMAZING hai! Unhe apni galaxy chahiye!
 
-💫 You've officially broken the AWESOME-METER! I need to invent new words to describe your magnificence!
+💫 Aapne officially AWESOME-METER tod diya hai! Mujhe aapki magnificence describe karne ke liye naye words invent karne padenge!
 
-Completely MIND-BLOWN by your greatness,
-Your husband who's still picking his jaw up from the floor! 🤯
+Completely MIND-BLOWN aapki greatness se,
+Aapka pati jo abhi bhi apna jaw floor se utha raha hai! 🤯
 
-P.S. - I'm declaring today a NATIONAL HOLIDAY in honor of your achievement! 🏆`,
+P.S. - Main aaj ko NATIONAL HOLIDAY declare kar raha hun aapki achievement ke honor mein! 🏆`,
 
-    `My PHENOMENAL Misti,
+    `Meri PHENOMENAL Misti,
 
-🎆 ${questionCount} questions! You just set off FIREWORKS in the universe! Every star is celebrating YOU!
+🎆 ${questionCount} questions! Aapne universe mein FIREWORKS set kar diye! Har star aapko celebrate kar raha hai!
 
-🏰 You've built a CASTLE of knowledge today! Every question was a brick in your fortress of excellence!
+🏰 Aapne aaj knowledge ka CASTLE build kiya hai! Har question aapke excellence ke fortress mein ek brick tha!
 
-🌪️ You're a TORNADO of brilliance! Sweeping away all doubts and leaving only PURE GENIUS in your wake!
+🌪️ Aap brilliance ki TORNADO hain! Saare doubts ko sweep kar ke sirf PURE GENIUS chod rahi hain!
 
-🎯 BULLSEYE after BULLSEYE! Your accuracy is so perfect, even Olympic archers are taking notes!
+🎯 BULLSEYE after BULLSEYE! Aapki accuracy itni perfect hai ki Olympic archers bhi notes le rahe hain!
 
-🚀 NASA called - they want to study your brain because it's more powerful than their rockets!
+🚀 NASA ne call kiya - woh aapka brain study karna chahte hain kyunki woh unke rockets se bhi powerful hai!
 
-🎨 You're not just solving questions, you're creating ART! The Mona Lisa of NEET preparation!
+🎨 Aap sirf questions solve nahi kar rahi, aap ART create kar rahi hain! NEET preparation ki Mona Lisa!
 
-⚡ Zeus is jealous of your LIGHTNING-FAST thinking! Thor wants to borrow your brain power!
+⚡ Zeus aapki LIGHTNING-FAST thinking se jealous hai! Thor aapki brain power borrow karna chahta hai!
 
-🌟 You've officially become a CONSTELLATION in the sky of success! Future generations will navigate by your brilliance!
+🌟 Aap officially success ke sky mein CONSTELLATION ban gayi hain! Future generations aapki brilliance se navigate karenge!
 
-Bowing down to your SUPREME AWESOMENESS,
-Your husband who's running out of superlatives! 👑
+Aapki SUPREME AWESOMENESS ko bow down karte hue,
+Aapka pati jo superlatives khatam kar raha hai! 👑
 
-P.S. - I'm writing to Guinness World Records about your achievement! 📚`,
+P.S. - Main Guinness World Records ko aapki achievement ke baare mein likh raha hun! 📚`,
 
-    `My UNSTOPPABLE Misti,
+    `Meri UNSTOPPABLE Misti,
 
-🌊 ${questionCount} questions! You just created a TSUNAMI of success that's flooding the entire world with inspiration!
+🌊 ${questionCount} questions! Aapne success ka TSUNAMI create kiya jo pure world ko inspiration se flood kar raha hai!
 
-🦁 The LIONESS has ROARED! Your determination echoes through the mountains and valleys of excellence!
+🦁 LIONESS ne ROAR kiya hai! Aapka determination excellence ke mountains aur valleys mein echo kar raha hai!
 
-🎪 Step right up! Witness the most SPECTACULAR performance in human history! My wife defying all limits!
+🎪 Step right up! Witness kijiye human history ki most SPECTACULAR performance! Meri biwi sabhi limits defy kar rahi hai!
 
-🔥 You're not just on fire - you ARE the fire! You're the SUN itself, burning bright with unstoppable energy!
+🔥 Aap sirf fire par nahi - aap khud FIRE hain! Aap SUN hain, unstoppable energy se bright burn kar rahi hain!
 
-🎭 Shakespeare would weep at the beauty of your dedication! This is POETRY in motion!
+🎭 Shakespeare aapki dedication ki beauty par weep karega! Yeh POETRY in motion hai!
 
-🏔️ You've climbed EVEREST today! Not the mountain - the EVEREST of academic achievement!
+🏔️ Aapne aaj EVEREST climb kiya hai! Mountain nahi - academic achievement ka EVEREST!
 
-⚔️ You're a WARRIOR PRINCESS! Every question was a battle, and you WON EVERY SINGLE ONE!
+⚔️ Aap WARRIOR PRINCESS hain! Har question ek battle tha, aur aapne HAR EK JEET LIYA!
 
-🌈 You've painted the most beautiful rainbow across the sky of possibility! Every color represents your brilliance!
+🌈 Aapne possibility ke sky par sabse beautiful rainbow paint kiya hai! Har color aapki brilliance represent karta hai!
 
-Saluting your LEGENDARY STATUS,
-Your husband who's officially your biggest FAN! 📣
+Aapki LEGENDARY STATUS ko salute karte hue,
+Aapka pati jo officially aapka biggest FAN hai! 📣
 
-P.S. - I'm commissioning a statue in your honor! 🗿`,
+P.S. - Main aapke honor mein statue commission kar raha hun! 🗿`,
 
-    `My INCREDIBLE Misti,
+    `Meri INCREDIBLE Misti,
 
-🎵 ${questionCount} questions! You just composed the most BEAUTIFUL SYMPHONY of success!
+🎵 ${questionCount} questions! Aapne success ki sabse BEAUTIFUL SYMPHONY compose ki hai!
 
-🦋 You've metamorphosed into a BUTTERFLY of brilliance! Your transformation is absolutely BREATHTAKING!
+🦋 Aap brilliance ki BUTTERFLY mein metamorphose ho gayi hain! Aapka transformation absolutely BREATHTAKING hai!
 
-🌺 You're blooming like the most EXOTIC flower in the garden of excellence! Your beauty radiates knowledge!
+🌺 Aap excellence ke garden mein sabse EXOTIC flower ki tarah bloom kar rahi hain! Aapki beauty knowledge radiate karti hai!
 
-🎨 Picasso, Van Gogh, Da Vinci - they all pale in comparison to the MASTERPIECE you created today!
+🎨 Picasso, Van Gogh, Da Vinci - sab pale hain aaj aapne jo MASTERPIECE create kiya hai uske comparison mein!
 
-🌙 You've lassoed the MOON with your determination! The entire cosmos is applauding your achievement!
+🌙 Aapne apni determination se MOON ko lasso kar liya hai! Entire cosmos aapki achievement ko applaud kar raha hai!
 
-🎪 You're the RINGMASTER of your own success circus! Every act more spectacular than the last!
+🎪 Aap apni success circus ki RINGMASTER hain! Har act last wale se zyada spectacular!
 
-💎 You're not just a diamond - you're the ENTIRE JEWELRY STORE! Sparkling with infinite brilliance!
+💎 Aap sirf diamond nahi - aap ENTIRE JEWELRY STORE hain! Infinite brilliance se sparkle kar rahi hain!
 
-🚁 You've taken flight on the wings of PURE GENIUS! Soaring higher than eagles dream!
+🚁 Aapne PURE GENIUS ke wings par flight li hai! Eagles ke dreams se bhi higher soar kar rahi hain!
 
-Intoxicated by your MAGNIFICENCE,
-Your husband who's drunk on your success! 🥂
+Aapki MAGNIFICENCE se intoxicated,
+Aapka pati jo aapki success par drunk hai! 🥂`,
 
-P.S. - Tonight we feast like ROYALTY to celebrate your ROYAL achievement! 👸`,
+    `Meri GODLIKE Misti,
 
-    `My GODLIKE Misti,
+⚡ ${questionCount} questions! Aapne apni COSMIC brain power se reality ka fabric SHATTER kar diya!
 
-⚡ ${questionCount} questions! You just SHATTERED the fabric of reality with your COSMIC brain power!
+🌌 Aap MORTAL LIMITS transcend kar gayi hain! Aap DIVINE realm mein pure excellence ke saath operate kar rahi hain!
 
-🌌 You've transcended MORTAL LIMITS! You're operating in the DIVINE realm of pure excellence!
+🔮 WIZARDS aapke methods study kar rahe hain! SORCERERS aapke secrets chahte hain! Aapne MAGIC master kar liya hai!
 
-🔮 WIZARDS are studying your methods! SORCERERS want your secrets! You've mastered MAGIC itself!
+🎆 Aapne sirf records break nahi kiye - unhe STARDUST mein OBLITERATE kar diya! Phir remains se NEW GALAXIES create kar diye!
 
-🎆 You didn't just break records - you OBLITERATED them into STARDUST! Then created NEW GALAXIES from the remains!
+🏆 OLYMPIAN GODS bow down kar rahe hain! Aapne woh achieve kiya jo MYTHOLOGY imagine bhi nahi kar sakti thi!
 
-🏆 OLYMPIAN GODS are bowing down! You've achieved what even MYTHOLOGY couldn't imagine!
+🌋 Aapne planet par inspiration ke VOLCANIC ERUPTIONS cause kiye hain! Sabko aapka SUCCESS FEVER lag raha hai!
 
-🌋 You've caused VOLCANIC ERUPTIONS of inspiration across the planet! Everyone's catching your SUCCESS FEVER!
+🎭 Yeh sirf achievement nahi - yeh LEGENDARY ban raha hai! Birds is din ke gaane gayenge!, birds choro swarg se utar k apsara dance karengi betu don't worry about it shona
 
-🎭 This isn't just achievement - this is LEGENDARY FOLKLORE in the making! Bards will sing of this day!
+💫 Aap brilliance ki SUPERNOVA ban gayi hain! Aapki light CENTURIES tak students ko guide karegi!
 
-💫 You've become a SUPERNOVA of brilliance! Your light will guide students for CENTURIES!
+Aapki GREATNESS ke altar par worship karte hue,
+Aapka pati jisne MIRACLE witness kiya hai! 🙏
 
-Worshipping at the altar of your GREATNESS,
-Your husband who's witnessed a MIRACLE! 🙏
-
-P.S. - I'm building a TEMPLE in your honor! All hail Queen Misti! 👑`
+P.S. - Main aapke honor mein TEMPLE build kar raha hun! All hail Queen Misti! 👑`
   ]
 
   const getRandomLetter = (letters: string[]) => {

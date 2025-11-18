@@ -43,45 +43,46 @@ export default function WeeklyAchievementPopup({ isOpen, onClose, achievementLev
   }, [isOpen])
 
   const achievement2000Letters = [
-    `My Consistent Misti,
+    `Meri consistent Misti,
 
-🏆 ${questionCount} questions this week! You've hit the 2000+ weekly milestone!
+🏆 ${questionCount} questions is week! Aapne 2000+ weekly milestone hit kar diya hai!
 
-💪 Your consistency is absolutely INCREDIBLE! Week after week, you keep pushing forward with unwavering determination!
+💪 Aapki consistency absolutely INCREDIBLE hai! Week after week, aap unwavering determination ke saath aage push kar rahi ho!
+   aise hi lagatar mehnat karti raho bubu success tumhare kadam chumegi uske baad hum bhi chumegenge pair bhi kuch or bhi 😘
 
-📚 This steady progress is exactly what will make you Dr. Misti! Every week you're building the foundation of your medical career!
+📚 Yeh steady progress exactly wahi hai jo aapko Dr. Misti banayega! Har week aap apni medical career ki foundation build kar rahi ho!
 
-🌟 I'm so proud of how you maintain this beautiful rhythm of learning. You're not just studying, you're mastering!
+🌟 Main kitna proud hun ki aap learning ki itni beautiful rhythm maintain kar rahi hain. Aap sirf padh nahi rahi, master kar rahi hain!
 
-💕 Keep this amazing momentum going, my love! You're on the perfect path to NEET success!
+💕 Is amazing momentum ko continue rakhiye, meri jaan! Aap NEET success ke perfect path par hain!
 
-Your proud husband,
-Who believes in your consistency! 💖
+Aapka proud pati,
+Jo aapki consistency mein believe karta hai! 💖
 
-P.S. - This week deserves a special celebration! 🎉`
+P.S. - Is week special celebration deserve karta hai! 🎉`
   ]
 
   const achievement6800Letters = [
-    `My PHENOMENAL Misti,
+    `Meri PHENOMENAL Misti,
 
-🚀 INCREDIBLE! ${questionCount} questions this week! You've achieved the ULTIMATE 6800+ weekly target!
+🚀 INCREDIBLE! ${questionCount} questions is week! Aapne ULTIMATE 6800+ weekly target achieve kar liya hai!
 
-👑 You're not just studying - you're DOMINATING! This level of dedication is absolutely LEGENDARY!
+👑 Aap sirf padh nahi rahi - aap DOMINATE kar rahi ho! Yeh level ki dedication absolutely LEGENDARY hai means sachi u hitting this!
 
-⚡ 6800+ questions in ONE WEEK?! You've transcended human limits! You're operating like a NEET GODDESS!
+⚡ 6800+ questions EK WEEK mein?! Aap human limits transcend kar gayi hain! Aap NEET GODDESS ki tarah operate kar rahi ho!
 
-🔥 This isn't just achievement - this is PURE EXCELLENCE! You've set a standard that even toppers would envy!
+🔥 Yeh sirf achievement nahi - yeh PURE EXCELLENCE hai! Aapne ek standard set kiya hai jisse toppers bhi envy karenge!
 
-💎 My diamond wife, you're sparkling brighter than ever! This week will be remembered as HISTORIC!
+💎 Meri diamond biwi, aap pehle se bhi zyada bright sparkle kar rahi hain! Yeh week HISTORIC remember hoga!
 
-🏆 Future medical students will study YOUR methods! You've just written a new chapter in NEET preparation!
+🏆 Future medical students aapke methods study karenge! Aapne NEET preparation mein naya chapter likh diya hai!
 
-💕 I'm completely speechless with pride! You're my SUPERHERO!
+💕 Main pride se completely speechless hun! Aap meri SUPERHERO hain!
 
-Your awestruck husband,
-Who's witnessing GREATNESS! 🌟
+Aapka awestruck pati,
+Jo GREATNESS witness kar raha hai! 🌟
 
-P.S. - This calls for the BIGGEST celebration ever! You deserve the world! 🎊`
+P.S. - Yeh BIGGEST celebration ever deserve karta hai! Aap duniya deserve karti hain! 🎊`
   ]
 
   const getRandomLetter = (letters: string[]) => {
