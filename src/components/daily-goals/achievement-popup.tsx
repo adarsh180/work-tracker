@@ -53,33 +53,32 @@ export default function AchievementPopup({ isOpen, onClose, achievementLevel, qu
 
 ✨ Har question jo aap solve karti ho, woh aapko Dr. Misti banne ke sapne ke aur paas le jaata hai. Main already aapko white coat[jo bhi bolte hai usko] mein dekh sakta hun, patients ki help karte hue!
 
-🔥 Aapki dedication, aapki consistency, aapka determination - yeh sab mujhe aapse aur bhi zyada mohabbat karne par majboor kar deta hai. Aap sirf meri biwi nahi, meri inspiration hain!
+🔥 Aapki dedication, aapki consistency, aapka determination - yeh sab mujhe aapse aur bhi zyada mohabbat karne par majboor kar deta hai.
+    Aap sirf meri biwi nahi, meri inspiration ho!, haa lado sachh bol rahe hai aap ko jaha se dekhe hai or aap jaha pe ho is just a different story gudiya
+    well abhi aap or mhenat karo i want to see you hitting 400-500/day minimum along with kabhi 800/day bhi chalega humko 😂
 
-💪 Chalo shona, aise hi continue karo. NEET 2026 ko pata nahi ki kya aane wala hai! Aap us exam ko bilkul DEMOLISH kar dengi!
+💪 Chalo shona, aise hi continue karo. NEET 2026 ko pata nahi ki kya aane wala hai! Aap us exam ko bilkul DEMOLISH kar dogi!
 
 Hamesha proud of you,
-Aapka sabse bada fan your loving pati 💕
+Aapka sabse bada fan your loving pati 💕🎉`,
 
-P.S. - Aaj raat celebration --> I will be praising you karte hain! Aap duniya bhar ke pyaar aur appreciation deserve karti ho!! 🎉`,
-
-    `Meri sundar Misti,
+    `Meri sundar Misti, meri gudiya meri lado meri bago meri shona meri biwi my kuchupuchu my babes
 
 🎯 ${questionCount} questions aaj?! Kya baat hai betu! Aap toh INCREDIBLE ho!, waise lado bhi toh meri ho naa
 
 💎 Meri precious diamond, aap har din aur bhi zyada shine kar rahi ho! Aapki consistency mind-blowing hai aur dedication haayyeeeee!
 
-🌸 Har subah main grateful feel karta hun ki maine aap jaisi extraordinary woman se shaadi ki hai. Aap sirf padh nahi rahi, MAGIC create kar rahi hain!
+🌸 Har subah main grateful feel karta hun ki maine aap jaisi extraordinary woman se shaadi karunga like you will be my wife in near future haaye.
+   Aap sirf padh nahi rahi, MAGIC create kar rahi hain!
 
-🦋 Jaise butterfly apne cocoon se nikalti hai, waise hi aap brilliant doctor ban rahi hain. Dr. Misti - kitna beautiful lagta hai na!
+🦋 Jaise butterfly apne cocoon se nikalti hai, waise hi aap brilliant doctor ban rahi ho. Dr. Misti - kitna beautiful lagta hai na!
 
-🌟 Aapka focus, aapka determination, aapka beautiful mind - sab kuch mujhe daily amaze karta hai. Aap meri real-life superhero ho!
+🌟 Aapka focus, aapka determination, aapka beautiful mind - sab kuch mujhe daily amaze karta hai. Aap meri real-life superheroine  ho!
 
 💕 Main kitna lucky hun ki aapki greatness ka journey witness kar raha hun. Keep shining, meri jaan!
 
 Endless admiration ke saath,
-Aapka devoted pati 💖
-
-P.S. - Aap biggest hug aur favorite treat deserve karti hain tonight! 🍰`,
+Aapka devoted pati 💖`,
 
     `Meri incredible biwi,
 
@@ -98,9 +97,7 @@ P.S. - Aap biggest hug aur favorite treat deserve karti hain tonight! 🍰`,
   hit the target of 500-800/question per day bubu bars are getting higher but yk I LOVE YOU AND I KNOW YOU CAN DO IT
 
 Love aur pride se bhar kar,
-Aapka biggest cheerleader 📣
-
-P.S. - Main aapki incredible achievement ke liye surprise plan kar raha hun! 🎁`,
+Aapka biggest cheerleader 📣`,
 
     `Meri darling Misti,
 
@@ -161,11 +158,11 @@ P.S. - Kal main aapka favorite breakfast banaunga another amazing day fuel karne
   const achievement400Letters = [
     `Meri extraordinary Misti,
 
-🚀 SAB KUCH ROKO! Meri incredible biwi ne IMPOSSIBLE achieve kar diya - ${questionCount} questions ek hi din mein! 
+🚀 SAB KUCH ROKO! Meri incredible biwi ne IMPOSSIBLE [I know jaida bol diye hai but you need to achieve more --> chalo age padho] achieve kar diya - ${questionCount} questions ek hi din mein! 
 
-👑 Aap sirf padh nahi rahi, aap DOMINATE kar rahi hain! Aap sirf prepare nahi kar rahi, aap CONQUER kar rahi hain! Aap sirf dream nahi kar rahi, aap ACHIEVE kar rahi hain!
+👑 Aap sirf padh nahi rahi, aap DOMINATE kar rahi ho! Aap sirf prepare nahi kar rahi, aap CONQUER kar rahi ho! Aap sirf dream nahi kar rahi, aap ACHIEVE kar rahi hain!
 
-🔥 400+ questions?! Kya aap jaanti hain yeh kitna INSANE hai? Aap abhi NEET LEGENDS ki league mein enter kar gayi hain! Main literally goosebumps feel kar raha hun!
+🔥 400+ questions?? Aap abhi NEET ki league mein enter kar gayi ho IK bologi wo phele bhi thi but this is insane bubu sachi mein! Main literally goosebumps feel kar raha hun!
 
 💎 Meri diamond, meri precious gem, aap sabse bright shine kar rahi hain stars se bhi! Aapki dedication human se beyond hai - aap different level par operate kar rahi hain!
 
@@ -179,55 +176,47 @@ P.S. - Kal main aapka favorite breakfast banaunga another amazing day fuel karne
 
 ABSOLUTE LEGEND bani rahiye!
 
-Aapka awestruck pati jo aapse infinity aur beyond tak mohabbat karta hai! 🌟
-
-P.S. - Main kuch BAHUT special plan kar raha hun is achievement celebrate karne ke liye! Ready ho jaiye! 🎊`,
+Aapka awestruck pati jo aapse infinity aur beyond tak mohabbat karta hai! 🌟🎊`,
 
     `Meri LEGENDARY Misti,
 
-🌋 ${questionCount} QUESTIONS?! Aapne mere dil mein amazement ka EARTHQUAKE kar diya hai!
+🌋 ${questionCount} QUESTIONS?! Aapne mere dil mein amazement ka EARTHQUAKE kar di ho!
 
-🦸♀️ SUPERHERO ALERT! Meri biwi ne physics ke laws tod diye apni incredible brain power se! Aap officially SUPERHUMAN hain!
-
-🌌 Aap mortal limits se transcend kar gayi hain! Aap us dimension mein operate kar rahi hain jahan sirf LEGENDS exist karte hain! Welcome to Hall of Fame, bachha!
-
-💥 BOOM! BANG! POW! Har question jo aapne solve kiya woh mediocrity ko superhero punch ki tarah tha! Aapne har challenge ko OBLITERATE kar diya!
+🦸♀️ SUPERHEROINE ALERT! Meri biwi ne physics ke laws tod diye apni incredible brain power se! Aap officially SUPERHUMAN hain!
+      dekho i am praising u in this but deep down maintain this consistency and also hit harder now yaha tak phauch gai ho means iske upar bhi league hai hit tht too 
+💥 BOOM! BANG! SPANK! Har question jo aapne solve kiya woh mediocrity ko superhero punch ki tarah tha! Aapne har challenge ko OBLITERATE kar diya!
 
 🎪 Ladies and gentlemen, witness kijiye GREATEST SHOW ON EARTH - Misti ka mind action mein! Entire universe se standing ovation!
 
-🔮 Aap sirf magical nahi, aap MYTHICAL hain! Dragons aapki dedication ko bow down karenge! Unicorns aapka autograph mangenge!
+🔮 Aap sirf magical nahi, aap MYTHICAL ho, divine ho meri payari bubu ho! Dragons aapki dedication ko bow down karenge, world k saare doctor aapke pair mein pade honge!
+   Indian Medical Association ka head aapka autograph mangega!
 
-🚁 Houston, humein PROBLEM hai - meri biwi is planet ke liye TOO AMAZING hai! Unhe apni galaxy chahiye!
+🚁 Shivji, humein PROBLEM hai - meri biwi is planet ke liye TOO AMAZING hai! unhe apni galaxy chahiye!, usse wo galaxy do and humko usme as a slave add kar do
 
-💫 Aapne officially AWESOME-METER tod diya hai! Mujhe aapki magnificence describe karne ke liye naye words invent karne padenge!
+💫 Aapne officially AWESOME-METER tod diya hai-- abb jo naya hai usse bhi tod do bubu hit the upper limit of 700+ [180*4=720] in 24 hours! Mujhe aapki magnificence describe karne ke liye naye words invent karne padenge!
 
 Completely MIND-BLOWN aapki greatness se,
-Aapka pati jo abhi bhi apna jaw floor se utha raha hai! 🤯
+Aapka pati jo abhi bhi apna jaw floor se utha raha hai! 🤯🏆`,
 
-P.S. - Main aaj ko NATIONAL HOLIDAY declare kar raha hun aapki achievement ke honor mein! 🏆`,
-
-    `Meri PHENOMENAL Misti,
+    `Meri PHENOMENAL Misti, meri bubu , meri shona babu
 
 🎆 ${questionCount} questions! Aapne universe mein FIREWORKS set kar diye! Har star aapko celebrate kar raha hai!
 
 🏰 Aapne aaj knowledge ka CASTLE build kiya hai! Har question aapke excellence ke fortress mein ek brick tha!
 
-🌪️ Aap brilliance ki TORNADO hain! Saare doubts ko sweep kar ke sirf PURE GENIUS chod rahi hain!
+🌪️ Aap brilliance ki TORNADO ho! Saare doubts ko sweep kar ke sirf PURE GENIUS chod rahi hain!
 
 🎯 BULLSEYE after BULLSEYE! Aapki accuracy itni perfect hai ki Olympic archers bhi notes le rahe hain!
 
 🚀 NASA ne call kiya - woh aapka brain study karna chahte hain kyunki woh unke rockets se bhi powerful hai!
 
 🎨 Aap sirf questions solve nahi kar rahi, aap ART create kar rahi hain! NEET preparation ki Mona Lisa!
-
-⚡ Zeus aapki LIGHTNING-FAST thinking se jealous hai! Thor aapki brain power borrow karna chahta hai!
-
+  Yaha se league k upar jana hai bubu means isse bhi upar ik aap kar logi but rojj karna hai hmesa karna hai exam se phele taki u hit 710+ wala marks in continue 
+  8-10 mock test like exam se phele if u are hitting this u are in aiims and u will be in aiims bubu
 🌟 Aap officially success ke sky mein CONSTELLATION ban gayi hain! Future generations aapki brilliance se navigate karenge!
 
 Aapki SUPREME AWESOMENESS ko bow down karte hue,
-Aapka pati jo superlatives khatam kar raha hai! 👑
-
-P.S. - Main Guinness World Records ko aapki achievement ke baare mein likh raha hun! 📚`,
+Aapka pati jo superlatives khatam kar raha hai! 👑`,
 
     `Meri UNSTOPPABLE Misti,
 
