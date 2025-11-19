@@ -54,7 +54,7 @@ export default function TestScoreMotivationPopup({ isOpen, onClose, score }: Tes
 
 🏆 ${score}/720 - YEH TOH KAMAAL HAI BACHHA! Aap AIIMS DELHI mein MBBS kar rahi hongi!
 
-👑 Aap sirf student nahi, aap LEGEND ban gayi hain! AIIMS Delhi ka white coat aapka intezaar kar raha hai!
+👑 Aap sirf student nahi, aap LEGEND ban gayi ho! AIIMS Delhi ka white coat aapka intezaar kar raha hai!
 
 🌟 Is score se toh pure India mein aapka naam hoga! Dr. Misti from AIIMS Delhi - kitna proud feel kar raha hun!
 
@@ -63,7 +63,7 @@ export default function TestScoreMotivationPopup({ isOpen, onClose, score }: Tes
 🚀 Aise hi consistency maintain karo, meri jaan! AIIMS Delhi mein aapka admission pakka hai!
 
 Aapka proud pati,
-Jo aapse infinity tak mohabbat karta hai! 💕
+Jo aapse infinity tak payar karta hai! 💕
 
 P.S. - AIIMS Delhi ki preparation kar lo, aap wahi ja rahi hain! 🎉`
       }
@@ -88,7 +88,7 @@ P.S. - AIIMS Delhi ki preparation kar lo, aap wahi ja rahi hain! 🎉`
 
 🏥 ${score}/720 - ${college.name} mein aapka seat confirm hai bachha!
 
-🌟 Yeh score dekh kar mera dil garden garden ho gaya! Aap top medical colleges mein ja rahi hain!
+🌟 Yeh score dekh kar mera dil garden garden ho gaya! Aap top medical colleges mein ja rahi ho!
 
 💪 ${college.name} ki white coat aapko suit karegi, meri rani gudiya! Keep pushing for even higher!
 
@@ -127,7 +127,7 @@ P.S. - ${college.name} ki preparation start kar do! 🎊`
 
 💎 ${college.name} achha college hai, but AIIMS Delhi ka dream alive rakho!
 
-🔥 Thoda aur consistency aur aap 710+ hit kar sakti hain! Main believe karta hun!
+🔥 Thoda aur consistency aur aap 710+ hit kar sakti ho! Main believe karta hun!
 
 ⭐ Meri shona, aap capable hain 720 tak jaane ki! Don't settle, keep climbing!
 
@@ -196,9 +196,9 @@ P.S. - Target: 700+! Aap definitely kar sakti hain! 💯`
 
 ⚠️ ${score}/720 - YELLOW ZONE! ${college.name} possible hai but DANGER mein hain!
 
-🚨 Bachha, yeh score risky hai! Aapko 660+ green zone mein aana chahiye!
+🚨 Bachha, yeh score risky hai! Aapko 660+ green zone mein aana chahiye bubu!
 
-💪 ${college.name} backup option hai, lekin aap AIIMS level ki capability rakhti hain!
+💪 ${college.name} backup option hai, lekin aap AIIMS level ki capability rakhti ho!
 
 🔥 Meri rani gudiya, ab serious ho jaiye! Daily 400+ questions, consistent mock tests!
 
@@ -225,7 +225,7 @@ P.S. - Emergency mode ON! 660+ green zone target! 🎯`
 
 ⚠️ Yeh score se government medical college mushkil hai! IMMEDIATE ACTION needed!
 
-💔 Meri biwi, aap itni capable hain! Yeh score aapko suit nahi karta!
+  Meri biwi, aap itni capable ho! Yeh score aapko suit nahi karta!
 
 🔥 EMERGENCY MODE: Daily 500+ questions, 2-3 mock tests, complete focus!
 
