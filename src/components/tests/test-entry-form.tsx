@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TestType } from '@/lib/repositories/test-performance-repository'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import MistakeAnalysisPopup from '@/components/ai/mistake-analysis-popup'
 import TestScoreMotivationPopup from '@/components/tests/test-score-motivation-popup'
 
 const testTypes: { value: TestType; label: string; description: string }[] = [
@@ -29,9 +28,6 @@ export default function TestEntryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
-  const [showMistakePopup, setShowMistakePopup] = useState(false)
-  const [testSessionData, setTestSessionData] = useState<any>(null)
-  const [pendingSave, setPendingSave] = useState(false)
   const [showMotivationPopup, setShowMotivationPopup] = useState(false)
   const [motivationScore, setMotivationScore] = useState(0)
 
@@ -81,23 +77,26 @@ export default function TestEntryForm() {
         throw new Error(result.error || 'Failed to save test score')
       }
 
-      // MANDATORY popup for all test scores
-      setPendingSave(true)
-      setTestSessionData({
-        testType: formData.testType,
-        testScore: parseInt(formData.score)
-      })
-      setShowMistakePopup(true)
+      // Show motivation popup based on score
+      setMotivationScore(score)
+      setShowMotivationPopup(true)
       
-      console.log('🚀 POPUP TRIGGERED:', {
-        showMistakePopup: true,
-        testSessionData: {
-          testType: formData.testType,
-          testScore: parseInt(formData.score)
-        }
+      // Complete the save process
+      setSubmitStatus('success')
+      
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['test-performance-trend'] })
+      
+      // Reset form
+      setFormData({
+        testType: '',
+        testNumber: '',
+        score: '',
+        testDate: new Date().toISOString().split('T')[0]
       })
       
-      return // Don't complete save until popup is filled
+      setTimeout(() => setSubmitStatus('idle'), 3000)
 
     } catch (error) {
       console.error('Error saving test score:', error)
@@ -298,60 +297,6 @@ export default function TestEntryForm() {
         isOpen={showMotivationPopup}
         onClose={() => setShowMotivationPopup(false)}
         score={motivationScore}
-      />
-      
-      {/* Mistake Analysis Popup */}
-      <MistakeAnalysisPopup
-        isOpen={showMistakePopup}
-        onClose={() => {
-          alert('⚠️ MANDATORY: You must complete the learning analysis to save your test score!')
-        }}
-        sessionType="test"
-        sessionData={testSessionData || {}}
-        onSubmit={async (mistakeData) => {
-          // Validate "no mistakes" option for tests
-          if (mistakeData.mistakeCategories.includes('no_mistakes') && testSessionData?.testScore < 710) {
-            alert('❌ "No Mistakes" is only valid for scores 710+ (98.6%+). Please select actual mistakes made.')
-            return
-          }
-          
-          try {
-            await fetch('/api/mistakes/analyze', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                sessionType: 'test',
-                sessionData: testSessionData,
-                mistakeData
-              })
-            })
-            
-            // Complete the save process
-            setSubmitStatus('success')
-            setPendingSave(false)
-            
-            // Show motivation popup based on score
-            setMotivationScore(testSessionData?.testScore || 0)
-            setShowMotivationPopup(true)
-            
-            // Invalidate queries
-            queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
-            queryClient.invalidateQueries({ queryKey: ['test-performance-trend'] })
-            
-            // Reset form
-            setFormData({
-              testType: '',
-              testNumber: '',
-              score: '',
-              testDate: new Date().toISOString().split('T')[0]
-            })
-            
-            setTimeout(() => setSubmitStatus('idle'), 3000)
-            
-          } catch (error) {
-            console.error('Error analyzing mistakes:', error)
-          }
-        }}
       />
     </>
   )
