@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TestType } from '@/lib/repositories/test-performance-repository'
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import MistakeAnalysisPopup from '@/components/ai/mistake-analysis-popup'
+import TestScoreMotivationPopup from '@/components/tests/test-score-motivation-popup'
 
 const testTypes: { value: TestType; label: string; description: string }[] = [
   { value: 'Weekly Test', label: 'Weekly Test', description: 'Regular weekly assessment' },
@@ -31,6 +32,8 @@ export default function TestEntryForm() {
   const [showMistakePopup, setShowMistakePopup] = useState(false)
   const [testSessionData, setTestSessionData] = useState<any>(null)
   const [pendingSave, setPendingSave] = useState(false)
+  const [showMotivationPopup, setShowMotivationPopup] = useState(false)
+  const [motivationScore, setMotivationScore] = useState(0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -290,6 +293,13 @@ export default function TestEntryForm() {
         </CardContent>
       </Card>
       
+      {/* Test Score Motivation Popup */}
+      <TestScoreMotivationPopup
+        isOpen={showMotivationPopup}
+        onClose={() => setShowMotivationPopup(false)}
+        score={motivationScore}
+      />
+      
       {/* Mistake Analysis Popup */}
       <MistakeAnalysisPopup
         isOpen={showMistakePopup}
@@ -319,6 +329,10 @@ export default function TestEntryForm() {
             // Complete the save process
             setSubmitStatus('success')
             setPendingSave(false)
+            
+            // Show motivation popup based on score
+            setMotivationScore(testSessionData?.testScore || 0)
+            setShowMotivationPopup(true)
             
             // Invalidate queries
             queryClient.invalidateQueries({ queryKey: ['test-analytics'] })
