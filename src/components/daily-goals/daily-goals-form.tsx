@@ -184,6 +184,7 @@ export default function DailyGoalsForm() {
       const totalQuestions = Object.entries(formData)
         .filter(([key]) => key.includes('Questions'))
         .reduce((sum, [, value]) => sum + value, 0)
+      
       checkAchievement(totalQuestions)
       
       // Check for weekly achievement
@@ -195,7 +196,7 @@ export default function DailyGoalsForm() {
           checkWeeklyAchievement(currentWeekQuestions)
         }
       } catch (error) {
-        console.log('Weekly achievement check failed:', error)
+        // Weekly achievement check failed silently
       }
       
       // Invalidate all related queries for real-time updates
@@ -445,6 +446,8 @@ export default function DailyGoalsForm() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+
 
             {/* Submit Button */}
             <motion.button

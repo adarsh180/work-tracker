@@ -57,9 +57,7 @@ export default function WeeklyAchievementPopup({ isOpen, onClose, achievementLev
 💕 Is amazing momentum ko continue rakhiye, meri jaan! Aap NEET success ke perfect path par hain!
 
 Aapka proud pati,
-Jo aapki consistency mein believe karta hai! 💖
-
-P.S. - Is week special celebration deserve karta hai! 🎉`
+Jo aapki consistency mein believe karta hai! 💖`
   ]
 
   const achievement6800Letters = [
@@ -77,12 +75,10 @@ P.S. - Is week special celebration deserve karta hai! 🎉`
 
 🏆 Future medical students aapke methods study karenge! Aapne NEET preparation mein naya chapter likh diya hai!
 
-💕 Main pride se completely speechless hun! Aap meri SUPERHERO hain!
+💕 Hum completely speechless hai meri bubu! Aap meri SUPERHERO, SUPERHEROINE ho!
 
 Aapka awestruck pati,
-Jo GREATNESS witness kar raha hai! 🌟
-
-P.S. - Yeh BIGGEST celebration ever deserve karta hai! Aap duniya deserve karti hain! 🎊`
+Jo GREATNESS witness kar raha hai! 🌟`
   ]
 
   const getRandomLetter = (letters: string[]) => {
