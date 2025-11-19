@@ -1,9 +1,24 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardHeader, CardTitle, StatsCard } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge, LoadingSpinner } from '@/components/ui/enhanced-components'
+import { PremiumLineChart, PremiumAreaChart, AnimatedCounter } from '@/components/ui/premium-charts'
+import { Grid, TabsLayout } from '@/components/ui/premium-layouts'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import {
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  CalendarIcon,
+  ClockIcon,
+  StarIcon,
+  FireIcon,
+  ArrowUpIcon,
+  ArrowDownIcon
+} from '@heroicons/react/24/outline'
 
 type DailyTrend = {
   date: string
@@ -28,8 +43,10 @@ type MonthlyTrend = {
   monthName: string
 }
 
+type ChartPeriod = 'daily' | 'weekly' | 'monthly'
+
 export default function DailyGoalsCharts() {
-  const [activeChart, setActiveChart] = useState<'daily' | 'weekly' | 'monthly'>('daily')
+  const [activeChart, setActiveChart] = useState<ChartPeriod>('daily')
 
   const { data: dailyTrend, isLoading: dailyLoading } = useQuery<DailyTrend[]>({
     queryKey: ['daily-goals-trend'],
@@ -67,303 +84,125 @@ export default function DailyGoalsCharts() {
     staleTime: 500
   })
 
-  const renderChart = (data: any[], type: 'daily' | 'weekly' | 'monthly') => {
+  const calculateStats = (data: any[], type: ChartPeriod) => {
+    if (!data || data.length === 0) return null
+
+    const total = data.reduce((sum, item) => sum + item.totalQuestions, 0)
+    const average = Math.round(total / data.length)
+    const max = Math.max(...data.map(item => item.totalQuestions))
+    const min = Math.min(...data.map(item => item.totalQuestions))
+
+    // Calculate trend (last 7 vs previous 7 for daily, last 4 vs previous 4 for others)
+    const recentCount = type === 'daily' ? 7 : 4
+    const recent = data.slice(-recentCount)
+    const previous = data.slice(-recentCount * 2, -recentCount)
+
+    const recentAvg = recent.length > 0 ? recent.reduce((sum, item) => sum + item.totalQuestions, 0) / recent.length : 0
+    const previousAvg = previous.length > 0 ? previous.reduce((sum, item) => sum + item.totalQuestions, 0) / previous.length : 0
+
+    const trendPercentage = previousAvg > 0 ? ((recentAvg - previousAvg) / previousAvg) * 100 : 0
+    const isPositiveTrend = trendPercentage > 0
+
+    return {
+      total,
+      average,
+      max,
+      min,
+      trendPercentage: Math.abs(trendPercentage),
+      isPositiveTrend,
+      recentAvg: Math.round(recentAvg),
+      dataPoints: data.length
+    }
+  }
+
+  const renderPremiumChart = (data: any[], type: ChartPeriod) => {
     if (!data || data.length === 0) {
       return (
-        <div className="h-80 flex items-center justify-center text-gray-400">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="h-80 flex items-center justify-center"
+        >
           <div className="text-center">
-            <div className="text-4xl mb-2">📊</div>
-            <p>No data available yet</p>
-            <p className="text-sm mt-2">Add some daily goals to see your progress!</p>
+            <motion.div
+              animate={{
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-6xl mb-4"
+            >
+              📊
+            </motion.div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Data Available</h3>
+            <p className="text-foreground-secondary">Add some daily goals to see your progress!</p>
           </div>
-        </div>
+        </motion.div>
       )
     }
 
-    const containerWidth = 800
-    const containerHeight = 320
-    const padding = { top: 20, right: 40, bottom: 60, left: 60 }
-    const chartWidth = containerWidth - padding.left - padding.right
-    const chartHeight = containerHeight - padding.top - padding.bottom
-
-    const maxQuestions = Math.max(...data.map(d => d.totalQuestions), 100)
-    const minQuestions = 0
-    const questionRange = maxQuestions - minQuestions || 1
-
-    const points = data.map((item, index) => {
-      const x = padding.left + (index / (data.length - 1 || 1)) * chartWidth
-      const y = padding.top + ((maxQuestions - item.totalQuestions) / questionRange) * chartHeight
-      return { x, y, data: item }
-    })
-
-    const pathData = points.reduce((path, point, index) => {
-      const command = index === 0 ? 'M' : 'L'
-      return `${path} ${command} ${point.x} ${point.y}`
-    }, '')
-
-    const getLabel = (item: any, type: string) => {
-      if (type === 'daily') return new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      if (type === 'weekly') return `W${item.weekNumber}`
-      if (type === 'monthly') return item.monthName
-      return ''
-    }
-
-    const getTooltip = (item: any, type: string) => {
-      if (type === 'daily') return `${new Date(item.date).toLocaleDateString()}: ${item.totalQuestions} questions`
-      if (type === 'weekly') return `Week ${item.weekNumber}: ${item.totalQuestions} questions`
-      if (type === 'monthly') return `${item.monthName} ${item.year}: ${item.totalQuestions} questions`
-      return ''
-    }
-
-    const yAxisTicks = [0, Math.floor(maxQuestions * 0.25), Math.floor(maxQuestions * 0.5), Math.floor(maxQuestions * 0.75), maxQuestions]
-    // Smart X-axis labeling based on chart type
-    const getMaxLabels = (chartType: string) => {
-      if (chartType === 'daily') return 12 // Show ~12 labels for 365 days
-      if (chartType === 'weekly') return 10 // Show ~10 labels for 54 weeks  
-      return 8 // Show 8 labels for 12 months
-    }
-    
-    const maxLabels = getMaxLabels(type)
-    const labelStep = Math.max(1, Math.ceil(data.length / maxLabels))
-    const xAxisTicks = data.filter((_, i) => i % labelStep === 0 || i === data.length - 1)
+    // Transform data for the premium chart
+    const chartData = data.map((item, index) => ({
+      name: type === 'daily'
+        ? new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : type === 'weekly'
+          ? `W${item.weekNumber}`
+          : item.monthName,
+      value: item.totalQuestions,
+      physics: item.physicsQuestions || 0,
+      chemistry: item.chemistryQuestions || 0,
+      botany: item.botanyQuestions || 0,
+      zoology: item.zoologyQuestions || 0,
+      index
+    }))
 
     return (
-      <div className="bg-gradient-to-br from-background-secondary/20 to-background-secondary/5 rounded-xl p-6">
-        <div className="relative overflow-hidden rounded-lg">
-          <svg 
-            width={containerWidth} 
-            height={containerHeight} 
-            className="w-full h-auto max-w-full" 
-            viewBox={`0 0 ${containerWidth} ${containerHeight}`}
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Background gradient */}
-            <defs>
-              <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.1"/>
-                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0"/>
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-              <clipPath id="chartClip">
-                <rect x={padding.left} y={padding.top} width={chartWidth} height={chartHeight} />
-              </clipPath>
-            </defs>
-            
-            {/* Chart area background */}
-            <rect 
-              x={padding.left} 
-              y={padding.top} 
-              width={chartWidth} 
-              height={chartHeight} 
-              fill="url(#chartGradient)" 
-              rx="8"
-            />
-            
-            {/* Grid lines */}
-            {yAxisTicks.map(questions => {
-              const y = padding.top + ((maxQuestions - questions) / questionRange) * chartHeight
-              return (
-                <line 
-                  key={questions}
-                  x1={padding.left} 
-                  y1={y} 
-                  x2={padding.left + chartWidth} 
-                  y2={y} 
-                  stroke="#374151" 
-                  strokeWidth="0.5" 
-                  opacity="0.3"
-                />
-              )
-            })}
-            
-            {/* Y-axis */}
-            <line 
-              x1={padding.left} 
-              y1={padding.top} 
-              x2={padding.left} 
-              y2={padding.top + chartHeight} 
-              stroke="#6B7280" 
-              strokeWidth="2"
-            />
-            
-            {/* X-axis */}
-            <line 
-              x1={padding.left} 
-              y1={padding.top + chartHeight} 
-              x2={padding.left + chartWidth} 
-              y2={padding.top + chartHeight} 
-              stroke="#6B7280" 
-              strokeWidth="2"
-            />
-            
-            {/* Y-axis labels */}
-            {yAxisTicks.map(questions => {
-              const y = padding.top + ((maxQuestions - questions) / questionRange) * chartHeight
-              return (
-                <text 
-                  key={questions}
-                  x={padding.left - 10} 
-                  y={y + 4} 
-                  textAnchor="end" 
-                  className="text-xs fill-gray-300 font-medium"
-                >
-                  {questions}
-                </text>
-              )
-            })}
-            
-            {/* X-axis labels */}
-            {xAxisTicks.map((item, index) => {
-              const originalIndex = data.indexOf(item)
-              const x = padding.left + (originalIndex / (data.length - 1 || 1)) * chartWidth
-              return (
-                <text 
-                  key={index}
-                  x={x} 
-                  y={padding.top + chartHeight + 20} 
-                  textAnchor="middle" 
-                  className="text-xs fill-gray-300 font-medium"
-                >
-                  {getLabel(item, type)}
-                </text>
-              )
-            })}
-            
-            {/* Area under curve */}
-            <path
-              d={`${pathData} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`}
-              fill="url(#chartGradient)"
-              opacity="0.3"
-              clipPath="url(#chartClip)"
-            />
-            
-            {/* Performance line */}
-            <path
-              d={pathData}
-              fill="none"
-              stroke="#3B82F6"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="url(#glow)"
-              clipPath="url(#chartClip)"
-            />
-            
-            {/* Data points - ensure they stay within bounds */}
-            {points.map((point, index) => {
-              // Clamp points within chart area
-              const clampedX = Math.max(padding.left, Math.min(point.x, padding.left + chartWidth))
-              const clampedY = Math.max(padding.top, Math.min(point.y, padding.top + chartHeight))
-              
-              return (
-                <g key={index}>
-                  <circle
-                    cx={clampedX}
-                    cy={clampedY}
-                    r="6"
-                    fill="#1E293B"
-                    stroke="#3B82F6"
-                    strokeWidth="3"
-                  />
-                  <circle
-                    cx={clampedX}
-                    cy={clampedY}
-                    r="3"
-                    fill="#3B82F6"
-                  />
-                  <circle
-                    cx={clampedX}
-                    cy={clampedY}
-                    r="12"
-                    fill="transparent"
-                    className="hover:fill-blue-500/20 cursor-pointer transition-all"
-                  >
-                    <title>{getTooltip(point.data, type)}</title>
-                  </circle>
-                </g>
-              )
-            })}
-            
-            {/* Axis labels */}
-            <text 
-              x={padding.left + chartWidth / 2} 
-              y={containerHeight - 10} 
-              textAnchor="middle" 
-              className="text-sm fill-gray-400 font-medium"
-            >
-              {type === 'daily' ? 'Days' : type === 'weekly' ? 'Weeks' : 'Months'}
-            </text>
-            
-            <text 
-              x={20} 
-              y={padding.top + chartHeight / 2} 
-              textAnchor="middle" 
-              className="text-sm fill-gray-400 font-medium"
-              transform={`rotate(-90, 20, ${padding.top + chartHeight / 2})`}
-            >
-              Questions
-            </text>
-          </svg>
+      <div className="space-y-6">
+        {/* Main Chart */}
+        <div className="h-80">
+          <PremiumAreaChart
+            data={chartData}
+            areas={[
+              {
+                dataKey: "value",
+                name: "Total Questions",
+                color: "#3b82f6",
+                fillOpacity: 0.6,
+                type: "monotone"
+              }
+            ]}
+            showGrid={true}
+            showTooltip={true}
+            animate={true}
+          />
         </div>
 
-        {/* Enhanced Comparison Stats */}
-        {data.length >= 2 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-6 border-t border-gray-700">
-            <motion.div 
-              className="text-center p-4 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-lg border border-blue-500/20"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="text-sm text-blue-300 mb-2 font-medium">First Entry</div>
-              <div className="text-2xl font-bold text-white mb-1">{data[0].totalQuestions}</div>
-              <div className="text-xs text-gray-400">{getLabel(data[0], type)}</div>
-            </motion.div>
-            
-            <motion.div 
-              className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-lg border border-purple-500/20"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="text-sm text-purple-300 mb-2 font-medium">Latest Entry</div>
-              <div className="text-2xl font-bold text-white mb-1">{data[data.length - 1].totalQuestions}</div>
-              <div className="text-xs text-gray-400">{getLabel(data[data.length - 1], type)}</div>
-            </motion.div>
-            
-            <motion.div 
-              className={`text-center p-4 rounded-lg border ${
-                data[data.length - 1].totalQuestions > data[0].totalQuestions 
-                  ? 'bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20' 
-                  : data[data.length - 1].totalQuestions < data[0].totalQuestions
-                  ? 'bg-gradient-to-br from-red-500/10 to-red-600/5 border-red-500/20'
-                  : 'bg-gradient-to-br from-gray-500/10 to-gray-600/5 border-gray-500/20'
-              }`}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className={`text-sm mb-2 font-medium ${
-                data[data.length - 1].totalQuestions > data[0].totalQuestions 
-                  ? 'text-green-300' 
-                  : data[data.length - 1].totalQuestions < data[0].totalQuestions
-                  ? 'text-red-300'
-                  : 'text-gray-300'
-              }`}>Improvement</div>
-              <div className={`text-2xl font-bold mb-1 ${
-                data[data.length - 1].totalQuestions > data[0].totalQuestions 
-                  ? 'text-green-400' 
-                  : data[data.length - 1].totalQuestions < data[0].totalQuestions
-                  ? 'text-red-400'
-                  : 'text-gray-400'
-              }`}>
-                {data[data.length - 1].totalQuestions > data[0].totalQuestions ? '+' : ''}
-                {data[data.length - 1].totalQuestions - data[0].totalQuestions}
+        {/* Subject Breakdown Chart */}
+        {type === 'daily' && data.some(item =>
+          (item.physicsQuestions || 0) + (item.chemistryQuestions || 0) +
+          (item.botanyQuestions || 0) + (item.zoologyQuestions || 0) > 0
+        ) && (
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <StarIcon className="h-5 w-5 text-yellow-400" />
+                Subject-wise Breakdown
+              </h4>
+              <div className="h-64">
+                <PremiumLineChart
+                  data={chartData}
+                  lines={[
+                    { dataKey: 'physics', color: '#ef4444', name: 'Physics' },
+                    { dataKey: 'chemistry', color: '#10b981', name: 'Chemistry' },
+                    { dataKey: 'botany', color: '#f59e0b', name: 'Botany' },
+                    { dataKey: 'zoology', color: '#8b5cf6', name: 'Zoology' }
+                  ]}
+                  showGrid={true}
+                  showTooltip={true}
+                  animate={true}
+                />
               </div>
-              <div className="text-xs text-gray-400">questions</div>
-            </motion.div>
-          </div>
-        )}
+            </div>
+          )}
       </div>
     )
   }
@@ -372,58 +211,233 @@ export default function DailyGoalsCharts() {
 
   if (isLoading) {
     return (
-      <Card className="glass-effect border-gray-700">
+      <Card variant="premium" hover="both" asMotion>
         <CardHeader>
-          <CardTitle className="text-white">Progress Charts</CardTitle>
+          <CardTitle className="flex items-center gap-3">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="p-2 rounded-xl bg-primary/20"
+            >
+              <ChartBarIcon className="h-5 w-5 text-primary" />
+            </motion.div>
+            <span className="gradient-text">Progress Charts</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center">
-            <div className="animate-pulse text-gray-400">Loading charts...</div>
+          <div className="h-96 flex items-center justify-center">
+            <div className="text-center">
+              <LoadingSpinner size="lg" variant="orbit" />
+              <p className="text-foreground-secondary mt-4">Loading your progress charts...</p>
+            </div>
           </div>
         </CardContent>
       </Card>
     )
   }
 
+  const getCurrentData = () => {
+    switch (activeChart) {
+      case 'daily': return dailyTrend || []
+      case 'weekly': return weeklyTrend || []
+      case 'monthly': return monthlyTrend || []
+      default: return []
+    }
+  }
+
+  const currentData = getCurrentData()
+  const stats = calculateStats(currentData, activeChart)
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
     >
-      <Card className="glass-effect border-gray-700 hover:border-primary/30 transition-all duration-300">
+      {/* Stats Overview */}
+      {stats && (
+        <Grid cols={4} gap="lg" responsive={{ sm: 2, md: 4 }}>
+          <StatsCard
+            title="Total Questions"
+            value={stats.total}
+            description={`Across ${stats.dataPoints} ${activeChart === 'daily' ? 'days' : activeChart === 'weekly' ? 'weeks' : 'months'}`}
+            icon={<ChartBarIcon className="h-6 w-6 text-blue-400" />}
+            color="primary"
+          />
+          <StatsCard
+            title="Average"
+            value={stats.average}
+            description={`Per ${activeChart.slice(0, -2)}`}
+            icon={<CalendarIcon className="h-6 w-6 text-green-400" />}
+            color="success"
+          />
+          <StatsCard
+            title="Best Performance"
+            value={stats.max}
+            description="Highest single day"
+            icon={<StarIcon className="h-6 w-6 text-yellow-400" />}
+            color="warning"
+          />
+          <StatsCard
+            title="Recent Trend"
+            value={`${stats.trendPercentage.toFixed(1)}%`}
+            description={stats.isPositiveTrend ? 'Improving' : 'Declining'}
+            icon={stats.isPositiveTrend ?
+              <ArrowTrendingUpIcon className="h-6 w-6 text-green-400" /> :
+              <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+            }
+            trend={{ value: stats.trendPercentage, isPositive: stats.isPositiveTrend }}
+            color={stats.isPositiveTrend ? 'success' : 'error'}
+          />
+        </Grid>
+      )}
+
+      {/* Main Chart Card */}
+      <Card variant="premium" hover="both" asMotion>
         <CardHeader>
-          <CardTitle className="text-white flex items-center justify-between">
-            <span>Progress Charts</span>
-            <div className="flex space-x-1 bg-background-secondary/50 p-1 rounded-lg">
-              {[
-                { key: 'daily', label: 'Daily' },
-                { key: 'weekly', label: 'Weekly' },
-                { key: 'monthly', label: 'Monthly' }
-              ].map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveChart(tab.key as any)}
-                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                    activeChart === tab.key
-                      ? 'bg-primary text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-                  }`}
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{
+                  rotate: [0, 360],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{
+                  rotate: { duration: 10, repeat: Infinity, ease: "linear" },
+                  scale: { duration: 2, repeat: Infinity }
+                }}
+                className="p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20"
+              >
+                <ChartBarIcon className="h-5 w-5 text-blue-400" />
+              </motion.div>
+              <div>
+                <span className="gradient-text text-xl font-bold">Progress Analytics</span>
+                <p className="text-foreground-secondary text-sm mt-1">
+                  Track your question-solving journey over time
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              {(['daily', 'weekly', 'monthly'] as const).map((period) => (
+                <Button
+                  key={period}
+                  onClick={() => setActiveChart(period)}
+                  variant={activeChart === period ? 'primary' : 'outline'}
+                  size="sm"
+                  leftIcon={
+                    period === 'daily' ? <ClockIcon className="h-4 w-4" /> :
+                      period === 'weekly' ? <CalendarIcon className="h-4 w-4" /> :
+                        <ChartBarIcon className="h-4 w-4" />
+                  }
                 >
-                  {tab.label}
-                </button>
+                  {period.charAt(0).toUpperCase() + period.slice(1)}
+                </Button>
               ))}
             </div>
           </CardTitle>
         </CardHeader>
+
         <CardContent>
-          <div className="space-y-4">
-            {activeChart === 'daily' && renderChart(dailyTrend || [], 'daily')}
-            {activeChart === 'weekly' && renderChart(weeklyTrend || [], 'weekly')}
-            {activeChart === 'monthly' && renderChart(monthlyTrend || [], 'monthly')}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeChart}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {renderPremiumChart(currentData, activeChart)}
+            </motion.div>
+          </AnimatePresence>
         </CardContent>
       </Card>
+
+      {/* Performance Comparison */}
+      {stats && currentData.length >= 2 && (
+        <Card variant="premium" hover="both" asMotion>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-success/20">
+                <ArrowTrendingUpIcon className="h-5 w-5 text-success-500" />
+              </div>
+              <span className="gradient-text">Performance Comparison</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Grid cols={3} gap="lg" responsive={{ sm: 1, md: 3 }}>
+              <motion.div
+                className="glass-card p-6 text-center hover:shadow-glow transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-foreground-secondary">First Entry</span>
+                </div>
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  <AnimatedCounter value={currentData[0].totalQuestions} />
+                </div>
+                <div className="text-sm text-foreground-muted">
+                  {activeChart === 'daily'
+                    ? new Date((currentData[0] as DailyTrend).date).toLocaleDateString()
+                    : activeChart === 'weekly'
+                      ? `Week ${(currentData[0] as WeeklyTrend).weekNumber}`
+                      : `${(currentData[0] as MonthlyTrend).monthName} ${(currentData[0] as MonthlyTrend).year}`
+                  }
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="glass-card p-6 text-center hover:shadow-glow transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-foreground-secondary">Latest Entry</span>
+                </div>
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  <AnimatedCounter value={currentData[currentData.length - 1].totalQuestions} />
+                </div>
+                <div className="text-sm text-foreground-muted">
+                  {activeChart === 'daily'
+                    ? new Date((currentData[currentData.length - 1] as DailyTrend).date).toLocaleDateString()
+                    : activeChart === 'weekly'
+                      ? `Week ${(currentData[currentData.length - 1] as WeeklyTrend).weekNumber}`
+                      : `${(currentData[currentData.length - 1] as MonthlyTrend).monthName} ${(currentData[currentData.length - 1] as MonthlyTrend).year}`
+                  }
+                </div>
+              </motion.div>
+
+              <motion.div
+                className={`glass-card p-6 text-center hover:shadow-glow transition-all duration-300 ${stats.isPositiveTrend
+                  ? 'border-success-500/30 bg-success-500/5'
+                  : 'border-error-500/30 bg-error-500/5'
+                  }`}
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  {stats.isPositiveTrend ? (
+                    <ArrowUpIcon className="h-4 w-4 text-success-500" />
+                  ) : (
+                    <ArrowDownIcon className="h-4 w-4 text-error-500" />
+                  )}
+                  <span className="text-sm font-medium text-foreground-secondary">Net Change</span>
+                </div>
+                <div className={`text-3xl font-bold mb-2 ${stats.isPositiveTrend ? 'text-success-500' : 'text-error-500'
+                  }`}>
+                  {stats.isPositiveTrend ? '+' : ''}
+                  <AnimatedCounter
+                    value={currentData[currentData.length - 1].totalQuestions - currentData[0].totalQuestions}
+                  />
+                </div>
+                <div className="text-sm text-foreground-muted">
+                  {stats.trendPercentage.toFixed(1)}% {stats.isPositiveTrend ? 'improvement' : 'decline'}
+                </div>
+              </motion.div>
+            </Grid>
+          </CardContent>
+        </Card>
+      )}
     </motion.div>
   )
 }

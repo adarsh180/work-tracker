@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import DashboardLayout from '@/components/dashboard/dashboard-layout'
 import TestEntryForm from '@/components/tests/test-entry-form'
 import TestPerformanceChart from '@/components/tests/test-performance-chart'
@@ -127,13 +128,74 @@ export default function TestsPage() {
         )}
 
         {activeTab === 'analytics' && (
-          <div className="space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-8"
+          >
+            {/* Enhanced Analytics Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-center space-y-4"
+            >
+              <div className="flex items-center justify-center gap-4">
+                <motion.div
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 2, repeat: Infinity }
+                  }}
+                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 flex items-center justify-center shadow-glow"
+                >
+                  <ChartBarIcon className="h-6 w-6 text-white" />
+                </motion.div>
+                
+                <div>
+                  <motion.h2 
+                    className="text-2xl md:text-3xl font-bold gradient-text"
+                    animate={{
+                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    style={{
+                      backgroundSize: '200% 200%',
+                    }}
+                  >
+                    Performance Analytics Dashboard
+                  </motion.h2>
+                  <p className="text-foreground-secondary mt-1">
+                    Track your NEET preparation progress with detailed insights
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Analytics Cards */}
             <TestAnalytics />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TestPerformanceChart />
-              <RecentTestsList />
+            
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+              {/* Main Performance Chart - Takes 2 columns */}
+              <div className="xl:col-span-2">
+                <TestPerformanceChart />
+              </div>
+              
+              {/* Recent Tests List - Takes 1 column */}
+              <div className="xl:col-span-1">
+                <RecentTestsList />
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </DashboardLayout>

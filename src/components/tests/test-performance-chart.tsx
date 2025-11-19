@@ -1,9 +1,20 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PremiumLineChart, PremiumAreaChart, ProgressRing } from '@/components/ui/premium-charts'
+import { Badge, LoadingSpinner } from '@/components/ui/enhanced-components'
+import { Button } from '@/components/ui/button'
+import {
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  AcademicCapIcon,
+  CalendarIcon,
+  StarIcon
+} from '@heroicons/react/24/outline'
 
 type PerformanceTrend = {
   date: string
@@ -15,14 +26,15 @@ type PerformanceTrend = {
 
 export default function TestPerformanceChart() {
   const [selectedTestType, setSelectedTestType] = useState<string>('all')
-  
+  const [chartType, setChartType] = useState<'line' | 'area'>('area')
+
   const { data: trendData, isLoading, error } = useQuery<PerformanceTrend[]>({
     queryKey: ['test-performance-trend', selectedTestType],
     queryFn: async () => {
-      const url = selectedTestType === 'all' 
-        ? '/api/tests/trend' 
+      const url = selectedTestType === 'all'
+        ? '/api/tests/trend'
         : `/api/tests/trend?testType=${encodeURIComponent(selectedTestType)}`
-      
+
       const response = await fetch(url)
       if (!response.ok) {
         throw new Error('Failed to fetch performance trend')
@@ -34,17 +46,54 @@ export default function TestPerformanceChart() {
     staleTime: 500
   })
 
-  const testTypes = ['all', 'Weekly Test', 'Rank Booster', 'Test Series', 'AITS', 'Full Length Test']
+  const testTypes = [
+    { value: 'all', label: 'All Tests', color: 'primary' },
+    { value: 'Weekly Test', label: 'Weekly Test', color: 'success' },
+    { value: 'Rank Booster', label: 'Rank Booster', color: 'warning' },
+    { value: 'Test Series', label: 'Test Series', color: 'error' },
+    { value: 'AITS', label: 'AITS', color: 'info' },
+    { value: 'Full Length Test', label: 'Full Length', color: 'primary' }
+  ]
+
+  // Get emoji for current performance
+  const getPerformanceEmoji = (percentage: number) => {
+    if (percentage < 75) return '😢'
+    if (percentage < 85) return '😟'
+    if (percentage < 95) return '😊'
+    return '�'
+  }
+
+  // Prepare chart data
+  const chartData = trendData?.map((item, index) => ({
+    name: `Test ${index + 1}`,
+    score: item.score,
+    percentage: item.percentage,
+    date: new Date(item.date).toLocaleDateString(),
+    testType: item.testType,
+    testNumber: item.testNumber
+  })) || []
 
   if (isLoading) {
     return (
-      <Card className="glass-effect border-gray-700">
+      <Card variant="premium" hover="both" asMotion>
         <CardHeader>
-          <CardTitle className="text-white">Performance Trend</CardTitle>
+          <CardTitle className="flex items-center gap-3">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="p-2 rounded-xl bg-primary/20"
+            >
+              <ChartBarIcon className="h-5 w-5 text-primary" />
+            </motion.div>
+            <span className="gradient-text">Performance Analytics</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center">
-            <div className="animate-pulse text-gray-400">Loading chart...</div>
+          <div className="h-80 flex items-center justify-center">
+            <div className="text-center">
+              <LoadingSpinner size="lg" variant="orbit" />
+              <p className="text-foreground-secondary mt-4">Loading performance data...</p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -53,55 +102,52 @@ export default function TestPerformanceChart() {
 
   if (error || !trendData || trendData.length === 0) {
     return (
-      <Card className="glass-effect border-gray-700">
+      <Card variant="premium" hover="both" asMotion>
         <CardHeader>
-          <CardTitle className="text-white">Performance Trend</CardTitle>
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/20">
+              <ChartBarIcon className="h-5 w-5 text-primary" />
+            </div>
+            <span className="gradient-text">Performance Analytics</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center text-gray-400">
+          <motion.div
+            className="h-80 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
             <div className="text-center">
-              <div className="text-4xl mb-2">📊</div>
-              <p>No test data available yet</p>
-              <p className="text-sm mt-2">Add some test scores to see your progress!</p>
+              <motion.div
+                animate={{
+                  y: [0, -10, 0],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="text-6xl mb-4"
+              >
+                📊
+              </motion.div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                No Performance Data Yet
+              </h3>
+              <p className="text-foreground-secondary mb-4">
+                Add some test scores to see your amazing progress journey!
+              </p>
+              <Button variant="gradient" size="sm">
+                Add Your First Test
+              </Button>
             </div>
-          </div>
+          </motion.div>
         </CardContent>
       </Card>
     )
   }
 
-  // Calculate chart dimensions and scaling
-  const chartWidth = 600
-  const chartHeight = 200
-  const padding = 40
-  const innerWidth = chartWidth - 2 * padding
-  const innerHeight = chartHeight - 2 * padding
-
-  // Find min and max values for scaling
-  const maxScore = Math.max(...trendData.map(d => d.score), 720)
-  const minScore = Math.min(...trendData.map(d => d.score), 0)
-  const scoreRange = maxScore - minScore || 1
-
-  // Create points for the line
-  const points = trendData.map((data, index) => {
-    const x = padding + (index / (trendData.length - 1 || 1)) * innerWidth
-    const y = padding + ((maxScore - data.score) / scoreRange) * innerHeight
-    return { x, y, data }
-  })
-
-  // Create path string for the line
-  const pathData = points.reduce((path, point, index) => {
-    const command = index === 0 ? 'M' : 'L'
-    return `${path} ${command} ${point.x} ${point.y}`
-  }, '')
-
-  // Get emoji for current performance
-  const getPerformanceEmoji = (percentage: number) => {
-    if (percentage < 75) return '😢'
-    if (percentage < 85) return '😟'
-    if (percentage < 95) return '😊'
-    return '😘'
-  }
+  const latestScore = trendData[trendData.length - 1]
+  const firstScore = trendData[0]
+  const improvement = latestScore.score - firstScore.score
+  const improvementPercentage = ((improvement / firstScore.score) * 100).toFixed(1)
 
   return (
     <motion.div
@@ -109,186 +155,198 @@ export default function TestPerformanceChart() {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="glass-effect border-gray-700 hover:border-primary/30 transition-all duration-300">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center justify-between">
-          <span>Performance Trend</span>
-          <select
-            value={selectedTestType}
-            onChange={(e) => setSelectedTestType(e.target.value)}
-            className="text-sm bg-background-secondary border border-gray-600 rounded px-2 py-1 text-white"
-          >
-            {testTypes.map(type => (
-              <option key={type} value={type}>
-                {type === 'all' ? 'All Tests' : type}
-              </option>
-            ))}
-          </select>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Chart */}
-          <div className="relative overflow-hidden rounded-lg">
-            <svg 
-              width={chartWidth} 
-              height={chartHeight} 
-              className="w-full h-auto max-w-full" 
-              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {/* Grid lines */}
-              <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
-                </pattern>
-              </defs>
-              <rect width={chartWidth} height={chartHeight} fill="url(#grid)" />
-              
-              {/* Y-axis labels */}
-              {[0, 180, 360, 540, 720].map(score => {
-                const y = padding + ((maxScore - score) / scoreRange) * innerHeight
-                return (
-                  <g key={score}>
-                    <line 
-                      x1={padding - 5} 
-                      y1={y} 
-                      x2={padding} 
-                      y2={y} 
-                      stroke="#9CA3AF" 
-                      strokeWidth="1"
-                    />
-                    <text 
-                      x={padding - 10} 
-                      y={y + 4} 
-                      textAnchor="end" 
-                      className="text-xs fill-gray-400"
-                    >
-                      {score}
-                    </text>
-                  </g>
-                )
-              })}
-              
-              {/* Performance line */}
-              <path
-                d={pathData}
-                fill="none"
-                stroke="#3B82F6"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              
-              {/* Data points - ensure they stay within bounds */}
-              {points.map((point, index) => {
-                // Clamp points within chart area
-                const clampedX = Math.max(padding, Math.min(point.x, chartWidth - padding))
-                const clampedY = Math.max(padding, Math.min(point.y, chartHeight - padding))
-                
-                return (
-                  <g key={index}>
-                    <circle
-                      cx={clampedX}
-                      cy={clampedY}
-                      r="4"
-                      fill="#3B82F6"
-                      stroke="#1E293B"
-                      strokeWidth="2"
-                    />
-                    {/* Tooltip on hover */}
-                    <circle
-                      cx={clampedX}
-                      cy={clampedY}
-                      r="8"
-                      fill="transparent"
-                      className="hover:fill-blue-500/20 cursor-pointer"
-                    >
-                      <title>
-                        {point.data.testNumber} ({point.data.testType}): {point.data.score}/720 ({point.data.percentage}%) on {new Date(point.data.date).toLocaleDateString()}
-                      </title>
-                    </circle>
-                  </g>
-                )
-              })}
-              
-              {/* X-axis */}
-              <line 
-                x1={padding} 
-                y1={chartHeight - padding} 
-                x2={chartWidth - padding} 
-                y2={chartHeight - padding} 
-                stroke="#9CA3AF" 
-                strokeWidth="1"
-              />
-              
-              {/* Y-axis */}
-              <line 
-                x1={padding} 
-                y1={padding} 
-                x2={padding} 
-                y2={chartHeight - padding} 
-                stroke="#9CA3AF" 
-                strokeWidth="1"
-              />
-            </svg>
-          </div>
+      <Card variant="premium" hover="both" asMotion className="overflow-hidden">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                className="p-2 rounded-xl bg-primary/20"
+              >
+                <ChartBarIcon className="h-5 w-5 text-primary" />
+              </motion.div>
+              <span className="gradient-text">Performance Analytics</span>
+            </CardTitle>
 
-          {/* Performance comparison */}
-          {trendData.length >= 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-700">
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">First Test</div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-lg font-semibold text-white">
-                    {trendData[0].score}
-                  </span>
-                  <span className="text-2xl">
-                    {getPerformanceEmoji(trendData[0].percentage)}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  {trendData[0].percentage}%
-                </div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">Latest Test</div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-lg font-semibold text-white">
-                    {trendData[trendData.length - 1].score}
-                  </span>
-                  <span className="text-2xl">
-                    {getPerformanceEmoji(trendData[trendData.length - 1].percentage)}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  {trendData[trendData.length - 1].percentage}%
-                </div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">Improvement</div>
-                <div className="flex items-center justify-center space-x-1">
-                  <span className={`text-lg font-semibold ${
-                    trendData[trendData.length - 1].score > trendData[0].score 
-                      ? 'text-green-400' 
-                      : trendData[trendData.length - 1].score < trendData[0].score
-                      ? 'text-red-400'
-                      : 'text-gray-400'
-                  }`}>
-                    {trendData[trendData.length - 1].score > trendData[0].score ? '+' : ''}
-                    {trendData[trendData.length - 1].score - trendData[0].score}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  points change
-                </div>
+            <div className="flex items-center gap-2">
+              {/* Chart Type Toggle */}
+              <div className="flex bg-background-secondary rounded-lg p-1">
+                <button
+                  onClick={() => setChartType('area')}
+                  className={`px-3 py-1 rounded text-sm transition-all ${chartType === 'area'
+                    ? 'bg-primary text-white'
+                    : 'text-foreground-secondary hover:text-foreground'
+                    }`}
+                >
+                  Area
+                </button>
+                <button
+                  onClick={() => setChartType('line')}
+                  className={`px-3 py-1 rounded text-sm transition-all ${chartType === 'line'
+                    ? 'bg-primary text-white'
+                    : 'text-foreground-secondary hover:text-foreground'
+                    }`}
+                >
+                  Line
+                </button>
               </div>
             </div>
-          )}
-        </div>
-      </CardContent>
+          </div>
+
+          {/* Test Type Filter */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {testTypes.map(type => (
+              <Badge
+                key={type.value}
+                variant={selectedTestType === type.value ? type.color as any : 'outline'}
+                className="cursor-pointer transition-all hover:scale-105"
+                onClick={() => setSelectedTestType(type.value)}
+              >
+                {type.label}
+              </Badge>
+            ))}
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <div className="space-y-6">
+            {/* Enhanced Chart */}
+            <div className="relative">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={chartType}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {chartType === 'area' ? (
+                    <PremiumAreaChart
+                      data={chartData}
+                      areas={[
+                        {
+                          dataKey: 'score',
+                          name: 'Score',
+                          color: '#3b82f6',
+                          type: 'monotone'
+                        }
+                      ]}
+                      height={300}
+                      showGrid={true}
+                      showTooltip={true}
+                      animate={true}
+                    />
+                  ) : (
+                    <PremiumLineChart
+                      data={chartData}
+                      lines={[
+                        {
+                          dataKey: 'score',
+                          name: 'Score',
+                          color: '#3b82f6',
+                          strokeWidth: 3,
+                          type: 'monotone'
+                        }
+                      ]}
+                      height={300}
+                      showGrid={true}
+                      showTooltip={true}
+                      animate={true}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Enhanced Performance Comparison */}
+            {trendData.length >= 2 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/10"
+              >
+                {/* First Test */}
+                <div className="glass-effect p-4 rounded-xl text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <CalendarIcon className="h-4 w-4 text-foreground-secondary" />
+                    <span className="text-sm text-foreground-secondary">First Test</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <span className="text-2xl font-bold text-foreground">
+                      {firstScore.score}
+                    </span>
+                    <motion.span
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-2xl"
+                    >
+                      {getPerformanceEmoji(firstScore.percentage)}
+                    </motion.span>
+                  </div>
+                  <div className="text-sm text-foreground-secondary">
+                    {firstScore.percentage.toFixed(1)}% • {new Date(firstScore.date).toLocaleDateString()}
+                  </div>
+                </div>
+
+                {/* Latest Test */}
+                <div className="glass-effect p-4 rounded-xl text-center border border-primary/30">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <StarIcon className="h-4 w-4 text-primary" />
+                    <span className="text-sm text-primary">Latest Test</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <span className="text-2xl font-bold text-foreground">
+                      {latestScore.score}
+                    </span>
+                    <motion.span
+                      animate={{
+                        scale: [1, 1.3, 1],
+                        rotate: [0, 10, -10, 0]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-2xl"
+                    >
+                      {getPerformanceEmoji(latestScore.percentage)}
+                    </motion.span>
+                  </div>
+                  <div className="text-sm text-foreground-secondary">
+                    {latestScore.percentage.toFixed(1)}% • {new Date(latestScore.date).toLocaleDateString()}
+                  </div>
+                </div>
+
+                {/* Improvement */}
+                <div className="glass-effect p-4 rounded-xl text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    {improvement >= 0 ? (
+                      <ArrowTrendingUpIcon className="h-4 w-4 text-success-500" />
+                    ) : (
+                      <ArrowTrendingDownIcon className="h-4 w-4 text-error-500" />
+                    )}
+                    <span className="text-sm text-foreground-secondary">Growth</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className={`text-2xl font-bold ${improvement >= 0 ? 'text-success-500' : 'text-error-500'
+                      }`}>
+                      {improvement >= 0 ? '+' : ''}{improvement}
+                    </span>
+                    <ProgressRing
+                      progress={Math.abs(parseFloat(improvementPercentage))}
+                      size={40}
+                      strokeWidth={4}
+                      color={improvement >= 0 ? '#10b981' : '#ef4444'}
+                      showValue={false}
+                    />
+                  </div>
+                  <div className="text-sm text-foreground-secondary">
+                    {improvementPercentage}% change
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </CardContent>
       </Card>
     </motion.div>
   )

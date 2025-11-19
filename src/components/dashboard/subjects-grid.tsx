@@ -19,7 +19,7 @@ interface SubjectSummary {
 export default function SubjectsGrid() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  
+
   const { data: subjects = [], isLoading: loading, error } = useQuery<SubjectSummary[]>({
     queryKey: ['subjects-dashboard'],
     queryFn: async () => {
@@ -62,7 +62,7 @@ export default function SubjectsGrid() {
       <div className="glass-effect rounded-xl p-6 text-center">
         <div className="text-red-400 mb-2">⚠️ Error Loading Subjects</div>
         <p className="text-gray-400 text-sm">{error instanceof Error ? error.message : 'An error occurred'}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
         >
@@ -82,7 +82,7 @@ export default function SubjectsGrid() {
         <p className="text-gray-400 mb-4">
           It looks like your subjects haven&apos;t been set up yet. The system should automatically create Physics, Chemistry, Botany, and Zoology subjects with their chapters.
         </p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
         >
@@ -95,7 +95,7 @@ export default function SubjectsGrid() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="text-2xl font-bold text-white flex items-center gap-3"
