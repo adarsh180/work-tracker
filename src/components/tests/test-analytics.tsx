@@ -112,6 +112,13 @@ export default function TestAnalytics() {
     return <div className="w-5 h-5 rounded-full bg-warning-500" />
   }
 
+  const getPerformanceLabel = (percentage: number) => {
+    if (percentage < 75) return 'Needs Focus'
+    if (percentage < 85) return 'Good Progress'
+    if (percentage < 95) return 'Excellent'
+    return 'Outstanding'
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -182,12 +189,11 @@ export default function TestAnalytics() {
               <motion.div
                 animate={{ 
                   scale: [1, 1.2, 1],
-                  rotate: [0, 10, -10, 0]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="text-3xl"
+                className="p-3 rounded-2xl bg-white/[0.08]"
               >
-                {analytics.emoji}
+                {getPerformanceIcon(analytics.recentPerformance)}
               </motion.div>
               
               <div>
@@ -201,8 +207,8 @@ export default function TestAnalytics() {
                   </span>
                 </div>
                 <p className="text-xs text-foreground-secondary">
-                  {analytics.improvementTrend > 0 ? 'Improving steadily' : 
-                   analytics.improvementTrend < 0 ? 'Needs attention' : 'Stable performance'}
+                  {getPerformanceLabel(analytics.recentPerformance)} • {analytics.improvementTrend > 0 ? 'Improving' : 
+                   analytics.improvementTrend < 0 ? 'Needs attention' : 'Stable'}
                 </p>
               </div>
             </div>

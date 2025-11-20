@@ -24,54 +24,89 @@ import {
   BoltIcon,
   HeartIcon,
   SparklesIcon,
-  AcademicCapIcon
+  AcademicCapIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
 
 type TabKey = 'today' | 'stats' | 'history'
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15
+    }
+  }
+}
 
 export default function DailyGoalsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('today')
 
   const performanceLevels = [
     {
-      emoji: '🔥',
+      icon: <FireIcon className="h-5 w-5" />,
       threshold: 500,
-      label: 'FIRE!',
+      label: 'LEGENDARY',
       color: 'error',
-      description: 'Legendary performance',
-      gradient: 'from-red-500 to-orange-500'
+      description: 'Exceptional performance',
+      gradient: 'from-red-500/20 to-orange-500/20',
+      borderColor: 'border-red-500/30',
+      indicatorColor: 'bg-red-500'
     },
     {
-      emoji: '😘',
+      icon: <StarIcon className="h-5 w-5" />,
       threshold: 300,
-      label: 'Amazing',
+      label: 'AMAZING',
       color: 'warning',
       description: 'Outstanding work',
-      gradient: 'from-pink-500 to-rose-500'
+      gradient: 'from-yellow-500/20 to-orange-500/20',
+      borderColor: 'border-yellow-500/30',
+      indicatorColor: 'bg-yellow-500'
     },
     {
-      emoji: '😊',
+      icon: <CheckCircleIcon className="h-5 w-5" />,
       threshold: 250,
-      label: 'Great',
+      label: 'EXCELLENT',
       color: 'success',
-      description: 'Excellent progress',
-      gradient: 'from-green-500 to-emerald-500'
+      description: 'Great progress',
+      gradient: 'from-green-500/20 to-emerald-500/20',
+      borderColor: 'border-green-500/30',
+      indicatorColor: 'bg-green-500'
     },
     {
-      emoji: '😐',
+      icon: <BoltIcon className="h-5 w-5" />,
       threshold: 150,
-      label: 'Good',
+      label: 'GOOD',
       color: 'info',
       description: 'Steady progress',
-      gradient: 'from-blue-500 to-cyan-500'
+      gradient: 'from-blue-500/20 to-cyan-500/20',
+      borderColor: 'border-blue-500/30',
+      indicatorColor: 'bg-blue-500'
     },
     {
-      emoji: '😟',
+      icon: <HeartIcon className="h-5 w-5" />,
       threshold: 1,
-      label: 'Keep going',
+      label: 'KEEP GOING',
       color: 'primary',
       description: 'Every step counts',
-      gradient: 'from-purple-500 to-indigo-500'
+      gradient: 'from-purple-500/20 to-indigo-500/20',
+      borderColor: 'border-purple-500/30',
+      indicatorColor: 'bg-purple-500'
     }
   ]
 
@@ -81,28 +116,36 @@ export default function DailyGoalsPage() {
       target: 250,
       icon: <AcademicCapIcon className="h-5 w-5" />,
       color: 'primary',
-      description: 'Minimum daily target'
+      description: 'Minimum daily target',
+      gradient: 'from-blue-500/20 to-cyan-500/20',
+      borderColor: 'border-blue-500/30'
     },
     {
       label: 'Excellence Level',
       target: 500,
       icon: <StarIcon className="h-5 w-5" />,
       color: 'warning',
-      description: 'Peak performance'
+      description: 'Peak performance',
+      gradient: 'from-yellow-500/20 to-orange-500/20',
+      borderColor: 'border-yellow-500/30'
     },
     {
       label: 'Weekly Goal',
       target: 6800,
       icon: <TrophyIcon className="h-5 w-5" />,
       color: 'success',
-      description: 'Weekly milestone'
+      description: 'Weekly milestone',
+      gradient: 'from-green-500/20 to-emerald-500/20',
+      borderColor: 'border-green-500/30'
     },
     {
       label: 'Monthly Goal',
       target: 27500,
       icon: <RocketLaunchIcon className="h-5 w-5" />,
       color: 'error',
-      description: 'Monthly achievement'
+      description: 'Monthly achievement',
+      gradient: 'from-red-500/20 to-pink-500/20',
+      borderColor: 'border-red-500/30'
     }
   ]
 
@@ -112,10 +155,10 @@ export default function DailyGoalsPage() {
       subtitle="Track your daily NEET preparation progress with gamification"
     >
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-6"
       >
         {/* Enhanced Header */}
         <motion.div
@@ -249,110 +292,112 @@ export default function DailyGoalsPage() {
   function renderTodayTab() {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
+        key="today"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className="space-y-6"
       >
-        <Grid cols={3} gap="lg" responsive={{ sm: 1, lg: 3 }}>
-          <div className="lg:col-span-2">
+        {/* Hero Stats Row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {dailyTargets.map((target, index) => (
+            <motion.div
+              key={target.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02, y: -4 }}
+              className="relative overflow-hidden rounded-3xl group"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${target.gradient} opacity-50`} />
+              <div className={`relative glass-effect border ${target.borderColor} p-6`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-white/[0.08] group-hover:bg-white/[0.12] transition-all">
+                    {target.icon}
+                  </div>
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="text-2xl opacity-20"
+                  >
+                    {target.icon}
+                  </motion.div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-3xl font-bold text-foreground">
+                    {target.target.toLocaleString()}
+                  </div>
+                  <div className="text-sm font-semibold text-foreground-secondary">
+                    {target.label}
+                  </div>
+                  <div className="text-xs text-foreground-tertiary">
+                    {target.description}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Form Section - Takes 2 columns */}
+          <div className="xl:col-span-2">
             <DailyGoalsForm />
           </div>
 
-          <div className="space-y-6">
-            {/* Daily Targets Card */}
+          {/* Performance Scale - Takes 1 column */}
+          <div>
             <Card variant="premium" hover="both" asMotion>
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-primary/20">
-                    <TrophyIcon className="h-5 w-5 text-primary" />
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20">
+                    <FireIcon className="h-6 w-6 text-orange-500" />
                   </div>
-                  <span className="gradient-text">Daily Targets</span>
+                  <div>
+                    <div className="gradient-text text-lg">Performance Scale</div>
+                    <div className="text-xs text-foreground-tertiary font-normal mt-1">
+                      Track your excellence level
+                    </div>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {dailyTargets.map((target, index) => (
-                    <motion.div
-                      key={target.label}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="glass-card p-4 hover:shadow-glow transition-all duration-300"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${target.color === 'primary' ? 'bg-primary/20' :
-                            target.color === 'success' ? 'bg-success/20' :
-                              target.color === 'warning' ? 'bg-warning/20' :
-                                'bg-error/20'
-                            }`}>
-                            {target.icon}
-                          </div>
-                          <div>
-                            <div className="font-medium text-foreground">{target.label}</div>
-                            <div className="text-xs text-foreground-muted">{target.description}</div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className={`text-lg font-bold ${target.color === 'primary' ? 'text-primary' :
-                            target.color === 'success' ? 'text-success-500' :
-                              target.color === 'warning' ? 'text-warning-500' :
-                                'text-error-500'
-                            }`}>
-                            {target.target.toLocaleString()}+
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Performance Levels Card */}
-            <Card variant="premium" hover="both" asMotion>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-warning/20">
-                    <FireIcon className="h-5 w-5 text-warning-500" />
-                  </div>
-                  <span className="gradient-text">Performance Levels</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {performanceLevels.map((level, index) => (
                     <motion.div
                       key={level.label}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`glass-card p-4 bg-gradient-to-r ${level.gradient} bg-opacity-5 border border-opacity-20 hover:shadow-glow transition-all duration-300`}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      className="relative overflow-hidden rounded-2xl group cursor-pointer"
                     >
-                      <div className="flex items-center gap-4">
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.2, 1],
-                            rotate: [0, 10, -10, 0]
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            delay: index * 0.2
-                          }}
-                          className="text-3xl"
-                        >
-                          {level.emoji}
-                        </motion.div>
-
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-semibold text-foreground">{level.threshold}+ questions</span>
-                            <Badge variant={level.color as any} size="sm">
-                              {level.label}
-                            </Badge>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${level.gradient}`} />
+                      <div className={`relative glass-effect border ${level.borderColor} p-4`}>
+                        <div className="flex items-center gap-4">
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
+                            className="p-3 rounded-xl bg-white/[0.12] group-hover:bg-white/[0.16] transition-all"
+                          >
+                            {level.icon}
+                          </motion.div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className={`w-2 h-2 rounded-full ${level.indicatorColor} animate-pulse`} />
+                              <span className="text-sm font-bold text-foreground">
+                                {level.threshold}+
+                              </span>
+                              <Badge variant={level.color as any} size="sm">
+                                {level.label}
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-foreground-tertiary">
+                              {level.description}
+                            </div>
                           </div>
-                          <div className="text-sm text-foreground-secondary">{level.description}</div>
                         </div>
                       </div>
                     </motion.div>
@@ -361,7 +406,7 @@ export default function DailyGoalsPage() {
               </CardContent>
             </Card>
           </div>
-        </Grid>
+        </div>
       </motion.div>
     )
   }
@@ -369,11 +414,17 @@ export default function DailyGoalsPage() {
   function renderStatsTab() {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
+        key="stats"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className="space-y-6"
       >
+        {/* Heatmap Hero */}
         <QuestionHeatmap />
+        
+        {/* Stats Grid */}
         <QuestionStats />
       </motion.div>
     )
@@ -382,12 +433,20 @@ export default function DailyGoalsPage() {
   function renderHistoryTab() {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
+        key="history"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className="space-y-6"
       >
+        {/* Full-Size Heatmap */}
         <QuestionHeatmap />
+        
+        {/* Charts Section */}
         <DailyGoalsCharts />
+        
+        {/* Recent Activity */}
         <RecentGoals />
       </motion.div>
     )

@@ -406,36 +406,36 @@ export default function CycleOptimizedScheduler() {
                   <Grid cols={3} gap="md">
                     <div className="text-center">
                       <ProgressRing
-                        progress={scheduleData.performancePrediction.accuracy}
+                        progress={scheduleData?.performancePrediction?.accuracy || 0}
                         size={50}
                         strokeWidth={4}
                         color="#10b981"
                         className="mx-auto mb-2"
                       />
                       <div className="text-white text-sm font-medium">Accuracy</div>
-                      <div className="text-white/60 text-xs">{scheduleData.performancePrediction.accuracy}%</div>
+                      <div className="text-white/60 text-xs">{scheduleData?.performancePrediction?.accuracy || 0}%</div>
                     </div>
                     <div className="text-center">
                       <ProgressRing
-                        progress={scheduleData.performancePrediction.speed}
+                        progress={scheduleData?.performancePrediction?.speed || 0}
                         size={50}
                         strokeWidth={4}
                         color="#f59e0b"
                         className="mx-auto mb-2"
                       />
                       <div className="text-white text-sm font-medium">Speed</div>
-                      <div className="text-white/60 text-xs">{scheduleData.performancePrediction.speed}%</div>
+                      <div className="text-white/60 text-xs">{scheduleData?.performancePrediction?.speed || 0}%</div>
                     </div>
                     <div className="text-center">
                       <ProgressRing
-                        progress={scheduleData.performancePrediction.retention}
+                        progress={scheduleData?.performancePrediction?.retention || 0}
                         size={50}
                         strokeWidth={4}
                         color="#8b5cf6"
                         className="mx-auto mb-2"
                       />
                       <div className="text-white text-sm font-medium">Retention</div>
-                      <div className="text-white/60 text-xs">{scheduleData.performancePrediction.retention}%</div>
+                      <div className="text-white/60 text-xs">{scheduleData?.performancePrediction?.retention || 0}%</div>
                     </div>
                   </Grid>
                 </div>
@@ -617,7 +617,7 @@ export default function CycleOptimizedScheduler() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {scheduleData.phaseRecommendations.map((tip, index) => (
+                    {(scheduleData?.phaseRecommendations || []).map((tip, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 10 }}
@@ -655,7 +655,7 @@ export default function CycleOptimizedScheduler() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {scheduleData.biologicalOptimizations.map((optimization, index) => (
+                    {(scheduleData?.biologicalOptimizations || []).map((optimization, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 10 }}

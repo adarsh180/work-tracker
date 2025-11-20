@@ -55,12 +55,12 @@ export default function TestPerformanceChart() {
     { value: 'Full Length Test', label: 'Full Length', color: 'primary' }
   ]
 
-  // Get emoji for current performance
-  const getPerformanceEmoji = (percentage: number) => {
-    if (percentage < 75) return '😢'
-    if (percentage < 85) return '😟'
-    if (percentage < 95) return '😊'
-    return '�'
+  // Get icon for current performance
+  const getPerformanceIndicator = (percentage: number) => {
+    if (percentage < 75) return <div className="w-3 h-3 rounded-full bg-error-500 animate-pulse" />
+    if (percentage < 85) return <div className="w-3 h-3 rounded-full bg-warning-500 animate-pulse" />
+    if (percentage < 95) return <div className="w-3 h-3 rounded-full bg-success-500 animate-pulse" />
+    return <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
   }
 
   // Prepare chart data
@@ -121,12 +121,11 @@ export default function TestPerformanceChart() {
               <motion.div
                 animate={{
                   y: [0, -10, 0],
-                  rotate: [0, 5, -5, 0]
                 }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="text-6xl mb-4"
+                className="mb-4 p-6 rounded-3xl bg-primary/10"
               >
-                📊
+                <ChartBarIcon className="h-16 w-16 text-primary mx-auto" />
               </motion.div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 No Performance Data Yet
@@ -277,13 +276,13 @@ export default function TestPerformanceChart() {
                     <span className="text-2xl font-bold text-foreground">
                       {firstScore.score}
                     </span>
-                    <motion.span
+                    <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="text-2xl"
+                      className="p-2 rounded-xl bg-white/[0.08]"
                     >
-                      {getPerformanceEmoji(firstScore.percentage)}
-                    </motion.span>
+                      {getPerformanceIndicator(firstScore.percentage)}
+                    </motion.div>
                   </div>
                   <div className="text-sm text-foreground-secondary">
                     {firstScore.percentage.toFixed(1)}% • {new Date(firstScore.date).toLocaleDateString()}
@@ -300,16 +299,15 @@ export default function TestPerformanceChart() {
                     <span className="text-2xl font-bold text-foreground">
                       {latestScore.score}
                     </span>
-                    <motion.span
+                    <motion.div
                       animate={{
                         scale: [1, 1.3, 1],
-                        rotate: [0, 10, -10, 0]
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="text-2xl"
+                      className="p-2 rounded-xl bg-primary/20"
                     >
-                      {getPerformanceEmoji(latestScore.percentage)}
-                    </motion.span>
+                      {getPerformanceIndicator(latestScore.percentage)}
+                    </motion.div>
                   </div>
                   <div className="text-sm text-foreground-secondary">
                     {latestScore.percentage.toFixed(1)}% • {new Date(latestScore.date).toLocaleDateString()}

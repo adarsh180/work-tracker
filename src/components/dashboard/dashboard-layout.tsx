@@ -65,14 +65,14 @@ const DashboardHeader = ({ title, subtitle }: { title: string; subtitle?: string
                 className="w-12 h-12 rounded-2xl bg-primary-gradient flex items-center justify-center shadow-glow"
                 animate={{ 
                   boxShadow: [
-                    "0 0 20px rgba(59, 130, 246, 0.3)",
-                    "0 0 40px rgba(59, 130, 246, 0.5)",
-                    "0 0 20px rgba(59, 130, 246, 0.3)"
+                    "0 0 20px rgba(0, 113, 227, 0.3)",
+                    "0 0 40px rgba(0, 113, 227, 0.5)",
+                    "0 0 20px rgba(0, 113, 227, 0.3)"
                   ]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <span className="text-white font-bold text-xl">N</span>
+                <span className="text-white font-bold text-xl">M</span>
               </motion.div>
               <motion.div
                 className="absolute -top-1 -right-1 w-4 h-4 bg-success-500 rounded-full border-2 border-background"

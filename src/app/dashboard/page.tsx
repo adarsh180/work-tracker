@@ -14,6 +14,40 @@ import MistiMotivationCard from '@/components/ui/misti-motivation-card'
 import DailyGoalsCard from '@/components/dashboard/daily-goals-card'
 import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
+import {
+  SparklesIcon,
+  RocketLaunchIcon,
+  ChartBarIcon,
+  AcademicCapIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  HeartIcon,
+  ArrowRightIcon
+} from '@heroicons/react/24/outline'
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15
+    }
+  }
+}
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
@@ -29,7 +63,14 @@ export default function Dashboard() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-white text-xl">Loading your tracker, Misti... 💕</div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <div className="text-foreground text-xl font-medium">Loading your tracker, Misti... 💕</div>
+        </motion.div>
       </div>
     )
   }
@@ -38,6 +79,54 @@ export default function Dashboard() {
     return null
   }
 
+  const quickActions = [
+    {
+      href: '/daily-goals',
+      icon: <ChartBarIcon className="h-6 w-6" />,
+      title: 'Daily Goals',
+      description: 'Track questions & progress',
+      color: 'from-green-500/20 to-emerald-500/20',
+      borderColor: 'border-green-500/30',
+      emoji: '🎯'
+    },
+    {
+      href: '/tests',
+      icon: <AcademicCapIcon className="h-6 w-6" />,
+      title: 'Test Scores',
+      description: 'Record performance',
+      color: 'from-purple-500/20 to-pink-500/20',
+      borderColor: 'border-purple-500/30',
+      emoji: '📊'
+    },
+    {
+      href: '/subjects/physics',
+      icon: <SparklesIcon className="h-6 w-6" />,
+      title: 'Study Now',
+      description: 'Continue learning',
+      color: 'from-blue-500/20 to-cyan-500/20',
+      borderColor: 'border-blue-500/30',
+      emoji: '📚'
+    },
+    {
+      href: '/mood',
+      icon: <HeartIcon className="h-6 w-6" />,
+      title: 'Mood Tracker',
+      description: 'Log your wellbeing',
+      color: 'from-pink-500/20 to-rose-500/20',
+      borderColor: 'border-pink-500/30',
+      emoji: '💖'
+    },
+    {
+      href: '/pomodoro',
+      icon: <ClockIcon className="h-6 w-6" />,
+      title: 'Focus Timer',
+      description: 'Start study session',
+      color: 'from-orange-500/20 to-red-500/20',
+      borderColor: 'border-orange-500/30',
+      emoji: '⏱️'
+    }
+  ]
+
   return (
     <>
       <QuestionMilestoneNotification />
@@ -45,98 +134,176 @@ export default function Dashboard() {
         title={`Welcome back, ${session.user?.name || 'Misti'}! 💕`}
         subtitle="Your comprehensive NEET preparation companion"
       >
-        <div className="space-y-8">
-          {/* Welcome Section */}
-          <div className="glass-effect rounded-xl p-8 text-center relative overflow-hidden">
-            <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: -30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-                className="mb-6"
-              >
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  <span className="text-white">Welcome back, </span>
-                  <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                    My Beautiful Misti
-                  </span>
-                  <span className="inline-block ml-2">💕</span>
-                </h2>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              >
-                <h3 className="text-xl md:text-2xl font-semibold text-white mb-3">
-                  Ready to conquer NEET UG 2026? 🚀
-                </h3>
-                <p className="text-gray-300 text-lg mb-6">
-                  Track your progress, analyze performance, and stay motivated on your journey to medical college.
-                </p>
-              </motion.div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
+        >
+          {/* Hero Welcome Section - Apple-inspired */}
+          <motion.div variants={itemVariants}>
+            <div className="relative overflow-hidden rounded-3xl bg-mesh-gradient">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-purple/10" />
+              <div className="relative glass-effect border-white/[0.08] p-8 md:p-12">
+                <div className="max-w-4xl">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                        className="text-4xl"
+                      >
+                        👋
+                      </motion.div>
+                      <h2 className="text-2xl md:text-3xl font-semibold text-foreground-secondary">
+                        Welcome back,
+                      </h2>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6 gradient-text leading-tight">
+                      {session.user?.name || 'Misti'}
+                    </h1>
+                    <p className="text-lg md:text-xl text-foreground-secondary max-w-2xl leading-relaxed mb-8">
+                      Ready to conquer NEET UG 2026? Track your progress, analyze performance, and stay motivated on your journey to becoming Dr. Misti.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Link href="/insights">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-semibold shadow-card hover:shadow-card-hover transition-all"
+                        >
+                          <RocketLaunchIcon className="h-5 w-5" />
+                          AI Insights
+                        </motion.button>
+                      </Link>
+                      <Link href="/analytics">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="inline-flex items-center gap-2 px-6 py-3 glass-effect rounded-2xl font-semibold text-foreground hover:bg-white/[0.12] transition-all"
+                        >
+                          <ChartBarIcon className="h-5 w-5" />
+                          View Analytics
+                        </motion.button>
+                      </Link>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Motivational Messages */}
-          <MotivationalMessages />
+          <motion.div variants={itemVariants}>
+            <MotivationalMessages />
+          </motion.div>
 
-          {/* Real-time Analytics */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4">📊 Real-time Analytics</h2>
+          {/* Quick Actions Grid - Apple Card Style */}
+          <motion.div variants={itemVariants}>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-foreground">Quick Actions</h2>
+              <motion.div
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <ArrowRightIcon className="h-5 w-5 text-foreground-tertiary" />
+              </motion.div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {quickActions.map((action, index) => (
+                <Link key={action.href} href={action.href}>
+                  <motion.div
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative overflow-hidden rounded-3xl"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-50`} />
+                    <div className={`relative glass-effect border ${action.borderColor} p-6 h-full transition-all`}>
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="p-3 rounded-2xl bg-white/[0.08] group-hover:bg-white/[0.12] transition-all">
+                            {action.icon}
+                          </div>
+                          <motion.span
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
+                            className="text-2xl"
+                          >
+                            {action.emoji}
+                          </motion.span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">
+                          {action.title}
+                        </h3>
+                        <p className="text-sm text-foreground-tertiary mb-4 flex-grow">
+                          {action.description}
+                        </p>
+                        <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                          <span>Open</span>
+                          <ArrowRightIcon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-all" />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Real-time Analytics Section */}
+          <motion.div variants={itemVariants}>
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Real-time Analytics</h2>
+              <p className="text-sm text-foreground-tertiary mt-1">Live performance metrics</p>
+            </div>
             <RealTimeAnalytics />
-          </div>
+          </motion.div>
 
-          {/* Analytics and Progress Overview */}
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            <div className="xl:col-span-3">
-              <SubjectsGrid />
-            </div>
-            <div className="space-y-6">
-              <DailyGoalsCard />
-              <YesterdayPerformance />
-            </div>
-          </div>
+          {/* Main Content Grid - Bento Box Layout */}
+          <motion.div variants={itemVariants}>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+              {/* Subjects Grid - Takes 8 columns */}
+              <div className="xl:col-span-8">
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold text-foreground">Subject Progress</h2>
+                  <p className="text-sm text-foreground-tertiary mt-1">Track your NEET syllabus completion</p>
+                </div>
+                <SubjectsGrid />
+              </div>
 
-          {/* Additional Analytics Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <QuestionAnalyticsCard />
-            <MistiMotivationCard showName={false} />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="glass-effect rounded-xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Link href="/daily-goals" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
-                <h4 className="font-medium text-white mb-2">🎯 Daily Goals</h4>
-                <p className="text-gray-400 text-sm mb-3">Track today's questions, DPPs, and revision progress.</p>
-                <span className="text-primary hover:text-primary-hover text-sm font-medium">Track Progress →</span>
-              </Link>
-              <Link href="/tests" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
-                <h4 className="font-medium text-white mb-2">📊 Add Test Score</h4>
-                <p className="text-gray-400 text-sm mb-3">Record your latest test performance and track improvement.</p>
-                <span className="text-primary hover:text-primary-hover text-sm font-medium">Add Score →</span>
-              </Link>
-              <Link href="/subjects/physics" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
-                <h4 className="font-medium text-white mb-2">📚 Study Physics</h4>
-                <p className="text-gray-400 text-sm mb-3">Continue with physics lectures and DPP.</p>
-                <span className="text-primary hover:text-primary-hover text-sm font-medium">Study Now →</span>
-              </Link>
-              <Link href="/mood" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
-                <h4 className="font-medium text-white mb-2">📅 Track Mood</h4>
-                <p className="text-gray-400 text-sm mb-3">Log your daily mood and maintain mental well-being.</p>
-                <span className="text-primary hover:text-primary-hover text-sm font-medium">Mood Calendar →</span>
-              </Link>
-              <Link href="/pomodoro" className="bg-background-secondary/50 rounded-lg p-4 border border-gray-700 hover:border-primary/30 transition-colors block">
-                <h4 className="font-medium text-white mb-2">🍅 Pomodoro Timer</h4>
-                <p className="text-gray-400 text-sm mb-3">Focus with customizable study sessions and track productivity.</p>
-                <span className="text-primary hover:text-primary-hover text-sm font-medium">Start Timer →</span>
-              </Link>
+              {/* Sidebar - Takes 4 columns */}
+              <div className="xl:col-span-4 space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Today's Goals</h2>
+                  <DailyGoalsCard />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Yesterday</h2>
+                  <YesterdayPerformance />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+
+          {/* Bottom Analytics Row */}
+          <motion.div variants={itemVariants}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Question Analytics</h2>
+                <QuestionAnalyticsCard />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Motivation</h2>
+                <MistiMotivationCard showName={false} />
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       </DashboardLayout>
     </>
   )

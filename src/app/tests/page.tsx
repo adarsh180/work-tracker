@@ -1,203 +1,310 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import DashboardLayout from '@/components/dashboard/dashboard-layout'
 import TestEntryForm from '@/components/tests/test-entry-form'
 import TestPerformanceChart from '@/components/tests/test-performance-chart'
 import TestAnalytics from '@/components/tests/test-analytics'
 import RecentTestsList from '@/components/tests/recent-tests-list'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { 
+  PlusIcon, 
+  ChartBarIcon,
+  AcademicCapIcon,
+  ClockIcon,
+  TrophyIcon,
+  SparklesIcon,
+  CheckCircleIcon,
+  ArrowTrendingUpIcon
+} from '@heroicons/react/24/outline'
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15
+    }
+  }
+}
 
 export default function TestsPage() {
-  const [activeTab, setActiveTab] = useState<'entry' | 'analytics'>('entry')
+  const [activeTab, setActiveTab] = useState<'entry' | 'analytics'>('analytics')
+
+  const testTypes = [
+    {
+      title: 'Weekly Tests',
+      description: 'Regular practice tests to assess weekly progress',
+      icon: <ClockIcon className="h-5 w-5" />,
+      color: 'from-blue-500/20 to-cyan-500/20',
+      borderColor: 'border-blue-500/30'
+    },
+    {
+      title: 'Rank Booster',
+      description: 'Targeted tests for specific topics',
+      icon: <ArrowTrendingUpIcon className="h-5 w-5" />,
+      color: 'from-green-500/20 to-emerald-500/20',
+      borderColor: 'border-green-500/30'
+    },
+    {
+      title: 'Test Series',
+      description: 'Comprehensive subject-wise tests',
+      icon: <AcademicCapIcon className="h-5 w-5" />,
+      color: 'from-purple-500/20 to-pink-500/20',
+      borderColor: 'border-purple-500/30'
+    },
+    {
+      title: 'AITS',
+      description: 'All India Test Series for national ranking',
+      icon: <TrophyIcon className="h-5 w-5" />,
+      color: 'from-yellow-500/20 to-orange-500/20',
+      borderColor: 'border-yellow-500/30'
+    },
+    {
+      title: 'Full Length',
+      description: 'Complete NEET mock tests (720 marks)',
+      icon: <SparklesIcon className="h-5 w-5" />,
+      color: 'from-red-500/20 to-pink-500/20',
+      borderColor: 'border-red-500/30'
+    }
+  ]
+
+  const performanceIndicators = [
+    { range: '< 75%', label: 'Needs Improvement', color: 'bg-red-500', icon: <div className="w-3 h-3 rounded-full bg-red-500" /> },
+    { range: '75-85%', label: 'Good Progress', color: 'bg-orange-500', icon: <div className="w-3 h-3 rounded-full bg-orange-500" /> },
+    { range: '85-95%', label: 'Excellent', color: 'bg-green-500', icon: <div className="w-3 h-3 rounded-full bg-green-500" /> },
+    { range: '> 95%', label: 'Outstanding', color: 'bg-primary', icon: <CheckCircleIcon className="h-4 w-4 text-primary" /> }
+  ]
 
   return (
     <DashboardLayout 
       title="Test Performance"
       subtitle="Track your test scores and analyze performance trends"
     >
-      <div className="space-y-6">
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-background-secondary/50 p-1 rounded-lg">
-          <button
-            onClick={() => setActiveTab('entry')}
-            className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'entry'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            <PlusIcon className="h-4 w-4" />
-            <span>Add Test Score</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-              activeTab === 'analytics'
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:text-white hover:bg-background-secondary'
-            }`}
-          >
-            <ChartBarIcon className="h-4 w-4" />
-            <span>Performance Analytics</span>
-          </button>
-        </div>
-
-        {/* Content */}
-        {activeTab === 'entry' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <TestEntryForm />
-            </div>
-            <div>
-              <Card className="glass-effect border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white">Quick Tips</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-300 text-sm">
-                          <span className="font-medium text-white">Weekly Tests:</span> Regular practice tests to assess weekly progress
-                        </p>
-                      </div>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-6"
+      >
+        {/* Hero Section */}
+        <motion.div variants={itemVariants}>
+          <div className="relative overflow-hidden rounded-3xl bg-mesh-gradient">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-purple/10" />
+            <div className="relative glass-effect border-white/[0.08] p-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-3 rounded-2xl bg-primary/20">
+                      <ChartBarIcon className="h-8 w-8 text-primary" />
                     </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-300 text-sm">
-                          <span className="font-medium text-white">Rank Booster:</span> Targeted tests for specific topics
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-300 text-sm">
-                          <span className="font-medium text-white">Test Series:</span> Comprehensive subject-wise tests
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-300 text-sm">
-                          <span className="font-medium text-white">AITS:</span> All India Test Series for national ranking
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-300 text-sm">
-                          <span className="font-medium text-white">Full Length:</span> Complete NEET mock tests (720 marks)
-                        </p>
-                      </div>
+                    <div>
+                      <h1 className="text-3xl font-bold gradient-text">Test Performance</h1>
+                      <p className="text-foreground-tertiary mt-1">Track scores and analyze trends</p>
                     </div>
                   </div>
-                  
-                  <div className="border-t border-gray-700 pt-4">
-                    <h4 className="text-white font-medium mb-2">Performance Indicators</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">😢</span>
-                        <span className="text-gray-400">&lt; 75%</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">😟</span>
-                        <span className="text-gray-400">75-85%</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">😊</span>
-                        <span className="text-gray-400">85-95%</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">😘</span>
-                        <span className="text-gray-400">&gt; 95%</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="hidden md:block"
+                >
+                  <TrophyIcon className="h-16 w-16 text-primary/30" />
+                </motion.div>
+              </div>
             </div>
           </div>
-        )}
+        </motion.div>
 
-        {activeTab === 'analytics' && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
-          >
-            {/* Enhanced Analytics Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-center space-y-4"
+        {/* Tab Navigation - Apple Style */}
+        <motion.div variants={itemVariants}>
+          <div className="glass-effect rounded-2xl p-2 inline-flex gap-2">
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`relative px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === 'analytics'
+                  ? 'text-white'
+                  : 'text-foreground-tertiary hover:text-foreground'
+              }`}
             >
-              <div className="flex items-center justify-center gap-4">
+              {activeTab === 'analytics' && (
                 <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{
-                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 2, repeat: Infinity }
-                  }}
-                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 flex items-center justify-center shadow-glow"
-                >
-                  <ChartBarIcon className="h-6 w-6 text-white" />
-                </motion.div>
-                
-                <div>
-                  <motion.h2 
-                    className="text-2xl md:text-3xl font-bold gradient-text"
-                    animate={{
-                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    style={{
-                      backgroundSize: '200% 200%',
-                    }}
-                  >
-                    Performance Analytics Dashboard
-                  </motion.h2>
-                  <p className="text-foreground-secondary mt-1">
-                    Track your NEET preparation progress with detailed insights
-                  </p>
-                </div>
+                  layoutId="activeTab"
+                  className="absolute inset-0 bg-primary rounded-xl"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                <ChartBarIcon className="h-5 w-5" />
+                Analytics
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('entry')}
+              className={`relative px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === 'entry'
+                  ? 'text-white'
+                  : 'text-foreground-tertiary hover:text-foreground'
+              }`}
+            >
+              {activeTab === 'entry' && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-0 bg-primary rounded-xl"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                <PlusIcon className="h-5 w-5" />
+                Add Score
+              </span>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'entry' && (
+            <motion.div
+              key="entry"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {/* Form - Takes 2 columns */}
+              <div className="lg:col-span-2">
+                <TestEntryForm />
+              </div>
+
+              {/* Sidebar - Takes 1 column */}
+              <div className="space-y-6">
+                {/* Test Types Card */}
+                <Card variant="premium" hover="both" asMotion>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <AcademicCapIcon className="h-5 w-5 text-primary" />
+                      Test Types
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {testTypes.map((type, index) => (
+                        <motion.div
+                          key={type.title}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`relative overflow-hidden rounded-2xl`}
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-br ${type.color}`} />
+                          <div className={`relative glass-effect border ${type.borderColor} p-4`}>
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 rounded-xl bg-white/[0.08]">
+                                {type.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground text-sm mb-1">
+                                  {type.title}
+                                </h4>
+                                <p className="text-xs text-foreground-tertiary leading-relaxed">
+                                  {type.description}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Performance Indicators */}
+                <Card variant="premium" hover="both" asMotion>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <SparklesIcon className="h-5 w-5 text-primary" />
+                      Performance Scale
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {performanceIndicators.map((indicator, index) => (
+                        <motion.div
+                          key={indicator.range}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center justify-between p-3 rounded-xl glass-effect"
+                        >
+                          <div className="flex items-center gap-3">
+                            {indicator.icon}
+                            <div>
+                              <div className="text-sm font-semibold text-foreground">
+                                {indicator.range}
+                              </div>
+                              <div className="text-xs text-foreground-tertiary">
+                                {indicator.label}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </motion.div>
+          )}
 
-            {/* Analytics Cards */}
-            <TestAnalytics />
-            
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-              {/* Main Performance Chart - Takes 2 columns */}
-              <div className="xl:col-span-2">
-                <TestPerformanceChart />
-              </div>
+          {activeTab === 'analytics' && (
+            <motion.div
+              key="analytics"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="space-y-6"
+            >
+              {/* Analytics Cards */}
+              <motion.div variants={itemVariants}>
+                <TestAnalytics />
+              </motion.div>
               
-              {/* Recent Tests List - Takes 1 column */}
-              <div className="xl:col-span-1">
-                <RecentTestsList />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
+              {/* Charts Section - Bento Layout */}
+              <motion.div variants={itemVariants}>
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  {/* Main Performance Chart - Takes 2 columns */}
+                  <div className="xl:col-span-2">
+                    <TestPerformanceChart />
+                  </div>
+                  
+                  {/* Recent Tests List - Takes 1 column */}
+                  <div className="xl:col-span-1">
+                    <RecentTestsList />
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </DashboardLayout>
   )
 }
