@@ -76,10 +76,10 @@ export default function AIRPredictionDashboard() {
   }
 
   const getAIRColor = (air: number) => {
-    if (air <= 50) return 'text-green-400'
-    if (air <= 100) return 'text-yellow-400'
-    if (air <= 500) return 'text-orange-400'
-    return 'text-red-400'
+    if (air <= 50) return 'text-green-500'
+    if (air <= 100) return 'text-yellow-500'
+    if (air <= 500) return 'text-orange-500'
+    return 'text-red-500'
   }
 
   if (isLoading) {
@@ -192,10 +192,10 @@ export default function AIRPredictionDashboard() {
               <div className="mb-4">
                 <RocketLaunchIcon className="h-8 w-8 text-primary mx-auto" />
               </div>
-              <div className={`text-5xl font-bold mb-3 ${getAIRColor(prediction.predictedAIR)}`}>
+              <div className={`text-6xl font-bold mb-3 ${getAIRColor(prediction.predictedAIR)} drop-shadow-glow`}>
                 <AnimatedCounter value={prediction.predictedAIR} />
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">Predicted AIR</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">Predicted AIR</div>
               <div className="text-xs text-foreground-tertiary">
                 {prediction.predictedAIR <= 50 ? 'Target Achieved!' : 
                  prediction.predictedAIR <= 100 ? 'Very Close!' : 
@@ -217,10 +217,10 @@ export default function AIRPredictionDashboard() {
                   showValue={false}
                 />
               </div>
-              <div className="text-5xl font-bold text-primary mb-3">
+              <div className="text-6xl font-bold text-primary mb-3 drop-shadow-glow">
                 {Math.round(prediction.confidence * 100)}%
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">Confidence</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">Confidence</div>
               <div className="text-xs text-foreground-tertiary">
                 {prediction.confidence > 0.8 ? 'High Accuracy' : 
                  prediction.confidence > 0.6 ? 'Good Accuracy' : 'Moderate Accuracy'}

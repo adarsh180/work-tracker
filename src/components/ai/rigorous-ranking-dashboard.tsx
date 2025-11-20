@@ -138,35 +138,40 @@ export default function RigorousRankingDashboard() {
       icon: <TrophyIcon className="h-8 w-8" />, 
       label: 'LEGENDARY',
       bg: 'from-yellow-500/20 to-orange-500/20',
-      border: 'border-yellow-500/30'
+      border: 'border-yellow-500/30',
+      textColor: 'text-yellow-500'
     }
     if (percentile >= 99) return { 
       gradient: 'from-green-500 to-emerald-500', 
       icon: <StarIcon className="h-8 w-8" />, 
       label: 'ELITE',
       bg: 'from-green-500/20 to-emerald-500/20',
-      border: 'border-green-500/30'
+      border: 'border-green-500/30',
+      textColor: 'text-green-500'
     }
     if (percentile >= 95) return { 
       gradient: 'from-blue-500 to-cyan-500', 
       icon: <RocketLaunchIcon className="h-8 w-8" />, 
       label: 'EXCELLENT',
       bg: 'from-blue-500/20 to-cyan-500/20',
-      border: 'border-blue-500/30'
+      border: 'border-blue-500/30',
+      textColor: 'text-blue-500'
     }
     if (percentile >= 90) return { 
       gradient: 'from-purple-500 to-pink-500', 
       icon: <SparklesIcon className="h-8 w-8" />, 
       label: 'GREAT',
       bg: 'from-purple-500/20 to-pink-500/20',
-      border: 'border-purple-500/30'
+      border: 'border-purple-500/30',
+      textColor: 'text-purple-500'
     }
     return { 
       gradient: 'from-gray-500 to-gray-600', 
       icon: <BoltIcon className="h-8 w-8" />, 
       label: 'GOOD',
       bg: 'from-gray-500/20 to-gray-600/20',
-      border: 'border-gray-500/30'
+      border: 'border-gray-500/30',
+      textColor: 'text-gray-500'
     }
   }
 
@@ -214,10 +219,10 @@ export default function RigorousRankingDashboard() {
               <div className="mb-4">
                 {rankConfig.icon}
               </div>
-              <div className={`text-5xl font-bold mb-3 bg-gradient-to-r ${rankConfig.gradient} bg-clip-text text-transparent`}>
+              <div className={`text-6xl font-bold mb-3 ${rankConfig.textColor} drop-shadow-glow`}>
                 #<AnimatedCounter value={ranking.currentRank || 0} />
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">Overall Rank</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">Overall Rank</div>
               <div className="text-xs text-foreground-tertiary">
                 Top {ranking.percentile}%
               </div>
@@ -231,10 +236,10 @@ export default function RigorousRankingDashboard() {
               <div className="mb-4">
                 <UsersIcon className="h-8 w-8 text-blue-500 mx-auto" />
               </div>
-              <div className="text-5xl font-bold text-blue-500 mb-3">
+              <div className="text-6xl font-bold text-blue-500 mb-3 drop-shadow-glow">
                 #<AnimatedCounter value={ranking.categoryRank || 0} />
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">Category Rank</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">Category Rank</div>
               <div className="text-xs text-foreground-tertiary">General Category</div>
             </motion.div>
 
@@ -246,10 +251,10 @@ export default function RigorousRankingDashboard() {
               <div className="mb-4">
                 <AcademicCapIcon className="h-8 w-8 text-green-500 mx-auto" />
               </div>
-              <div className="text-5xl font-bold text-green-500 mb-3">
+              <div className="text-6xl font-bold text-green-500 mb-3 drop-shadow-glow">
                 #<AnimatedCounter value={ranking.stateRank || 0} />
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">State Rank</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">State Rank</div>
               <div className="text-xs text-foreground-tertiary">Within State</div>
             </motion.div>
 
@@ -267,10 +272,10 @@ export default function RigorousRankingDashboard() {
                   showValue={false}
                 />
               </div>
-              <div className="text-5xl font-bold text-accent-purple-500 mb-3">
+              <div className="text-6xl font-bold text-accent-purple mb-3 drop-shadow-glow">
                 {ranking.percentile || 0}%
               </div>
-              <div className="text-sm font-semibold text-foreground mb-2">Percentile</div>
+              <div className="text-sm font-semibold text-foreground-secondary mb-2">Percentile</div>
               <div className="text-xs text-foreground-tertiary">
                 {ranking.currentRank <= 50 ? 'AIR Target!' : 
                  ranking.currentRank <= 1000 ? 'Excellent!' : 

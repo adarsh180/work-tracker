@@ -18,7 +18,6 @@ import {
   CheckCircleIcon,
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline'
-import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -190,8 +189,7 @@ export default function TestsPage() {
               className="space-y-6"
             >
               {/* Test Types Grid - Full Width */}
-              <ScrollReveal variant="fadeInUp" delay={0.1}>
-                <Card variant="premium" hover="both" asMotion>
+              <Card variant="premium" hover="both" asMotion>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
                       <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
@@ -206,11 +204,10 @@ export default function TestsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ScrollRevealStagger staggerDelay={0.05}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {testTypes.map((type, index) => (
-                          <ScrollRevealItem key={type.title}>
-                            <motion.div
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      {testTypes.map((type, index) => (
+                        <motion.div
+                          key={type.title}
                               whileHover={{ scale: 1.05, y: -4 }}
                               whileTap={{ scale: 0.98 }}
                               className="relative overflow-hidden rounded-2xl cursor-pointer group"
@@ -230,28 +227,22 @@ export default function TestsPage() {
                                     </p>
                                   </div>
                                 </div>
-                              </div>
-                            </motion.div>
-                          </ScrollRevealItem>
+                            </div>
+                          </motion.div>
                         ))}
-                      </div>
-                    </ScrollRevealStagger>
+                    </div>
                   </CardContent>
                 </Card>
-              </ScrollReveal>
 
               {/* Form and Performance Scale - Side by Side */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Form - Takes 2 columns */}
-                <ScrollReveal variant="fadeInUp" delay={0.2}>
-                  <div className="xl:col-span-2">
-                    <TestEntryForm />
-                  </div>
-                </ScrollReveal>
+                <div className="xl:col-span-2">
+                  <TestEntryForm />
+                </div>
 
                 {/* Performance Scale - Takes 1 column */}
-                <ScrollReveal variant="fadeInUp" delay={0.3}>
-                  <div>
+                <div>
                     <Card variant="premium" hover="both" asMotion>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
@@ -267,11 +258,10 @@ export default function TestsPage() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <ScrollRevealStagger staggerDelay={0.08}>
-                          <div className="space-y-3">
-                            {performanceIndicators.map((indicator, index) => (
-                              <ScrollRevealItem key={indicator.range}>
-                                <motion.div
+                        <div className="space-y-3">
+                          {performanceIndicators.map((indicator, index) => (
+                            <motion.div
+                              key={indicator.range}
                                   whileHover={{ scale: 1.02, x: 4 }}
                                   className="flex items-center justify-between p-4 rounded-2xl glass-effect border border-white/[0.08] group cursor-pointer"
                                 >
@@ -288,16 +278,13 @@ export default function TestsPage() {
                                       </div>
                                     </div>
                                   </div>
-                                  <div className={`w-2 h-2 rounded-full ${indicator.color} animate-pulse`} />
-                                </motion.div>
-                              </ScrollRevealItem>
+                                <div className={`w-2 h-2 rounded-full ${indicator.color} animate-pulse`} />
+                              </motion.div>
                             ))}
-                          </div>
-                        </ScrollRevealStagger>
+                        </div>
                       </CardContent>
                     </Card>
-                  </div>
-                </ScrollReveal>
+                </div>
               </div>
             </motion.div>
           )}
@@ -312,15 +299,12 @@ export default function TestsPage() {
               className="space-y-6"
             >
               {/* Analytics Cards */}
-              <ScrollReveal variant="fadeInUp" delay={0.1}>
-                <motion.div variants={itemVariants}>
-                  <TestAnalytics />
-                </motion.div>
-              </ScrollReveal>
+              <motion.div variants={itemVariants}>
+                <TestAnalytics />
+              </motion.div>
               
               {/* Charts Section - Bento Layout */}
-              <ScrollReveal variant="fadeInUp" delay={0.2}>
-                <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants}>
                   <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     {/* Main Performance Chart - Takes 2 columns */}
                     <div className="xl:col-span-2">
@@ -331,9 +315,8 @@ export default function TestsPage() {
                     <div className="xl:col-span-1">
                       <RecentTestsList />
                     </div>
-                  </div>
-                </motion.div>
-              </ScrollReveal>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

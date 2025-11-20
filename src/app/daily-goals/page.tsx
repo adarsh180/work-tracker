@@ -27,7 +27,6 @@ import {
   AcademicCapIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline'
-import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 
 type TabKey = 'today' | 'stats' | 'history'
 
@@ -301,11 +300,9 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Hero Stats Row */}
-        <ScrollRevealStagger staggerDelay={0.1}>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {dailyTargets.map((target, index) => (
-              <ScrollRevealItem key={target.label}>
-                <motion.div
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {dailyTargets.map((target, index) => (
+            <motion.div
               key={target.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -338,16 +335,13 @@ export default function DailyGoalsPage() {
                     {target.description}
                   </div>
                 </div>
-              </div>
-                </motion.div>
-              </ScrollRevealItem>
-            ))}
-          </div>
-        </ScrollRevealStagger>
+            </div>
+            </motion.div>
+          ))}
+        </div>
 
         {/* Main Content Grid */}
-        <ScrollReveal variant="fadeInUp" delay={0.2}>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             {/* Form Section - Takes 2 columns */}
             <div className="xl:col-span-2">
               <DailyGoalsForm />
@@ -371,10 +365,9 @@ export default function DailyGoalsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <ScrollRevealStagger staggerDelay={0.08}>
-                    {performanceLevels.map((level, index) => (
-                      <ScrollRevealItem key={level.label}>
-                        <motion.div
+                  {performanceLevels.map((level, index) => (
+                    <motion.div
+                      key={level.label}
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
@@ -406,17 +399,14 @@ export default function DailyGoalsPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                        </motion.div>
-                      </ScrollRevealItem>
-                    ))}
-                  </ScrollRevealStagger>
+                    </div>
+                    </motion.div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-            </div>
           </div>
-        </ScrollReveal>
+        </div>
       </motion.div>
     )
   }
@@ -432,14 +422,10 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Heatmap Hero */}
-        <ScrollReveal variant="fadeInUp" delay={0.1}>
-          <QuestionHeatmap />
-        </ScrollReveal>
+        <QuestionHeatmap />
         
         {/* Stats Grid */}
-        <ScrollReveal variant="fadeInUp" delay={0.2}>
-          <QuestionStats />
-        </ScrollReveal>
+        <QuestionStats />
       </motion.div>
     )
   }
@@ -455,19 +441,13 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Full-Size Heatmap */}
-        <ScrollReveal variant="fadeInUp" delay={0.1}>
-          <QuestionHeatmap />
-        </ScrollReveal>
+        <QuestionHeatmap />
         
         {/* Charts Section */}
-        <ScrollReveal variant="fadeInUp" delay={0.2}>
-          <DailyGoalsCharts />
-        </ScrollReveal>
+        <DailyGoalsCharts />
         
         {/* Recent Activity */}
-        <ScrollReveal variant="fadeInUp" delay={0.3}>
-          <RecentGoals />
-        </ScrollReveal>
+        <RecentGoals />
       </motion.div>
     )
   }
