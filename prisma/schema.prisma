@@ -566,3 +566,5 @@ model DailyWisdom {
 
   @@map("daily_wisdom")
 }
+
+

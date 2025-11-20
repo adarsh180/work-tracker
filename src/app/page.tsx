@@ -25,6 +25,7 @@ import { SpiritualBalanceSystem } from '@/components/spiritual/balance-system'
 import { DailyWisdom } from '@/components/spiritual/daily-wisdom'
 import QuestionHeatmap from '@/components/daily-goals/question-heatmap'
 
+
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()

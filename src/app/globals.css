@@ -7,13 +7,22 @@
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     
-    /* Apple-inspired CSS custom properties */
+    /* Apple-inspired CSS custom properties - Ultra Smooth */
     --glass-opacity: 0.72;
     --blur-strength: 20px;
     --animation-speed: 1;
     --glow-intensity: 0.4;
-    --spring-duration: 0.5s;
+    --spring-duration: 0.35s;
     --spring-easing: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  /* Force GPU acceleration on all elements */
+  *,
+  *::before,
+  *::after {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   * {
@@ -23,6 +32,11 @@
   html {
     scroll-behavior: smooth;
     font-size: 16px;
+    overflow-x: hidden;
+    /* Enable smooth scrolling with momentum */
+    -webkit-overflow-scrolling: touch;
+    /* Optimize rendering */
+    text-rendering: optimizeSpeed;
   }
 
   body {
@@ -34,6 +48,30 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     letter-spacing: -0.01em;
+    overflow-x: hidden;
+    /* Force GPU layer */
+    transform: translateZ(0);
+    /* Optimize repaints */
+    backface-visibility: hidden;
+  }
+
+  /* Optimize all animated elements */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent text selection lag */
+    -webkit-touch-callout: none;
+  }
+
+  /* Smooth scrolling for all scrollable elements */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  /* Optimize images and media */
+  img, video, canvas, svg {
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast;
   }
 
   /* Apple-style focus rings */
@@ -55,21 +93,35 @@
 }
 
 @layer components {
-  /* Apple-inspired Glass Effects */
+  /* Apple-inspired Glass Effects - Ultra Smooth */
   .glass-effect {
     @apply bg-background-glass backdrop-blur-xl border border-white/[0.08] shadow-card;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-    transition: all var(--spring-duration) var(--spring-easing);
+    transition: transform var(--spring-duration) var(--ease-out-expo),
+                opacity var(--spring-duration) var(--ease-out-expo),
+                box-shadow var(--spring-duration) var(--ease-out-expo);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   .glass-card {
     @apply glass-effect rounded-3xl p-6 hover:shadow-card-hover hover:border-white/[0.12] hover:bg-background-elevated/80;
-    transition: all var(--spring-duration) var(--spring-easing);
+    transition: transform var(--spring-duration) var(--ease-out-expo),
+                box-shadow var(--spring-duration) var(--ease-out-expo),
+                border-color var(--spring-duration) var(--ease-out-expo);
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    contain: layout style paint;
   }
 
   .glass-button {
     @apply glass-effect rounded-2xl px-6 py-3 hover:bg-white/[0.12] active:scale-[0.98];
-    transition: all 0.2s var(--spring-easing);
+    transition: transform 0.15s var(--ease-out-expo),
+                background-color 0.15s var(--ease-out-expo);
+    transform: translate3d(0, 0, 0);
+    touch-action: manipulation;
   }
 
   /* Neumorphic Effects */
@@ -100,43 +152,52 @@
     font-weight: 600;
   }
 
-  /* Apple-inspired Premium Cards */
+  /* Apple-inspired Premium Cards - Optimized */
   .premium-card {
     @apply glass-card hover:shadow-card-hover hover:scale-[1.01];
     background: linear-gradient(135deg, rgba(0, 113, 227, 0.04) 0%, rgba(191, 90, 242, 0.04) 100%);
     transition: all var(--spring-duration) var(--spring-easing);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .hero-card {
     @apply premium-card relative overflow-hidden;
+    contain: layout style paint;
   }
 
   .hero-card::before {
     content: '';
     @apply absolute inset-0 bg-gradient-to-r from-primary/[0.08] via-transparent to-accent-purple-500/[0.08] opacity-0;
     transition: opacity var(--spring-duration) var(--spring-easing);
+    will-change: opacity;
   }
 
   .hero-card:hover::before {
     @apply opacity-100;
   }
 
-  /* Apple-style Interactive Elements */
+  /* Apple-style Interactive Elements - Ultra Responsive */
   .interactive-element {
     @apply cursor-pointer;
-    transition: all 0.2s var(--spring-easing);
+    transition: transform 0.15s var(--ease-out-expo);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   .interactive-element:hover {
-    transform: scale(1.02) translateY(-1px);
+    transform: translate3d(0, -2px, 0) scale(1.02);
   }
 
   .interactive-element:active {
-    transform: scale(0.98);
+    transform: translate3d(0, 0, 0) scale(0.98);
+    transition-duration: 0.1s;
   }
 
   .glow-on-hover {
-    transition: all var(--spring-duration) var(--spring-easing);
+    transition: box-shadow 0.25s var(--ease-out-expo);
+    will-change: box-shadow;
   }
 
   .glow-on-hover:hover {
@@ -263,14 +324,33 @@
     animation-delay: 300ms;
   }
 
-  /* Transform Utilities */
+  /* Transform Utilities - GPU Acceleration */
   .transform-gpu {
     transform: translate3d(0, 0, 0);
+    will-change: transform;
   }
 
-  /* Backdrop Utilities */
+  /* Smooth Scrolling Optimization */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* GPU Accelerated Animations - Maximum Performance */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    will-change: transform;
+  }
+
+  /* Backdrop Utilities - Optimized */
   .backdrop-blur-glass {
     backdrop-filter: blur(var(--blur-strength)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength)) saturate(180%);
+    transform: translateZ(0);
   }
 
   /* Text Utilities */
@@ -280,5 +360,29 @@
 
   .text-glow {
     text-shadow: 0 0 10px currentColor;
+  }
+
+  /* Performance Optimization - Maximum */
+  .optimize-performance {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
+  /* Smooth hover transitions */
+  .smooth-hover {
+    transition: transform 0.2s var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  .smooth-hover:hover {
+    transform: translate3d(0, -2px, 0);
+  }
+
+  /* Remove animation jank */
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      scroll-behavior: smooth;
+    }
   }
 }
