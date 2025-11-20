@@ -27,6 +27,7 @@ import {
   AcademicCapIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline'
+import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 
 type TabKey = 'today' | 'stats' | 'history'
 
@@ -300,9 +301,11 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Hero Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {dailyTargets.map((target, index) => (
-            <motion.div
+        <ScrollRevealStagger staggerDelay={0.1}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {dailyTargets.map((target, index) => (
+              <ScrollRevealItem key={target.label}>
+                <motion.div
               key={target.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -336,19 +339,22 @@ export default function DailyGoalsPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
+                </motion.div>
+              </ScrollRevealItem>
+            ))}
+          </div>
+        </ScrollRevealStagger>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Form Section - Takes 2 columns */}
-          <div className="xl:col-span-2">
-            <DailyGoalsForm />
-          </div>
+        <ScrollReveal variant="fadeInUp" delay={0.2}>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Form Section - Takes 2 columns */}
+            <div className="xl:col-span-2">
+              <DailyGoalsForm />
+            </div>
 
-          {/* Performance Scale - Takes 1 column */}
-          <div>
+            {/* Performance Scale - Takes 1 column */}
+            <div>
             <Card variant="premium" hover="both" asMotion>
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
@@ -365,15 +371,16 @@ export default function DailyGoalsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {performanceLevels.map((level, index) => (
-                    <motion.div
-                      key={level.label}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02, x: 4 }}
-                      className="relative overflow-hidden rounded-2xl group cursor-pointer"
-                    >
+                  <ScrollRevealStagger staggerDelay={0.08}>
+                    {performanceLevels.map((level, index) => (
+                      <ScrollRevealItem key={level.label}>
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.02, x: 4 }}
+                          className="relative overflow-hidden rounded-2xl group cursor-pointer"
+                        >
                       <div className={`absolute inset-0 bg-gradient-to-r ${level.gradient}`} />
                       <div className={`relative glass-effect border ${level.borderColor} p-4`}>
                         <div className="flex items-center gap-4">
@@ -400,13 +407,16 @@ export default function DailyGoalsPage() {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
+                        </motion.div>
+                      </ScrollRevealItem>
+                    ))}
+                  </ScrollRevealStagger>
                 </div>
               </CardContent>
             </Card>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </motion.div>
     )
   }
@@ -422,10 +432,14 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Heatmap Hero */}
-        <QuestionHeatmap />
+        <ScrollReveal variant="fadeInUp" delay={0.1}>
+          <QuestionHeatmap />
+        </ScrollReveal>
         
         {/* Stats Grid */}
-        <QuestionStats />
+        <ScrollReveal variant="fadeInUp" delay={0.2}>
+          <QuestionStats />
+        </ScrollReveal>
       </motion.div>
     )
   }
@@ -441,13 +455,19 @@ export default function DailyGoalsPage() {
         className="space-y-6"
       >
         {/* Full-Size Heatmap */}
-        <QuestionHeatmap />
+        <ScrollReveal variant="fadeInUp" delay={0.1}>
+          <QuestionHeatmap />
+        </ScrollReveal>
         
         {/* Charts Section */}
-        <DailyGoalsCharts />
+        <ScrollReveal variant="fadeInUp" delay={0.2}>
+          <DailyGoalsCharts />
+        </ScrollReveal>
         
         {/* Recent Activity */}
-        <RecentGoals />
+        <ScrollReveal variant="fadeInUp" delay={0.3}>
+          <RecentGoals />
+        </ScrollReveal>
       </motion.div>
     )
   }

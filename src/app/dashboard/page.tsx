@@ -14,6 +14,7 @@ import MistiMotivationCard from '@/components/ui/misti-motivation-card'
 import DailyGoalsCard from '@/components/dashboard/daily-goals-card'
 import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
+import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 import {
   SparklesIcon,
   RocketLaunchIcon,
@@ -198,30 +199,35 @@ export default function Dashboard() {
           </motion.div>
 
           {/* Motivational Messages */}
-          <motion.div variants={itemVariants}>
-            <MotivationalMessages />
-          </motion.div>
+          <ScrollReveal variant="fadeInUp" delay={0.2}>
+            <motion.div variants={itemVariants}>
+              <MotivationalMessages />
+            </motion.div>
+          </ScrollReveal>
 
           {/* Quick Actions Grid - Apple Card Style */}
-          <motion.div variants={itemVariants}>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-foreground">Quick Actions</h2>
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <ArrowRightIcon className="h-5 w-5 text-foreground-tertiary" />
-              </motion.div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <ScrollReveal variant="fadeInUp" delay={0.3}>
+            <motion.div variants={itemVariants}>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-foreground">Quick Actions</h2>
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <ArrowRightIcon className="h-5 w-5 text-foreground-tertiary" />
+                </motion.div>
+              </div>
+              <ScrollRevealStagger staggerDelay={0.1}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {quickActions.map((action, index) => (
-                <Link key={action.href} href={action.href}>
-                  <motion.div
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.02, y: -4 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group relative overflow-hidden rounded-3xl"
-                  >
+                <ScrollRevealItem key={action.href}>
+                  <Link href={action.href}>
+                    <motion.div
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.02, y: -4 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="group relative overflow-hidden rounded-3xl"
+                    >
                     <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-50`} />
                     <div className={`relative glass-effect border ${action.borderColor} p-6 h-full transition-all`}>
                       <div className="flex flex-col h-full">
@@ -251,22 +257,28 @@ export default function Dashboard() {
                     </div>
                   </motion.div>
                 </Link>
+              </ScrollRevealItem>
               ))}
-            </div>
-          </motion.div>
+              </div>
+            </ScrollRevealStagger>
+            </motion.div>
+          </ScrollReveal>
 
           {/* Real-time Analytics Section */}
-          <motion.div variants={itemVariants}>
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-foreground">Real-time Analytics</h2>
-              <p className="text-sm text-foreground-tertiary mt-1">Live performance metrics</p>
-            </div>
-            <RealTimeAnalytics />
-          </motion.div>
+          <ScrollReveal variant="fadeInUp" delay={0.1}>
+            <motion.div variants={itemVariants}>
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold text-foreground">Real-time Analytics</h2>
+                <p className="text-sm text-foreground-tertiary mt-1">Live performance metrics</p>
+              </div>
+              <RealTimeAnalytics />
+            </motion.div>
+          </ScrollReveal>
 
           {/* Main Content Grid - Bento Box Layout */}
-          <motion.div variants={itemVariants}>
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <ScrollReveal variant="fadeInUp" delay={0.2}>
+            <motion.div variants={itemVariants}>
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
               {/* Subjects Grid - Takes 8 columns */}
               <div className="xl:col-span-8">
                 <div className="mb-4">
@@ -288,10 +300,12 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </ScrollReveal>
 
           {/* Bottom Analytics Row */}
-          <motion.div variants={itemVariants}>
+          <ScrollReveal variant="fadeInUp" delay={0.1}>
+            <motion.div variants={itemVariants}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-4">Question Analytics</h2>
@@ -302,7 +316,8 @@ export default function Dashboard() {
                 <MistiMotivationCard showName={false} />
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </ScrollReveal>
         </motion.div>
       </DashboardLayout>
     </>

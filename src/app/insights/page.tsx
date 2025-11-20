@@ -29,6 +29,7 @@ import {
   ChartBarIcon,
   TrophyIcon
 } from '@heroicons/react/24/outline'
+import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 
 type TabKey = 'prediction' | 'biology' | 'cycle-schedule' | 'energy-prediction' | 'study-techniques' | 'hormonal' | 'emergency' | 'ai-suggestions' | 'schedule' | 'memory' | 'progress' | 'competitive'
 
@@ -241,19 +242,22 @@ export default function InsightsPage() {
         </motion.div>
 
         {/* Premium Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-          className="glass-card p-2"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        <ScrollReveal variant="fadeInUp" delay={0.2}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="glass-card p-2"
+          >
+            <ScrollRevealStagger staggerDelay={0.05}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {tabs.map((tab, index) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.key
 
               return (
-                <motion.button
+                <ScrollRevealItem key={tab.key}>
+                  <motion.button
                   key={tab.key}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -343,20 +347,24 @@ export default function InsightsPage() {
                       bg-gradient-to-br ${tab.color} opacity-20
                     `} />
                   </div>
-                </motion.button>
+                  </motion.button>
+                </ScrollRevealItem>
               )
             })}
-          </div>
-        </motion.div>
+              </div>
+            </ScrollRevealStagger>
+          </motion.div>
+        </ScrollReveal>
 
         {/* Active Tab Indicator */}
         {activeTabData && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="text-center"
-          >
+          <ScrollReveal variant="fadeIn" delay={0.1}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-center"
+            >
             <div className={`inline-flex items-center gap-3 glass-effect px-6 py-3 rounded-2xl border bg-gradient-to-r ${activeTabData.color} bg-opacity-10`}>
               <span className="text-2xl">{activeTabData.emoji}</span>
               <div>
@@ -364,18 +372,20 @@ export default function InsightsPage() {
                 <div className="text-sm text-foreground-secondary">{activeTabData.description}</div>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </ScrollReveal>
         )}
 
         {/* Content with Enhanced Transitions */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -40, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-          >
+          <ScrollReveal variant="fadeInUp" delay={0.1}>
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -40, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
             {activeTab === 'prediction' && (
               <div className="space-y-6">
                 <AIRPredictionDashboard />
@@ -393,7 +403,8 @@ export default function InsightsPage() {
             {activeTab === 'memory' && <MemoryRetentionSystem />}
             {activeTab === 'progress' && <ProgressAnalytics />}
             {activeTab === 'competitive' && <CompetitiveEdgeSystem />}
-          </motion.div>
+            </motion.div>
+          </ScrollReveal>
         </AnimatePresence>
       </motion.div>
     </DashboardLayout>

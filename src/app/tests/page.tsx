@@ -18,6 +18,7 @@ import {
   CheckCircleIcon,
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline'
+import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from '@/components/ui/scroll-reveal'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -186,89 +187,117 @@ export default function TestsPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ type: "spring", stiffness: 100, damping: 20 }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+              className="space-y-6"
             >
-              {/* Form - Takes 2 columns */}
-              <div className="lg:col-span-2">
-                <TestEntryForm />
-              </div>
-
-              {/* Sidebar - Takes 1 column */}
-              <div className="space-y-6">
-                {/* Test Types Card */}
+              {/* Test Types Grid - Full Width */}
+              <ScrollReveal variant="fadeInUp" delay={0.1}>
                 <Card variant="premium" hover="both" asMotion>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AcademicCapIcon className="h-5 w-5 text-primary" />
-                      Test Types
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                        <AcademicCapIcon className="h-6 w-6 text-purple-500" />
+                      </div>
+                      <div>
+                        <div className="gradient-text text-lg">Test Types</div>
+                        <div className="text-xs text-foreground-tertiary font-normal mt-1">
+                          Select the type of test you want to record
+                        </div>
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {testTypes.map((type, index) => (
-                        <motion.div
-                          key={type.title}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className={`relative overflow-hidden rounded-2xl`}
-                        >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${type.color}`} />
-                          <div className={`relative glass-effect border ${type.borderColor} p-4`}>
-                            <div className="flex items-start gap-3">
-                              <div className="p-2 rounded-xl bg-white/[0.08]">
-                                {type.icon}
+                    <ScrollRevealStagger staggerDelay={0.05}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {testTypes.map((type, index) => (
+                          <ScrollRevealItem key={type.title}>
+                            <motion.div
+                              whileHover={{ scale: 1.05, y: -4 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="relative overflow-hidden rounded-2xl cursor-pointer group"
+                            >
+                              <div className={`absolute inset-0 bg-gradient-to-br ${type.color} opacity-50`} />
+                              <div className={`relative glass-effect border ${type.borderColor} p-5 h-full`}>
+                                <div className="flex flex-col items-center text-center space-y-3">
+                                  <div className="p-4 rounded-2xl bg-white/[0.08] group-hover:bg-white/[0.16] transition-all">
+                                    {type.icon}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-foreground text-sm mb-1">
+                                      {type.title}
+                                    </h4>
+                                    <p className="text-xs text-foreground-tertiary leading-relaxed">
+                                      {type.description}
+                                    </p>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-foreground text-sm mb-1">
-                                  {type.title}
-                                </h4>
-                                <p className="text-xs text-foreground-tertiary leading-relaxed">
-                                  {type.description}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
+                            </motion.div>
+                          </ScrollRevealItem>
+                        ))}
+                      </div>
+                    </ScrollRevealStagger>
                   </CardContent>
                 </Card>
+              </ScrollReveal>
 
-                {/* Performance Indicators */}
-                <Card variant="premium" hover="both" asMotion>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <SparklesIcon className="h-5 w-5 text-primary" />
-                      Performance Scale
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {performanceIndicators.map((indicator, index) => (
-                        <motion.div
-                          key={indicator.range}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center justify-between p-3 rounded-xl glass-effect"
-                        >
-                          <div className="flex items-center gap-3">
-                            {indicator.icon}
-                            <div>
-                              <div className="text-sm font-semibold text-foreground">
-                                {indicator.range}
-                              </div>
-                              <div className="text-xs text-foreground-tertiary">
-                                {indicator.label}
-                              </div>
+              {/* Form and Performance Scale - Side by Side */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Form - Takes 2 columns */}
+                <ScrollReveal variant="fadeInUp" delay={0.2}>
+                  <div className="xl:col-span-2">
+                    <TestEntryForm />
+                  </div>
+                </ScrollReveal>
+
+                {/* Performance Scale - Takes 1 column */}
+                <ScrollReveal variant="fadeInUp" delay={0.3}>
+                  <div>
+                    <Card variant="premium" hover="both" asMotion>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                          <div className="p-3 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20">
+                            <SparklesIcon className="h-6 w-6 text-yellow-500" />
+                          </div>
+                          <div>
+                            <div className="gradient-text text-lg">Performance Scale</div>
+                            <div className="text-xs text-foreground-tertiary font-normal mt-1">
+                              Track your excellence level
                             </div>
                           </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollRevealStagger staggerDelay={0.08}>
+                          <div className="space-y-3">
+                            {performanceIndicators.map((indicator, index) => (
+                              <ScrollRevealItem key={indicator.range}>
+                                <motion.div
+                                  whileHover={{ scale: 1.02, x: 4 }}
+                                  className="flex items-center justify-between p-4 rounded-2xl glass-effect border border-white/[0.08] group cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-xl bg-white/[0.08] group-hover:bg-white/[0.12] transition-all">
+                                      {indicator.icon}
+                                    </div>
+                                    <div>
+                                      <div className="text-sm font-bold text-foreground">
+                                        {indicator.range}
+                                      </div>
+                                      <div className="text-xs text-foreground-tertiary">
+                                        {indicator.label}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className={`w-2 h-2 rounded-full ${indicator.color} animate-pulse`} />
+                                </motion.div>
+                              </ScrollRevealItem>
+                            ))}
+                          </div>
+                        </ScrollRevealStagger>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </ScrollReveal>
               </div>
             </motion.div>
           )}
@@ -283,24 +312,28 @@ export default function TestsPage() {
               className="space-y-6"
             >
               {/* Analytics Cards */}
-              <motion.div variants={itemVariants}>
-                <TestAnalytics />
-              </motion.div>
+              <ScrollReveal variant="fadeInUp" delay={0.1}>
+                <motion.div variants={itemVariants}>
+                  <TestAnalytics />
+                </motion.div>
+              </ScrollReveal>
               
               {/* Charts Section - Bento Layout */}
-              <motion.div variants={itemVariants}>
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                  {/* Main Performance Chart - Takes 2 columns */}
-                  <div className="xl:col-span-2">
-                    <TestPerformanceChart />
+              <ScrollReveal variant="fadeInUp" delay={0.2}>
+                <motion.div variants={itemVariants}>
+                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    {/* Main Performance Chart - Takes 2 columns */}
+                    <div className="xl:col-span-2">
+                      <TestPerformanceChart />
+                    </div>
+                    
+                    {/* Recent Tests List - Takes 1 column */}
+                    <div className="xl:col-span-1">
+                      <RecentTestsList />
+                    </div>
                   </div>
-                  
-                  {/* Recent Tests List - Takes 1 column */}
-                  <div className="xl:col-span-1">
-                    <RecentTestsList />
-                  </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </ScrollReveal>
             </motion.div>
           )}
         </AnimatePresence>
