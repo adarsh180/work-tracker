@@ -67,35 +67,66 @@ export async function POST(request: NextRequest) {
     const randomFocus = ['Physics mastery', 'Chemistry precision', 'Biology depth', 'Time management', 'Accuracy improvement'][Math.floor(Math.random() * 5)]
     const randomStrategy = ['intensive practice', 'smart revision', 'concept clarity', 'speed building', 'error analysis'][Math.floor(Math.random() * 5)]
     
-    const prompt = `
-You are an expert NEET coaching strategist. Create a UNIQUE, personalized action plan for Misti to achieve AIR under 50. Current timestamp: ${currentTime}
+    const prompt = `Create NEET study plan. Daily questions: ${Math.round(avgDailyQuestions)}. Test score: ${Math.round(avgTestScore)}/720. Syllabus: ${Math.round(syllabusCompletion)}%. Give 4 week targets and milestones.`
 
-CURRENT PERFORMANCE:
-- Daily Questions: ${Math.round(avgDailyQuestions)} (Target: 400+)
-- Test Average: ${Math.round(avgTestScore)}/720 (Target: 650+)
-- Syllabus: ${Math.round(syllabusCompletion)}% (Target: 95%+)
-- Energy: ${Math.round(avgMood)}/5
-- Consistency: ${recentGoals.length}/7 days
+    try {
+      const groq = GroqClient.getInstance()
+      const aiResponse = await groq.generateCompletion(prompt, { 
+        maxTokens: 500,
+        temperature: 0.3
+      })
+      
+      return NextResponse.json({
+        success: true,
+        actionPlan: aiResponse,
+        currentMetrics: {
+          dailyQuestions: Math.round(avgDailyQuestions),
+          testAverage: Math.round(avgTestScore),
+          syllabusCompletion: Math.round(syllabusCompletion),
+          consistency: Math.round((recentGoals.length / 7) * 100),
+          moodLevel: Math.round(avgMood)
+        },
+        gaps: {
+          questionsGap: Math.max(0, 400 - avgDailyQuestions),
+          scoreGap: Math.max(0, 650 - avgTestScore),
+          syllabusGap: Math.max(0, 95 - syllabusCompletion)
+        }
+      })
+    } catch (aiError) {
+      console.log('AI generation failed, using fallback:', aiError)
+      // Fall through to fallback plan
+    }
 
-SPECIAL FOCUS: ${randomFocus}
-STRATEGY EMPHASIS: ${randomStrategy}
+    // Generate reliable action plan without AI dependency
+    const actionPlan = `🎯 PERSONALIZED ACTION PLAN FOR MISTI
 
-Create a FRESH 30-day plan with:
-1. WEEK 1 BREAKTHROUGH ACTIONS
-2. SUBJECT-SPECIFIC TARGETS
-3. DAILY OPTIMIZATION SCHEDULE
-4. PERFORMANCE MILESTONES
-5. MOTIVATION CHECKPOINTS
+📊 CURRENT STATUS:
+• Daily Questions: ${Math.round(avgDailyQuestions)}
+• Test Average: ${Math.round(avgTestScore)}/720
+• Syllabus: ${Math.round(syllabusCompletion)}%
+• Consistency: ${Math.round((recentGoals.length / 7) * 100)}%
 
-Make it specific, actionable, and different from previous plans. Include exact numbers and deadlines.
-`
+🚀 IMMEDIATE ACTIONS (Next 7 Days):
+• Increase daily questions to ${Math.round(avgDailyQuestions) + 50}
+• Focus on weak subjects for 2 hours daily
+• Take 1 full-length test
+• Complete 3 new chapters
 
-    const groq = GroqClient.getInstance()
-    const aiResponse = await groq.generateCompletion(prompt, { maxTokens: 1500 })
+📈 WEEKLY TARGETS:
+Week 1: ${Math.round(avgDailyQuestions) + 50} questions/day
+Week 2: ${Math.round(avgDailyQuestions) + 100} questions/day
+Week 3: ${Math.round(avgDailyQuestions) + 150} questions/day
+Week 4: 400+ questions/day (Target achieved!)
+
+🎯 SUCCESS MILESTONES:
+• Day 7: Complete 1 subject revision
+• Day 14: Achieve 80%+ test accuracy
+• Day 21: Complete 5 new chapters
+• Day 30: Ready for AIR < 50 performance!`
 
     return NextResponse.json({
       success: true,
-      actionPlan: aiResponse,
+      actionPlan,
       currentMetrics: {
         dailyQuestions: Math.round(avgDailyQuestions),
         testAverage: Math.round(avgTestScore),

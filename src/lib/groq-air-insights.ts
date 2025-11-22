@@ -102,25 +102,25 @@ Provide comprehensive, actionable strategies.
     const [motivationResponse, scheduleResponse, weakAreaResponse, strategicResponse] = await Promise.all([
       groq.chat.completions.create({
         messages: [{ role: 'user', content: motivationPrompt }],
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.8,
         max_tokens: 300,
       }),
       groq.chat.completions.create({
         messages: [{ role: 'user', content: schedulePlannerPrompt }],
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.6,
         max_tokens: 500,
       }),
       groq.chat.completions.create({
         messages: [{ role: 'user', content: weakAreaPrompt }],
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.7,
         max_tokens: 400,
       }),
       groq.chat.completions.create({
         messages: [{ role: 'user', content: strategicPrompt }],
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.6,
         max_tokens: 400,
       })

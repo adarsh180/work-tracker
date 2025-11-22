@@ -12,6 +12,7 @@ export type AIRPredictionResult = {
   }
   recommendations: string[]
   riskLevel: 'low' | 'medium' | 'high'
+  comprehensiveData?: any
 }
 
 export class AIRPredictionEngine {
@@ -60,29 +61,37 @@ export class AIRPredictionEngine {
       )
 
       // RIGOROUS 2024-2026 NEET AIR Calculation - MUCH HARDER!
-      const normalizedScore = Math.max(10, Math.min(95, weightedScore))
+      const normalizedScore = Math.max(5, Math.min(95, weightedScore))
       
-      // AIR calculation reflecting NEET 2026 brutal competition
+      // AIR calculation for 1 million NEET candidates (2026)
       let predictedAIR: number
-      if (normalizedScore >= 92) {
-        predictedAIR = Math.round(1 + (95 - normalizedScore) * 16) // AIR 1-50 (need 92%+ score!)
+      if (normalizedScore >= 95) {
+        predictedAIR = Math.round(1 + (100 - normalizedScore) * 20) // AIR 1-100 (top 0.01%)
+      } else if (normalizedScore >= 90) {
+        predictedAIR = Math.round(100 + (95 - normalizedScore) * 180) // AIR 100-1000 (top 0.1%)
       } else if (normalizedScore >= 85) {
-        predictedAIR = Math.round(50 + (92 - normalizedScore) * 25) // AIR 50-225
-      } else if (normalizedScore >= 75) {
-        predictedAIR = Math.round(225 + (85 - normalizedScore) * 40) // AIR 225-625
-      } else if (normalizedScore >= 65) {
-        predictedAIR = Math.round(625 + (75 - normalizedScore) * 60) // AIR 625-1225
+        predictedAIR = Math.round(1000 + (90 - normalizedScore) * 800) // AIR 1000-5000 (top 0.5%)
+      } else if (normalizedScore >= 80) {
+        predictedAIR = Math.round(5000 + (85 - normalizedScore) * 2000) // AIR 5000-15000 (top 1.5%)
+      } else if (normalizedScore >= 70) {
+        predictedAIR = Math.round(15000 + (80 - normalizedScore) * 3500) // AIR 15000-50000 (top 5%)
+      } else if (normalizedScore >= 60) {
+        predictedAIR = Math.round(50000 + (70 - normalizedScore) * 5000) // AIR 50000-100000 (top 10%)
       } else if (normalizedScore >= 50) {
-        predictedAIR = Math.round(1225 + (65 - normalizedScore) * 80) // AIR 1225-2425
+        predictedAIR = Math.round(100000 + (60 - normalizedScore) * 10000) // AIR 100000-200000 (top 20%)
+      } else if (normalizedScore >= 40) {
+        predictedAIR = Math.round(200000 + (50 - normalizedScore) * 20000) // AIR 200000-400000 (top 40%)
+      } else if (normalizedScore >= 30) {
+        predictedAIR = Math.round(400000 + (40 - normalizedScore) * 30000) // AIR 400000-700000 (top 70%)
       } else {
-        predictedAIR = Math.round(2425 + (50 - normalizedScore) * 100) // AIR 2425+
+        predictedAIR = Math.round(700000 + (30 - normalizedScore) * 10000) // AIR 700000+ (bottom 30%)
       }
       
-      predictedAIR = Math.max(1, Math.min(5000, predictedAIR)) // Extended range for reality
+      predictedAIR = Math.max(1, Math.min(1000000, predictedAIR)) // Cap at 1 million candidates
       
       // Confidence based on data quality and consistency
       const dataQuality = this.calculateDataQuality(subjects, dailyGoals, testPerformances)
-      const confidence = Math.min(0.95, Math.max(0.4, (normalizedScore / 100) * dataQuality))
+      const confidence = Math.min(0.95, Math.max(0.05, (normalizedScore / 100) * dataQuality))
 
       const factors = {
         progressScore,
@@ -94,28 +103,40 @@ export class AIRPredictionEngine {
 
       const recommendations = this.generateRecommendations(factors, predictedAIR)
       const riskLevel = this.assessRiskLevel(predictedAIR, confidence)
+      
+      // Calculate comprehensive data for UI
+      const comprehensiveData = {
+        totalQuestionsLifetime: dailyGoals.reduce((sum, g) => sum + (g.totalQuestions || 0), 0),
+        consistencyScore: consistency,
+        averageTestScore: testPerformances.length > 0 ? 
+          testPerformances.reduce((sum, t) => sum + (t.score || 0), 0) / testPerformances.length : 0,
+        studyStreak: this.calculateStudyStreak(dailyGoals),
+        chaptersCompleted: subjects.reduce((sum, s) => sum + (s.chapters?.filter((ch: any) => ch.isCompleted)?.length || 0), 0),
+        totalChapters: subjects.reduce((sum, s) => sum + (s.chapters?.length || 0), 0)
+      }
 
       return {
         predictedAIR,
         confidence,
         factors,
         recommendations,
-        riskLevel
+        riskLevel,
+        comprehensiveData
       }
     } catch (error) {
       console.error('AIR prediction error:', error)
       return {
-        predictedAIR: 1500,
-        confidence: 0.5,
-        factors: { progressScore: 50, testTrend: 50, consistency: 50, biologicalFactor: 50, externalFactor: 50 },
-        recommendations: ['Continue consistent study', 'Focus on weak areas'],
-        riskLevel: 'medium'
+        predictedAIR: 800000,
+        confidence: 0.05,
+        factors: { progressScore: 5, testTrend: 5, consistency: 5, biologicalFactor: 50, externalFactor: 50 },
+        recommendations: ['Start tracking your progress', 'Begin taking mock tests', 'Set daily study goals'],
+        riskLevel: 'high'
       }
     }
   }
 
   private static calculateProgressScore(subjects: any[]): number {
-    if (!subjects || subjects.length === 0) return 0
+    if (!subjects || subjects.length === 0) return 5 // Very low score for no data
     
     let totalWeightedProgress = 0
     let totalWeight = 0
@@ -123,7 +144,9 @@ export class AIRPredictionEngine {
     subjects.forEach(subject => {
       // Weight subjects based on NEET importance
       const weight = this.getSubjectWeight(subject.name)
-      const progress = subject.completionPercentage || 0
+      const completedChapters = subject.chapters?.filter((ch: any) => ch.isCompleted)?.length || 0
+      const totalChapters = subject.chapters?.length || 1
+      const progress = (completedChapters / totalChapters) * 100
       
       totalWeightedProgress += progress * weight
       totalWeight += weight
@@ -153,7 +176,7 @@ export class AIRPredictionEngine {
   }
 
   private static calculateTestTrend(tests: any[], afternoonAdj: number = 0): number {
-    if (!tests || tests.length === 0) return 25 // Harsh default for no test practice
+    if (!tests || tests.length === 0) return 15 // Very low score for no test data
     if (tests.length === 1) {
       const base = Math.min(70, Math.max(15, (tests[0].score / 720) * 100))
       return Math.max(10, base + afternoonAdj)
@@ -205,25 +228,19 @@ export class AIRPredictionEngine {
   }
 
   private static calculateConsistency(dailyGoals: any[]): number {
-    if (dailyGoals.length === 0) return 0
+    if (dailyGoals.length === 0) return 5
     
     const activeDays = dailyGoals.filter(g => g.totalQuestions > 0).length
     const avgQuestions = dailyGoals.reduce((sum, g) => sum + g.totalQuestions, 0) / dailyGoals.length
     const consistencyRate = activeDays / dailyGoals.length
     
-    // RIGOROUS 2024-2026 Consistency Requirements
-    let consistencyScore = 0
-    
-    // Daily study is MANDATORY for NEET 2026
-    if (consistencyRate >= 0.95 && avgQuestions >= 300) consistencyScore = 95 // 95%+ days, 300+ questions
-    else if (consistencyRate >= 0.90 && avgQuestions >= 250) consistencyScore = 85 // 90%+ days, 250+ questions
-    else if (consistencyRate >= 0.85 && avgQuestions >= 200) consistencyScore = 75 // 85%+ days, 200+ questions
-    else if (consistencyRate >= 0.80 && avgQuestions >= 150) consistencyScore = 60 // 80%+ days, 150+ questions
-    else if (consistencyRate >= 0.70 && avgQuestions >= 100) consistencyScore = 45 // 70%+ days, 100+ questions
-    else if (consistencyRate >= 0.60) consistencyScore = 30 // 60%+ days
-    else consistencyScore = Math.max(5, consistencyRate * 25) // <60% is very poor
-    
-    return consistencyScore
+    if (consistencyRate >= 0.95 && avgQuestions >= 300) return 95
+    if (consistencyRate >= 0.90 && avgQuestions >= 250) return 85
+    if (consistencyRate >= 0.85 && avgQuestions >= 200) return 75
+    if (consistencyRate >= 0.80 && avgQuestions >= 150) return 60
+    if (consistencyRate >= 0.70 && avgQuestions >= 100) return 45
+    if (consistencyRate >= 0.60) return 30
+    return Math.max(5, consistencyRate * 25)
   }
 
   private static calculateBiologicalFactor(menstrualData: any[]): number {
@@ -232,39 +249,10 @@ export class AIRPredictionEngine {
     const avgEnergy = menstrualData.reduce((sum, m) => sum + m.energyLevel, 0) / menstrualData.length
     const avgStudyCapacity = menstrualData.reduce((sum, m) => sum + m.studyCapacity, 0) / menstrualData.length
     
-    // Enhanced biological impact analysis
     const energyScore = (avgEnergy / 10) * 100
     const capacityScore = (avgStudyCapacity / 10) * 100
-    const cyclicImpact = this.calculateCyclicImpact(menstrualData)
     
-    return Math.min(100, (energyScore * 0.4 + capacityScore * 0.4 + cyclicImpact * 0.2))
-  }
-  
-  private static calculateCyclicImpact(menstrualData: any[]): number {
-    // Analyze how menstrual phases affect study performance
-    let impactScore = 100
-    
-    menstrualData.forEach(cycle => {
-      const daysSinceStart = Math.floor((new Date().getTime() - new Date(cycle.cycleStartDate).getTime()) / (1000 * 60 * 60 * 24))
-      const cycleDay = daysSinceStart % cycle.cycleLength
-      
-      // Phase-based impact calculation
-      if (cycleDay <= cycle.periodLength) {
-        // Menstrual phase - reduced capacity
-        impactScore -= (cycle.periodLength - cycleDay + 1) * 2
-      } else if (cycleDay <= 14) {
-        // Follicular phase - optimal learning
-        impactScore += 5
-      } else if (cycleDay <= 16) {
-        // Ovulation - peak performance
-        impactScore += 10
-      } else {
-        // Luteal phase - declining energy
-        impactScore -= (cycleDay - 16) * 1.5
-      }
-    })
-    
-    return Math.max(0, Math.min(100, impactScore))
+    return Math.min(100, (energyScore * 0.5 + capacityScore * 0.5))
   }
 
   private static calculateExternalFactor(): number {
@@ -281,7 +269,6 @@ export class AIRPredictionEngine {
   private static generateRecommendations(factors: any, predictedAIR: number): string[] {
     const recommendations = []
     
-    // RIGOROUS 2024-2026 NEET Recommendations
     if (factors.progressScore < 80) {
       recommendations.push('🚨 URGENT: Complete 98%+ syllabus - NEET 2026 demands perfection!')
     }
@@ -294,64 +281,58 @@ export class AIRPredictionEngine {
       recommendations.push('⚡ MANDATORY: Study 300+ questions daily - competition is BRUTAL!')
     }
     
-    if (predictedAIR > 50) {
-      recommendations.push('🔥 REALITY CHECK: You need 92%+ weighted score for AIR 50 in 2026!')
-      recommendations.push('💪 STEP UP: Current preparation insufficient for medical college admission')
-      recommendations.push('📈 INTENSIFY: Double your effort - NEET 2026 is the toughest yet!')
-    }
-    
-    if (predictedAIR > 200) {
-      recommendations.push('⚠️ WARNING: At this pace, medical college admission is at serious risk!')
+    if (predictedAIR > 5000) {
+      recommendations.push('🔥 REALITY CHECK: You need 85%+ weighted score for top 0.5% in 2026!')
     }
     
     return recommendations.slice(0, 5)
   }
 
   private static calculateDataQuality(subjects: any[], dailyGoals: any[], testPerformances: any[]): number {
-    let qualityScore = 0.5 // Base score
+    let qualityScore = 0.1
     
-    // Subject data quality
     if (subjects && subjects.length >= 4) qualityScore += 0.2
     
-    // Daily goals data quality
-    if (dailyGoals && dailyGoals.length >= 15) qualityScore += 0.15
-    if (dailyGoals && dailyGoals.length >= 25) qualityScore += 0.1
+    const activeGoals = dailyGoals?.filter(g => g.totalQuestions > 0) || []
+    if (activeGoals.length >= 15) qualityScore += 0.15
+    if (activeGoals.length >= 25) qualityScore += 0.1
     
-    // Test performance data quality
     if (testPerformances && testPerformances.length >= 3) qualityScore += 0.15
     if (testPerformances && testPerformances.length >= 6) qualityScore += 0.1
+    
+    const completedChapters = subjects?.reduce((sum, s) => sum + (s.chapters?.filter((ch: any) => ch.isCompleted)?.length || 0), 0) || 0
+    if (completedChapters >= 50) qualityScore += 0.2
+    if (completedChapters >= 100) qualityScore += 0.1
     
     return Math.min(1.0, qualityScore)
   }
 
   private static assessRiskLevel(predictedAIR: number, confidence: number): 'low' | 'medium' | 'high' {
-    // RIGOROUS 2024-2026 Risk Assessment - Much stricter!
-    if (predictedAIR <= 25 && confidence > 0.85) return 'low'    // Only top 25 AIR is truly safe
-    if (predictedAIR <= 50 && confidence > 0.80) return 'medium' // AIR 50 is now medium risk
-    if (predictedAIR <= 100 && confidence > 0.70) return 'medium' // AIR 100 is risky
-    return 'high' // Everything else is high risk in NEET 2026
+    if (predictedAIR <= 1000 && confidence > 0.85) return 'low'
+    if (predictedAIR <= 5000 && confidence > 0.80) return 'medium'
+    if (predictedAIR <= 15000 && confidence > 0.70) return 'medium'
+    return 'high'
   }
+  
+  private static calculateStudyStreak(dailyGoals: any[]): number {
+    if (!dailyGoals || dailyGoals.length === 0) return 0
+    
+    let currentStreak = 0
+    const sortedGoals = dailyGoals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    
+    for (const goal of sortedGoals) {
+      if (goal.totalQuestions > 0) {
+        currentStreak++
+      } else {
+        break
+      }
+    }
+    
+    return currentStreak
+  }
+  
   private static calculateAfternoonAdjustment(studySessions: any[]): number {
     if (!studySessions || studySessions.length === 0) return 0
-    const isAfternoon = (d: Date) => {
-      const h = d.getHours()
-      return h >= 14 && h <= 17
-    }
-    const isMorning = (d: Date) => {
-      const h = d.getHours()
-      return h >= 6 && h <= 11
-    }
-    const afternoon = studySessions.filter(s => isAfternoon(s.startTime))
-    const morning = studySessions.filter(s => isMorning(s.startTime))
-    if (afternoon.length === 0 || morning.length === 0) return 0
-    const acc = (arr: any[]) => arr.reduce((sum, s) => sum + ((s.questionsAttempted > 0 ? (s.questionsCorrect / s.questionsAttempted) : 0) * 100), 0) / arr.length
-    const focus = (arr: any[]) => arr.reduce((sum, s) => sum + (s.focusScore || 0), 0) / arr.length
-    const afternoonScore = (acc(afternoon) * 0.7 + focus(afternoon) * 0.3)
-    const morningScore = (acc(morning) * 0.7 + focus(morning) * 0.3)
-    const delta = afternoonScore - morningScore
-    // Map delta to a modest adjustment
-    if (delta >= 5) return 5
-    if (delta <= -5) return -7
-    return delta * 0.8
+    return 0 // Simplified for now
   }
 }

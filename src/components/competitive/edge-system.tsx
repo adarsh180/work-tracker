@@ -87,9 +87,7 @@ export function CompetitiveEdgeSystem() {
 
   const [showMotivation, setShowMotivation] = useState(false);
   const [currentQuote, setCurrentQuote] = useState('');
-  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
-  const [actionPlan, setActionPlan] = useState('');
-  const [showActionPlan, setShowActionPlan] = useState(false);
+
   const [isThinking, setIsThinking] = useState(false);
   const [displayedQuote, setDisplayedQuote] = useState('');
 
@@ -128,41 +126,7 @@ export function CompetitiveEdgeSystem() {
     }, 1500); // 1.5 second thinking delay
   };
 
-  const generateActionPlan = async () => {
-    setIsGeneratingPlan(true);
-    try {
-      const response = await fetch('/api/competitive-edge/action-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setActionPlan(data.actionPlan);
-        setShowActionPlan(true);
-      } else {
-        // Fallback to basic plan
-        const basicPlan = [
-          `📈 Increase daily questions from ${competitiveData.mistiProgress.dailyQuestions} to ${competitiveData.topperPatterns.dailyQuestions}`,
-          `⏰ Add ${competitiveData.gapAnalysis.hoursGap} more study hours daily`,
-          `🎯 Improve accuracy by ${competitiveData.gapAnalysis.accuracyGap}% through focused practice`,
-          `🔄 Add one more revision cycle per chapter`,
-          `📊 Weekly mock tests to track improvement`
-        ].join('\n\n');
-        setActionPlan(basicPlan);
-        setShowActionPlan(true);
-      }
-    } catch (error) {
-      console.error('Failed to generate action plan:', error);
-      // Fallback plan
-      const basicPlan = `🎯 IMMEDIATE ACTION PLAN\n\n📈 Increase daily practice\n⏰ Optimize study schedule\n🎯 Focus on weak areas\n🔄 Regular revision cycles`;
-      setActionPlan(basicPlan);
-      setShowActionPlan(true);
-    } finally {
-      setIsGeneratingPlan(false);
-    }
-  };
+
 
   return (
     <div className="space-y-6">
@@ -250,28 +214,10 @@ export function CompetitiveEdgeSystem() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              onClick={generateActionPlan}
-              disabled={isGeneratingPlan}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              {isGeneratingPlan ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Brain className="h-4 w-4 mr-2" />
-                  AI Action Plan
-                </>
-              )}
-            </Button>
-            
+          <div className="flex justify-center">
             <Button 
               onClick={generateMotivationalBoost}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg transform hover:scale-105 transition-all duration-200 w-full max-w-md"
             >
               <Heart className="h-4 w-4 mr-2" />
               Motivational Boost
@@ -323,45 +269,7 @@ export function CompetitiveEdgeSystem() {
         </Card>
       </motion.div>
 
-      {/* AI Action Plan Modal */}
-      <AnimatePresence>
-        {showActionPlan && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowActionPlan(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-blue-400" />
-                  AI-Generated Action Plan
-                </h2>
-                <Button
-                  onClick={() => setShowActionPlan(false)}
-                  size="sm"
-                  className="bg-gray-700 hover:bg-gray-600"
-                >
-                  ✕
-                </Button>
-              </div>
-              <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">
-                  {actionPlan}
-                </pre>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
 
 
     </div>

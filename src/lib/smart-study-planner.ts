@@ -100,7 +100,7 @@ export class SmartStudyPlanner {
         },
         update: {
           totalStudyHours: 14, // Set target to 14 hours
-          energyLevel: preferences.energyLevel,
+          energyLevel: preferences?.energyLevel || 5,
           focusLevel: sleepData?.quality || 5,
           schedule: aiSchedule,
           aiGenerated: true
@@ -109,7 +109,7 @@ export class SmartStudyPlanner {
           userId,
           date,
           totalStudyHours: 14, // Set target to 14 hours
-          energyLevel: preferences.energyLevel,
+          energyLevel: preferences?.energyLevel || 5,
           focusLevel: sleepData?.quality || 5,
           schedule: aiSchedule,
           aiGenerated: true
@@ -141,10 +141,10 @@ export class SmartStudyPlanner {
     try {
       const prompt = `
 Create an optimal study schedule for NEET preparation with these parameters:
-- Available study hours: ${preferences.availableHours}
-- Energy level: ${preferences.energyLevel}/10
-- Weak areas: ${preferences.weakAreas.join(', ')}
-- Menstrual phase: ${preferences.menstrualPhase || 'normal'}
+- Available study hours: ${preferences?.availableHours || 8}
+- Energy level: ${preferences?.energyLevel || 5}/10
+- Weak areas: ${preferences?.weakAreas?.join(', ') || 'None'}
+- Menstrual phase: ${preferences?.menstrualPhase || 'normal'}
 - Sleep quality: ${sleepData?.quality || 5}/10
 - Recent test average: ${testPerformances.length > 0 ? Math.round(testPerformances.reduce((sum: number, t: any) => sum + t.score, 0) / testPerformances.length) : 0}/720
 
@@ -172,7 +172,7 @@ Rules:
 
       const completion = await groq.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.6,
         max_tokens: 1000,
       })
@@ -196,7 +196,7 @@ Rules:
     let blockId = 1
 
     const subjects = ['Physics', 'Chemistry', 'Biology']
-    const hoursPerSubject = Math.floor(preferences.availableHours / 3)
+    const hoursPerSubject = Math.floor((preferences?.availableHours || 8) / 3)
 
     subjects.forEach(subject => {
       for (let i = 0; i < hoursPerSubject; i++) {
@@ -207,7 +207,7 @@ Rules:
           endTime: this.addMinutes(currentTime, 90),
           duration: 90,
           type: 'study',
-          priority: preferences.weakAreas.includes(subject) ? 'high' : 'medium',
+          priority: preferences?.weakAreas?.includes(subject) ? 'high' : 'medium',
           completed: false
         })
         

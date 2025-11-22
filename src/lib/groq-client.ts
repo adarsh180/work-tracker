@@ -104,7 +104,7 @@ export class GroqClient {
             content: prompt,
           },
         ],
-        model: options.model || 'llama3-8b-8192',
+        model: options.model || 'llama-3.1-8b-instant',
         max_tokens: options.maxTokens || 1000,
         temperature: options.temperature || 0.7,
       });

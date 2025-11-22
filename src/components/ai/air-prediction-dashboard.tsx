@@ -53,8 +53,8 @@ export default function AIRPredictionDashboard() {
       const result = await response.json()
       return result.data
     },
-    refetchInterval: 60000, // Refresh every minute for real-time updates
-    staleTime: 30000 // Consider data stale after 30 seconds
+    refetchInterval: 10000, // Refresh every 10 seconds for real-time updates
+    staleTime: 5000 // Consider data stale after 5 seconds
   })
 
   const getRiskColor = (risk: string) => {
