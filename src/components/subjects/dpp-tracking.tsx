@@ -41,6 +41,9 @@ export default function DppTracking({
       field: 'dppCompleted',
       value: newDpp
     })
+
+    // Trigger immediate dashboard update
+    window.dispatchEvent(new CustomEvent('dppCompleted', { detail: { chapterId, dppIndex } }))
   }
 
   const completedCount = localDpp.filter(Boolean).length

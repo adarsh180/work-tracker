@@ -38,6 +38,9 @@ export default function LectureTracking({
       field: 'lecturesCompleted',
       value: newLectures
     })
+
+    // Trigger immediate dashboard update
+    window.dispatchEvent(new CustomEvent('lectureCompleted', { detail: { chapterId, lectureIndex } }))
   }
 
   const completedCount = localLectures.filter(Boolean).length

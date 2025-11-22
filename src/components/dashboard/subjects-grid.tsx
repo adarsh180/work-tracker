@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/use-auth'
 import SubjectCard from './subject-card'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface SubjectSummary {
   id: string
@@ -20,19 +20,33 @@ interface SubjectSummary {
 export default function SubjectsGrid() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Listen for chapter updates and invalidate queries
   useEffect(() => {
     const handleChapterUpdate = () => {
-      queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+      // Debounce updates to prevent excessive API calls in production
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
+      }
+      updateTimeoutRef.current = setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+        queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+        queryClient.refetchQueries({ queryKey: ['subjects-dashboard'] })
+      }, process.env.NODE_ENV === 'production' ? 1000 : 100)
     }
 
     // Listen for custom events from chapter updates
     window.addEventListener('chapterProgressUpdated', handleChapterUpdate)
+    window.addEventListener('lectureCompleted', handleChapterUpdate)
+    window.addEventListener('dppCompleted', handleChapterUpdate)
+    window.addEventListener('assignmentCompleted', handleChapterUpdate)
     
     return () => {
       window.removeEventListener('chapterProgressUpdated', handleChapterUpdate)
+      window.removeEventListener('lectureCompleted', handleChapterUpdate)
+      window.removeEventListener('dppCompleted', handleChapterUpdate)
+      window.removeEventListener('assignmentCompleted', handleChapterUpdate)
     }
   }, [queryClient])
 
@@ -43,11 +57,13 @@ export default function SubjectsGrid() {
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: 1000, // Refetch every 1 second for real-time updates
-    staleTime: 0, // Always consider data stale for immediate updates
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnMount: true, // Always refetch on mount
-    refetchIntervalInBackground: true // Continue refetching in background
+    refetchInterval: process.env.NODE_ENV === 'production' ? 3000 : 500, // 3s in prod, 500ms in dev
+    staleTime: process.env.NODE_ENV === 'production' ? 2000 : 0, // 2s cache in prod
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchIntervalInBackground: false, // Disable in production to save resources
+    retry: 3, // Retry failed requests
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
   })
 
   if (loading) {

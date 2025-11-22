@@ -5,7 +5,13 @@ export async function GET(request: NextRequest) {
   try {
     const dashboardSummary = await SubjectRepository.getDashboardSummary()
     
-    return NextResponse.json(dashboardSummary)
+    return NextResponse.json(dashboardSummary, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
   } catch (error) {
     console.error('Error fetching dashboard subjects:', error)
     return NextResponse.json(
