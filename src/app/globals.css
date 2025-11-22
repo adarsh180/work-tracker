@@ -6,7 +6,7 @@
   :root {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
-    
+
     /* Apple-inspired CSS custom properties - Ultra Smooth */
     --glass-opacity: 0.72;
     --blur-strength: 20px;
@@ -69,7 +69,10 @@
   }
 
   /* Optimize images and media */
-  img, video, canvas, svg {
+  img,
+  video,
+  canvas,
+  svg {
     transform: translateZ(0);
     image-rendering: -webkit-optimize-contrast;
   }
@@ -82,6 +85,7 @@
 
   /* Smooth transitions for reduced motion users */
   @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -93,13 +97,14 @@
 }
 
 @layer components {
+
   /* Apple-inspired Glass Effects - Ultra Smooth */
   .glass-effect {
     @apply bg-background-glass backdrop-blur-xl border border-white/[0.08] shadow-card;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
     transition: transform var(--spring-duration) var(--ease-out-expo),
-                opacity var(--spring-duration) var(--ease-out-expo),
-                box-shadow var(--spring-duration) var(--ease-out-expo);
+      opacity var(--spring-duration) var(--ease-out-expo),
+      box-shadow var(--spring-duration) var(--ease-out-expo);
     transform: translate3d(0, 0, 0);
     will-change: transform;
     backface-visibility: hidden;
@@ -109,8 +114,8 @@
   .glass-card {
     @apply glass-effect rounded-3xl p-6 hover:shadow-card-hover hover:border-white/[0.12] hover:bg-background-elevated/80;
     transition: transform var(--spring-duration) var(--ease-out-expo),
-                box-shadow var(--spring-duration) var(--ease-out-expo),
-                border-color var(--spring-duration) var(--ease-out-expo);
+      box-shadow var(--spring-duration) var(--ease-out-expo),
+      border-color var(--spring-duration) var(--ease-out-expo);
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     contain: layout style paint;
@@ -119,7 +124,7 @@
   .glass-button {
     @apply glass-effect rounded-2xl px-6 py-3 hover:bg-white/[0.12] active:scale-[0.98];
     transition: transform 0.15s var(--ease-out-expo),
-                background-color 0.15s var(--ease-out-expo);
+      background-color 0.15s var(--ease-out-expo);
     transform: translate3d(0, 0, 0);
     touch-action: manipulation;
   }
@@ -167,20 +172,6 @@
   }
 
   .hero-card::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-primary/[0.08] via-transparent to-accent-purple-500/[0.08] opacity-0;
-    transition: opacity var(--spring-duration) var(--spring-easing);
-    will-change: opacity;
-  }
-
-  .hero-card:hover::before {
-    @apply opacity-100;
-  }
-
-  /* Apple-style Interactive Elements - Ultra Responsive */
-  .interactive-element {
-    @apply cursor-pointer;
-    transition: transform 0.15s var(--ease-out-expo);
     transform: translate3d(0, 0, 0);
     will-change: transform;
     backface-visibility: hidden;
@@ -295,7 +286,7 @@
     .glass-effect {
       @apply bg-background border-2 border-foreground/50;
     }
-    
+
     .gradient-text {
       @apply text-foreground bg-none;
     }
@@ -303,6 +294,7 @@
 
   /* Print Styles */
   @media print {
+
     .glass-effect,
     .neumorphic {
       @apply bg-white text-black border border-black/20 shadow-none;
@@ -311,15 +303,16 @@
 }
 
 @layer utilities {
+
   /* Animation Utilities */
   .animate-delay-100 {
     animation-delay: 100ms;
   }
-  
+
   .animate-delay-200 {
     animation-delay: 200ms;
   }
-  
+
   .animate-delay-300 {
     animation-delay: 300ms;
   }

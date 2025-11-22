@@ -41,7 +41,7 @@ export default function SubjectsGrid() {
     window.addEventListener('lectureCompleted', handleChapterUpdate)
     window.addEventListener('dppCompleted', handleChapterUpdate)
     window.addEventListener('assignmentCompleted', handleChapterUpdate)
-    
+
     return () => {
       window.removeEventListener('chapterProgressUpdated', handleChapterUpdate)
       window.removeEventListener('lectureCompleted', handleChapterUpdate)
@@ -57,12 +57,12 @@ export default function SubjectsGrid() {
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: process.env.NODE_ENV === 'production' ? 3000 : 500, // 3s in prod, 500ms in dev
-    staleTime: process.env.NODE_ENV === 'production' ? 2000 : 0, // 2s cache in prod
+    refetchInterval: process.env.NODE_ENV === 'production' ? 3000 : 500,
+    staleTime: process.env.NODE_ENV === 'production' ? 2000 : 0,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchIntervalInBackground: false, // Disable in production to save resources
-    retry: 3, // Retry failed requests
+    refetchIntervalInBackground: false,
+    retry: 3,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
   })
 
@@ -92,7 +92,7 @@ export default function SubjectsGrid() {
   if (error) {
     return (
       <div className="glass-effect rounded-xl p-6 text-center">
-        <div className="text-red-400 mb-2">⚠️ Error Loading Subjects</div>
+        <div className="text-red-400 mb-2">Error Loading Subjects</div>
         <p className="text-gray-400 text-sm">{error instanceof Error ? error.message : 'An error occurred'}</p>
         <button
           onClick={() => window.location.reload()}
@@ -130,35 +130,13 @@ export default function SubjectsGrid() {
         <motion.h2
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-2xl font-bold text-white flex items-center gap-3"
+          className="text-2xl font-bold text-white"
         >
-          <span>Subject Progress for</span>
-          <motion.span
-            className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent"
-            animate={{
-              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              backgroundSize: '200% 200%',
-            }}
-          >
-            Misti
-          </motion.span>
-          <motion.span
-            animate={{ rotate: [0, 20, -20, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            💕
-          </motion.span>
+          Subject Progress
         </motion.h2>
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-400">
-            {subjects.length} subjects • Click to view details
+            {subjects.length} subjects
           </div>
           <button
             onClick={() => {
@@ -167,13 +145,13 @@ export default function SubjectsGrid() {
             className="text-xs px-3 py-1 bg-primary/20 text-primary rounded-full hover:bg-primary/30 transition-colors"
             title="Refresh progress data"
           >
-            🔄 Refresh
+            Refresh
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {subjects.map((subject) => (
+        {subjects.map((subject, index) => (
           <SubjectCard
             key={subject.id}
             id={subject.id}
@@ -184,6 +162,7 @@ export default function SubjectsGrid() {
             completedLectures={subject.completedLectures}
             totalQuestions={subject.totalQuestions}
             emoji={subject.emoji}
+            index={index}
           />
         ))}
       </div>
