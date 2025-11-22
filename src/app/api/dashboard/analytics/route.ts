@@ -36,8 +36,13 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    subjectProgress.overall = (subjectProgress.physics + subjectProgress.chemistry + 
-                             subjectProgress.botany + subjectProgress.zoology) / 4
+    // Use the same calculation as subjects grid - weighted average
+    const totalSubjects = subjects.filter(s => 
+      ['physics', 'chemistry', 'botany', 'zoology'].includes(s.name.toLowerCase())
+    )
+    subjectProgress.overall = totalSubjects.length > 0 
+      ? totalSubjects.reduce((acc, s) => acc + s.completionPercentage, 0) / totalSubjects.length 
+      : 0
 
     // Calculate question stats including chapter-wise questions
     const today = new Date()

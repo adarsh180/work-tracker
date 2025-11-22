@@ -43,21 +43,21 @@ export default function DppQuestionInput({
   }
 
   if (!isCompleted) {
-    return <span className="text-gray-500 text-xs">Complete DPP first</span>
+    return null
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <input
         type="number"
         min="0"
         max="100"
         value={questionCount}
         onChange={(e) => handleUpdate(parseInt(e.target.value) || 0)}
-        className="w-16 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white"
+        className="w-14 px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-400 focus:outline-none"
         placeholder="0"
       />
-      <span className="text-xs text-gray-400">questions</span>
+      <span className="text-xs text-gray-500">Q</span>
     </div>
   )
 }

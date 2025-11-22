@@ -137,6 +137,7 @@ export default function SubjectDetailPage() {
             <div className="text-3xl">
               {getSubjectEmoji(averageProgress)}
             </div>
+            <FloatingSaveButton />
           </div>
         </div>
 
@@ -235,7 +236,6 @@ export default function SubjectDetailPage() {
           </div>
         </div>
       </div>
-      <FloatingSaveButton />
     </DashboardLayout>
     </SubjectChangesProvider>
   )

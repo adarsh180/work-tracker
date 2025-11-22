@@ -1,9 +1,10 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 import { ChartBarIcon, BookOpenIcon, CalendarIcon, LightBulbIcon } from '@heroicons/react/24/outline'
+import { useEffect } from 'react'
 
 type DashboardAnalytics = {
   subjectProgress: {
@@ -34,6 +35,22 @@ type DashboardAnalytics = {
 }
 
 export default function RealTimeAnalytics() {
+  const queryClient = useQueryClient()
+
+  // Listen for chapter updates and invalidate queries
+  useEffect(() => {
+    const handleChapterUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+    }
+
+    window.addEventListener('chapterProgressUpdated', handleChapterUpdate)
+    
+    return () => {
+      window.removeEventListener('chapterProgressUpdated', handleChapterUpdate)
+    }
+  }, [queryClient])
+
   const { data: analytics, isLoading } = useQuery<DashboardAnalytics>({
     queryKey: ['dashboard-analytics'],
     queryFn: async () => {
@@ -42,8 +59,8 @@ export default function RealTimeAnalytics() {
       const result = await response.json()
       return result.data
     },
-    refetchInterval: 2000, // Refresh every 2 seconds for real-time updates
-    staleTime: 500 // Consider data stale after 0.5 seconds
+    refetchInterval: 1000, // Refresh every 1 second for real-time updates
+    staleTime: 0 // Always consider data stale for immediate updates
   })
 
   if (isLoading || !analytics) {

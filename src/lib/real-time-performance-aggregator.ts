@@ -24,17 +24,17 @@ export class RealTimePerformanceAggregator {
    */
   static async aggregatePerformanceData(userId?: string): Promise<RealTimePerformanceData> {
     try {
-      const [
-        dailyGoalsData,
-        testData,
-        chaptersData,
-        questionsData
-      ] = await Promise.all([
+      const results = await Promise.allSettled([
         this.getDailyGoalsData(),
         this.getTestPerformanceData(),
         this.getChaptersData(),
         this.getQuestionAnalyticsData()
       ])
+
+      const dailyGoalsData = results[0].status === 'fulfilled' ? results[0].value : this.getDefaultDailyGoalsData()
+      const testData = results[1].status === 'fulfilled' ? results[1].value : this.getDefaultTestData()
+      const chaptersData = results[2].status === 'fulfilled' ? results[2].value : this.getDefaultChaptersData()
+      const questionsData = results[3].status === 'fulfilled' ? results[3].value : this.getDefaultQuestionsData()
 
       return {
         dailyQuestions: dailyGoalsData.averageQuestions,
@@ -58,13 +58,23 @@ export class RealTimePerformanceAggregator {
    * Get daily goals performance data
    */
   private static async getDailyGoalsData() {
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    try {
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const goals = await prisma.dailyGoal.findMany({
-      where: { date: { gte: thirtyDaysAgo } },
-      orderBy: { date: 'desc' }
-    })
+      const goals = await prisma.dailyGoal.findMany({
+        where: { date: { gte: thirtyDaysAgo } },
+        orderBy: { date: 'desc' }
+      })
+
+      return this.processDailyGoalsData(goals)
+    } catch (error) {
+      console.error('Database connection error in getDailyGoalsData:', error)
+      return this.getDefaultDailyGoalsData()
+    }
+  }
+
+  private static processDailyGoalsData(goals: any[]) {
 
     if (goals.length === 0) {
       return {
@@ -127,10 +137,20 @@ export class RealTimePerformanceAggregator {
    * Get test performance data
    */
   private static async getTestPerformanceData() {
-    const tests = await prisma.testPerformance.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 20
-    })
+    try {
+      const tests = await prisma.testPerformance.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 20
+      })
+
+      return this.processTestData(tests)
+    } catch (error) {
+      console.error('Database connection error in getTestPerformanceData:', error)
+      return this.getDefaultTestData()
+    }
+  }
+
+  private static processTestData(tests: any[]) {
 
     if (tests.length === 0) {
       return { averageScore: 0, accuracy: 0 }
@@ -149,7 +169,17 @@ export class RealTimePerformanceAggregator {
    * Get chapters completion data (out of 81 total chapters)
    */
   private static async getChaptersData() {
-    const chapters = await prisma.chapter.findMany()
+    try {
+      const chapters = await prisma.chapter.findMany()
+
+      return this.processChaptersData(chapters)
+    } catch (error) {
+      console.error('Database connection error in getChaptersData:', error)
+      return this.getDefaultChaptersData()
+    }
+  }
+
+  private static processChaptersData(chapters: any[]) {
     const TOTAL_CHAPTERS = 81
 
     if (chapters.length === 0) {
@@ -215,10 +245,20 @@ export class RealTimePerformanceAggregator {
    * Get question analytics data
    */
   private static async getQuestionAnalyticsData() {
-    const analytics = await prisma.questionAnalytics.findMany({
-      orderBy: { date: 'desc' },
-      take: 30
-    })
+    try {
+      const analytics = await prisma.questionAnalytics.findMany({
+        orderBy: { date: 'desc' },
+        take: 30
+      })
+
+      return this.processAnalyticsData(analytics)
+    } catch (error) {
+      console.error('Database connection error in getQuestionAnalyticsData:', error)
+      return this.getDefaultQuestionsData()
+    }
+  }
+
+  private static processAnalyticsData(analytics: any[]) {
 
     if (analytics.length === 0) {
       return { weeklyTarget: 0, monthlyGrowth: 0 }
@@ -254,5 +294,27 @@ export class RealTimePerformanceAggregator {
       monthlyGrowth: 0,
       lastUpdateDays: 30
     }
+  }
+
+  private static getDefaultDailyGoalsData() {
+    return {
+      averageQuestions: 0,
+      consistency: 0,
+      currentStreak: 0,
+      averageHours: 0,
+      daysSinceLastUpdate: 30
+    }
+  }
+
+  private static getDefaultTestData() {
+    return { averageScore: 0, accuracy: 0 }
+  }
+
+  private static getDefaultChaptersData() {
+    return { completionPercentage: 0 }
+  }
+
+  private static getDefaultQuestionsData() {
+    return { weeklyTarget: 0, monthlyGrowth: 0 }
   }
 }

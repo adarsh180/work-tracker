@@ -7,7 +7,7 @@ import { prisma } from './prisma'
 
 export class AchievementTracker {
   /**
-   * Calculate comprehensive user statistics for 200K question target
+   * Calculate comprehensive user statistics for 188K question target
    */
   static async calculateUserStats(userId: string) {
     try {
@@ -99,11 +99,11 @@ export class AchievementTracker {
         console.log('StudyStreak table not available yet')
       }
 
-      // Calculate TOTAL 200K QUESTION PROGRESS
+      // Calculate TOTAL 188K QUESTION PROGRESS
       // Include: DPP + Assignments + Kattar + Daily Goals + Test Questions
       const testQuestions = testPerformances.length * 180 // Each NEET test = 180 questions
       const totalQuestionsSolved = completedDppQuestions + completedAssignmentQuestions + completedKattarQuestions + lifetimeQuestions + testQuestions
-      const questionProgress = (totalQuestionsSolved / 200000) * 100 // Progress towards 200K
+      const questionProgress = (totalQuestionsSolved / 188000) * 100 // Progress towards 188K
 
       return {
         // Chapter stats
@@ -119,12 +119,12 @@ export class AchievementTracker {
         totalKattarQuestions,
         completedKattarQuestions,
         
-        // 200K QUESTION TARGET TRACKING
+        // 188K QUESTION TARGET TRACKING
         testQuestions, // Questions from tests (180 per test)
         totalQuestionsSolved, // ALL questions combined
-        questionProgress, // Progress towards 200K target
-        questionsRemaining: Math.max(0, 200000 - totalQuestionsSolved),
-        dailyTargetForRemaining: Math.max(0, Math.ceil((200000 - totalQuestionsSolved) / Math.max(1, (new Date('2026-05-03').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))),
+        questionProgress, // Progress towards 188K target
+        questionsRemaining: Math.max(0, 188000 - totalQuestionsSolved),
+        dailyTargetForRemaining: Math.max(0, Math.ceil((188000 - totalQuestionsSolved) / Math.max(1, (new Date('2026-05-03').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))),
 
         // Daily goal stats
         todayQuestions,
@@ -183,9 +183,9 @@ export class AchievementTracker {
             isCompleted = stats.totalQuestionsSolved >= condition.count
             break
 
-          case 'total_questions_200k':
-            progress = Math.min(1, stats.totalQuestionsSolved / 200000)
-            isCompleted = stats.totalQuestionsSolved >= 200000
+          case 'total_questions_188k':
+            progress = Math.min(1, stats.totalQuestionsSolved / 188000)
+            isCompleted = stats.totalQuestionsSolved >= 188000
             break
 
           case 'daily_questions':
@@ -263,7 +263,7 @@ export class AchievementTracker {
       if (existingCount > 0) return
 
       const defaultAchievements = [
-        // 200K QUESTION TARGET ACHIEVEMENTS (STRINGENT)
+        // 188K QUESTION TARGET ACHIEVEMENTS (STRINGENT)
         {
           name: "Question Starter",
           description: "Solve your first 1,000 questions",
@@ -275,7 +275,7 @@ export class AchievementTracker {
         },
         {
           name: "10K Milestone",
-          description: "Solve 10,000 questions (5% of 200K target)",
+          description: "Solve 10,000 questions (5% of 188K target)",
           category: "performance",
           icon: "🎯",
           condition: { type: "questions_solved", count: 10000 },
@@ -284,7 +284,7 @@ export class AchievementTracker {
         },
         {
           name: "Quarter Champion",
-          description: "Solve 50,000 questions (25% of 200K target)",
+          description: "Solve 50,000 questions (27% of 188K target)",
           category: "performance",
           icon: "⭐",
           condition: { type: "questions_solved", count: 50000 },
@@ -293,7 +293,7 @@ export class AchievementTracker {
         },
         {
           name: "Halfway Hero",
-          description: "Solve 100,000 questions (50% of 200K target)",
+          description: "Solve 100,000 questions (53% of 188K target)",
           category: "milestones",
           icon: "🔥",
           condition: { type: "questions_solved", count: 100000 },
@@ -301,11 +301,11 @@ export class AchievementTracker {
           rarity: "epic"
         },
         {
-          name: "200K LEGEND",
-          description: "COMPLETE 200,000 QUESTIONS - NEET MASTERY!",
+          name: "188K LEGEND",
+          description: "COMPLETE 188,000 QUESTIONS - NEET MASTERY!",
           category: "milestones",
           icon: "👑",
-          condition: { type: "total_questions_200k", count: 200000 },
+          condition: { type: "total_questions_188k", count: 188000 },
           points: 2000,
           rarity: "legendary"
         },

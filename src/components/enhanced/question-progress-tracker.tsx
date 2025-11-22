@@ -28,7 +28,7 @@ export default function QuestionProgressTracker() {
     )
   }
 
-  const progress = (stats.totalQuestionsSolved / 200000) * 100
+  const progress = (stats.totalQuestionsSolved / 188000) * 100
   const daysLeft = Math.ceil((new Date('2026-05-03').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
   const dailyTarget = Math.ceil(stats.questionsRemaining / Math.max(1, daysLeft))
 
@@ -40,7 +40,7 @@ export default function QuestionProgressTracker() {
   }
 
   const getUrgencyMessage = () => {
-    if (progress >= 90) return '🎉 ALMOST THERE! Final push to 200K!'
+    if (progress >= 90) return '🎉 ALMOST THERE! Final push to 188K!'
     if (progress >= 75) return '🔥 EXCELLENT! You\'re on track!'
     if (progress >= 50) return '💪 GOOD PROGRESS! Keep pushing!'
     if (progress >= 25) return '⚡ STEP UP! Need more intensity!'
@@ -56,7 +56,7 @@ export default function QuestionProgressTracker() {
           animate={{ scale: [1, 1.02, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          🎯 200K Lifetime Question Target
+          🎯 188K Lifetime Question Target
         </motion.h3>
         <p className="text-gray-400">Total questions solved from beginning to NEET 2026</p>
       </div>

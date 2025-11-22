@@ -14,6 +14,8 @@ export default function FloatingSaveButton() {
       setSaveStatus('idle')
       await saveAllChanges()
       setSaveStatus('success')
+      // Dispatch event for real-time updates
+      window.dispatchEvent(new CustomEvent('chapterProgressUpdated'))
       setTimeout(() => setSaveStatus('idle'), 2000)
     } catch (error) {
       setSaveStatus('error')
@@ -25,18 +27,17 @@ export default function FloatingSaveButton() {
     <AnimatePresence>
       {hasChanges && (
         <motion.div
-          initial={{ opacity: 0, y: 100, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 100, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed bottom-6 right-6 z-50"
         >
           <motion.button
             onClick={handleSave}
             disabled={isSaving}
             className={`
-              relative flex items-center space-x-3 px-6 py-4 rounded-full shadow-2xl
-              transition-all duration-300 font-medium text-white
+              relative flex items-center space-x-2 px-3 py-2 rounded-lg shadow-lg
+              transition-all duration-300 font-medium text-white text-sm
               ${saveStatus === 'success' 
                 ? 'bg-green-500 hover:bg-green-600' 
                 : saveStatus === 'error'
@@ -52,7 +53,7 @@ export default function FloatingSaveButton() {
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/50 to-pink-500/50 blur-lg opacity-75" />
             
             {/* Content */}
-            <div className="relative flex items-center space-x-3">
+            <div className="relative flex items-center space-x-2">
               {isSaving ? (
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -98,7 +99,7 @@ export default function FloatingSaveButton() {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center z-10"
           >
             {pendingChanges.length}
           </motion.div>

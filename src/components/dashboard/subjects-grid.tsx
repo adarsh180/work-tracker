@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/use-auth'
 import SubjectCard from './subject-card'
+import { useEffect } from 'react'
 
 interface SubjectSummary {
   id: string
@@ -20,6 +21,21 @@ export default function SubjectsGrid() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
+  // Listen for chapter updates and invalidate queries
+  useEffect(() => {
+    const handleChapterUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
+    }
+
+    // Listen for custom events from chapter updates
+    window.addEventListener('chapterProgressUpdated', handleChapterUpdate)
+    
+    return () => {
+      window.removeEventListener('chapterProgressUpdated', handleChapterUpdate)
+    }
+  }, [queryClient])
+
   const { data: subjects = [], isLoading: loading, error } = useQuery<SubjectSummary[]>({
     queryKey: ['subjects-dashboard'],
     queryFn: async () => {
@@ -27,8 +43,8 @@ export default function SubjectsGrid() {
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: 3000, // Refetch every 3 seconds for real-time updates
-    staleTime: 500, // Consider data stale after 0.5 seconds
+    refetchInterval: 1000, // Refetch every 1 second for real-time updates
+    staleTime: 0, // Always consider data stale for immediate updates
     refetchOnWindowFocus: true, // Refetch when window gains focus
     refetchOnMount: true, // Always refetch on mount
     refetchIntervalInBackground: true // Continue refetching in background

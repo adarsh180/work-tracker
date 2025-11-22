@@ -14,6 +14,7 @@ import MistiMotivationCard from '@/components/ui/misti-motivation-card'
 import DailyGoalsCard from '@/components/dashboard/daily-goals-card'
 import YesterdayPerformance from '@/components/dashboard/yesterday-performance'
 import RealTimeAnalytics from '@/components/dashboard/real-time-analytics'
+import BackupManager from '@/components/backup/backup-manager'
 import {
   SparklesIcon,
   RocketLaunchIcon,
@@ -197,6 +198,15 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
+          {/* Backup Manager */}
+          <motion.div variants={itemVariants}>
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Data Backup</h2>
+              <p className="text-sm text-foreground-tertiary mt-1">Protect your NEET preparation data</p>
+            </div>
+            <BackupManager />
+          </motion.div>
+
           {/* Motivational Messages */}
           <motion.div variants={itemVariants}>
             <MotivationalMessages />
@@ -303,6 +313,7 @@ export default function Dashboard() {
               </div>
             </div>
           </motion.div>
+
         </motion.div>
       </DashboardLayout>
     </>
