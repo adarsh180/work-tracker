@@ -109,42 +109,42 @@ export default function MoodCalendar({ moodEntries, onMoodSelect }: MoodCalendar
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   return (
-    <div className="glass-effect rounded-xl p-6">
+    <div className="glass-effect rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <button
           onClick={() => navigateMonth('prev')}
-          className="p-2 rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200"
+          className="p-1 sm:p-2 rounded-md sm:rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200"
         >
-          <ChevronLeftIcon className="h-5 w-5" />
+          <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
         
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-lg sm:text-xl font-semibold text-white break-words">
           {monthNames[month]} {year}
         </h2>
         
         <button
           onClick={() => navigateMonth('next')}
-          className="p-2 rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200"
+          className="p-1 sm:p-2 rounded-md sm:rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200"
         >
-          <ChevronRightIcon className="h-5 w-5" />
+          <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
       </div>
 
       {/* Day Names Header */}
-      <div className="grid grid-cols-7 gap-2 mb-4">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3 sm:mb-4">
         {dayNames.map(day => (
-          <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
+          <div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-400 py-1 sm:py-2 break-words">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2 mb-6">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-4 sm:mb-6">
         {calendarDays.map((day, index) => {
           if (day === null) {
-            return <div key={index} className="aspect-square" />
+            return <div key={index} className="aspect-square min-h-[32px] sm:min-h-[40px]" />
           }
 
           const dateStr = formatDate(day)
@@ -157,8 +157,8 @@ export default function MoodCalendar({ moodEntries, onMoodSelect }: MoodCalendar
               key={day}
               onClick={() => handleDayClick(day)}
               className={`
-                aspect-square rounded-lg border transition-all duration-200 hover:scale-105
-                flex items-center justify-center text-sm font-medium
+                aspect-square min-h-[32px] sm:min-h-[40px] rounded-md sm:rounded-lg border transition-all duration-200 hover:scale-105
+                flex items-center justify-center text-xs sm:text-sm font-medium
                 ${isSelected 
                   ? 'bg-primary/30 border-primary text-primary' 
                   : mood 
@@ -176,12 +176,12 @@ export default function MoodCalendar({ moodEntries, onMoodSelect }: MoodCalendar
 
       {/* Mood Selection */}
       {selectedDate && (
-        <div className="border-t border-gray-700 pt-6">
-          <h3 className="text-lg font-medium text-white mb-4">
+        <div className="border-t border-gray-700 pt-4 sm:pt-6">
+          <h3 className="text-base sm:text-lg font-medium text-white mb-3 sm:mb-4 break-words">
             How are you feeling on {new Date(selectedDate).toLocaleDateString()}?
           </h3>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
             {MOOD_OPTIONS.map(option => {
               const Icon = option.icon
               return (
@@ -205,7 +205,7 @@ export default function MoodCalendar({ moodEntries, onMoodSelect }: MoodCalendar
           
           <button
             onClick={() => setSelectedDate(null)}
-            className="mt-4 w-full py-2 px-4 rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-gray-700 transition-all duration-200"
+            className="mt-3 sm:mt-4 w-full py-2 px-3 sm:px-4 rounded-md sm:rounded-lg bg-background-secondary/50 border border-gray-700 text-gray-300 hover:bg-gray-700 transition-all duration-200 text-sm"
           >
             Cancel
           </button>
@@ -213,9 +213,9 @@ export default function MoodCalendar({ moodEntries, onMoodSelect }: MoodCalendar
       )}
 
       {/* Legend */}
-      <div className="border-t border-gray-700 pt-6 mt-6">
-        <h4 className="text-sm font-medium text-gray-400 mb-3">Mood Legend</h4>
-        <div className="flex flex-wrap gap-4">
+      <div className="border-t border-gray-700 pt-4 sm:pt-6 mt-4 sm:mt-6">
+        <h4 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3 break-words">Mood Legend</h4>
+        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
           {MOOD_OPTIONS.map(option => {
             const Icon = option.icon
             return (

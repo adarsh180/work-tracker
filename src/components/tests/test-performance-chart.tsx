@@ -156,7 +156,7 @@ export default function TestPerformanceChart() {
     >
       <Card variant="premium" hover="both" asMotion className="overflow-hidden">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <CardTitle className="flex items-center gap-3">
               <motion.div
                 animate={{ rotate: [0, 360] }}
@@ -168,7 +168,7 @@ export default function TestPerformanceChart() {
               <span className="gradient-text">Performance Analytics</span>
             </CardTitle>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               {/* Chart Type Toggle */}
               <div className="flex bg-background-secondary rounded-lg p-1">
                 <button
@@ -194,7 +194,7 @@ export default function TestPerformanceChart() {
           </div>
 
           {/* Test Type Filter */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-1 sm:gap-2 mt-3 sm:mt-4">
             {testTypes.map(type => (
               <Badge
                 key={type.value}
@@ -209,7 +209,7 @@ export default function TestPerformanceChart() {
         </CardHeader>
 
         <CardContent>
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Enhanced Chart */}
             <div className="relative">
               <AnimatePresence mode="wait">
@@ -264,7 +264,7 @@ export default function TestPerformanceChart() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/10"
+                className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 pt-4 sm:pt-6 border-t border-white/10"
               >
                 {/* First Test */}
                 <div className="glass-effect p-4 rounded-xl text-center">

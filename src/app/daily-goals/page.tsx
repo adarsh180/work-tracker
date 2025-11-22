@@ -158,14 +158,14 @@ export default function DailyGoalsPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-6"
+        className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6 xl:space-y-8 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8"
       >
         {/* Enhanced Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center space-y-6"
+          className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-2 sm:px-4"
         >
           <div className="flex items-center justify-center gap-4">
             <motion.div
@@ -193,7 +193,7 @@ export default function DailyGoalsPage() {
 
             <div>
               <motion.h1
-                className="text-4xl md:text-6xl font-bold gradient-text"
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold gradient-text break-words"
                 animate={{
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                 }}
@@ -239,7 +239,7 @@ export default function DailyGoalsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-xl text-foreground-secondary max-w-3xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-secondary max-w-3xl mx-auto leading-relaxed px-2 break-words"
           >
             Track your daily NEET preparation progress with
             <motion.span
@@ -297,10 +297,10 @@ export default function DailyGoalsPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 20 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="space-y-6"
+        className="space-y-4 sm:space-y-6"
       >
         {/* Hero Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
           {dailyTargets.map((target, index) => (
             <motion.div
               key={target.label}
@@ -341,7 +341,7 @@ export default function DailyGoalsPage() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             {/* Form Section - Takes 2 columns */}
             <div className="xl:col-span-2">
               <DailyGoalsForm />
@@ -419,7 +419,7 @@ export default function DailyGoalsPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -20 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="space-y-6"
+        className="space-y-4 sm:space-y-6"
       >
         {/* Heatmap Hero */}
         <QuestionHeatmap />
@@ -438,7 +438,7 @@ export default function DailyGoalsPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -20 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="space-y-6"
+        className="space-y-4 sm:space-y-6"
       >
         {/* Full-Size Heatmap */}
         <QuestionHeatmap />
