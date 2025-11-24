@@ -28,9 +28,11 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline'
 
-// Adaptive Theme based on time of day
+// Adaptive Theme based on Indian Standard Time (IST)
 const getTimeBasedTheme = () => {
-  const hour = new Date().getHours()
+  const now = new Date()
+  const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}))
+  const hour = istTime.getHours()
   if (hour >= 5 && hour < 12) return 'morning'   // Sunrise energy
   if (hour >= 12 && hour < 17) return 'day'      // Focused study
   if (hour >= 17 && hour < 21) return 'evening'  // Golden hour calm
