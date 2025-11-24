@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       overall: 0
     }
 
-    subjects.forEach(subject => {
+    subjects.forEach((subject: any) => {
       const subjectName = subject.name.toLowerCase()
       if (subjectName === 'physics' || subjectName === 'chemistry' || subjectName === 'botany' || subjectName === 'zoology') {
         subjectProgress[subjectName as keyof typeof subjectProgress] = subject.completionPercentage
@@ -37,11 +37,11 @@ export async function GET(request: NextRequest) {
     })
 
     // Use the same calculation as subjects grid - weighted average
-    const totalSubjects = subjects.filter(s => 
+    const totalSubjects = subjects.filter((s: any) => 
       ['physics', 'chemistry', 'botany', 'zoology'].includes(s.name.toLowerCase())
     )
     subjectProgress.overall = totalSubjects.length > 0 
-      ? totalSubjects.reduce((acc, s) => acc + s.completionPercentage, 0) / totalSubjects.length 
+      ? totalSubjects.reduce((acc: number, s: any) => acc + s.completionPercentage, 0) / totalSubjects.length 
       : 0
 
     // Calculate question stats including chapter-wise questions
@@ -53,21 +53,21 @@ export async function GET(request: NextRequest) {
     
     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
 
-    const todayGoal = dailyGoals.find(g => 
+    const todayGoal = dailyGoals.find((g: any) => 
       new Date(g.date).toDateString() === today.toDateString()
     )
     
-    const weeklyGoals = dailyGoals.filter(g => 
+    const weeklyGoals = dailyGoals.filter((g: any) => 
       new Date(g.date) >= weekStart && new Date(g.date) <= today
     )
     
-    const monthlyGoals = dailyGoals.filter(g => 
+    const monthlyGoals = dailyGoals.filter((g: any) => 
       new Date(g.date) >= monthStart && new Date(g.date) <= today
     )
 
     // Calculate chapter-wise questions from subjects data
-    const chapterQuestions = subjects.reduce((total, subject) => {
-      const subjectTotal = subject.chapters.reduce((chapterSum, chapter) => {
+    const chapterQuestions = subjects.reduce((total: number, subject: any) => {
+      const subjectTotal = subject.chapters.reduce((chapterSum: number, chapter: any) => {
         const dppCompleted = Array.isArray(chapter.dppCompleted) 
           ? (chapter.dppCompleted as boolean[]).filter(Boolean).length 
           : 0
@@ -84,9 +84,9 @@ export async function GET(request: NextRequest) {
 
     const questionStats = {
       daily: todayGoal?.totalQuestions || 0,
-      weekly: weeklyGoals.reduce((sum, g) => sum + g.totalQuestions, 0),
-      monthly: monthlyGoals.reduce((sum, g) => sum + g.totalQuestions, 0),
-      lifetime: dailyGoals.reduce((sum, g) => sum + g.totalQuestions, 0) + chapterQuestions,
+      weekly: weeklyGoals.reduce((sum: number, g: any) => sum + g.totalQuestions, 0),
+      monthly: monthlyGoals.reduce((sum: number, g: any) => sum + g.totalQuestions, 0),
+      lifetime: dailyGoals.reduce((sum: number, g: any) => sum + g.totalQuestions, 0) + chapterQuestions,
       chapterwise: chapterQuestions
     }
 
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     const testPerformance = {
       totalTests: testPerformances.length,
       averageScore: testPerformances.length > 0 
-        ? Math.round(testPerformances.reduce((sum, t) => sum + t.score, 0) / testPerformances.length)
+        ? Math.round(testPerformances.reduce((sum: number, t: any) => sum + t.score, 0) / testPerformances.length)
         : 0,
       lastScore: testPerformances.length > 0 ? testPerformances[0].score : 0,
       improvement: testPerformances.length >= 2 
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate mood insights
-    const happyMoods = moodEntries.filter(m => m.mood === 'happy').length
+    const happyMoods = moodEntries.filter((m: any) => m.mood === 'happy').length
     const currentDate = new Date()
     let currentStreak = 0
     
@@ -132,6 +132,14 @@ export async function GET(request: NextRequest) {
         questionStats,
         testPerformance,
         moodInsights
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Last-Modified': new Date().toUTCString(),
+        'ETag': `"${Date.now()}"`
       }
     })
 

@@ -7,9 +7,11 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(dashboardSummary, {
       headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
-        'Expires': '0'
+        'Expires': '0',
+        'Last-Modified': new Date().toUTCString(),
+        'ETag': `"${Date.now()}"`
       }
     })
   } catch (error) {

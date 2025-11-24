@@ -40,8 +40,10 @@ export default function RealTimeAnalytics() {
   // Listen for chapter updates and invalidate queries
   useEffect(() => {
     const handleChapterUpdate = () => {
+      // Force immediate refetch for real-time updates
       queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
       queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+      queryClient.refetchQueries({ queryKey: ['dashboard-analytics'] })
     }
 
     window.addEventListener('chapterProgressUpdated', handleChapterUpdate)
@@ -54,13 +56,26 @@ export default function RealTimeAnalytics() {
   const { data: analytics, isLoading } = useQuery<DashboardAnalytics>({
     queryKey: ['dashboard-analytics'],
     queryFn: async () => {
-      const response = await fetch('/api/dashboard/analytics')
+      // Vercel-optimized fetch with cache busting
+      const timestamp = Date.now()
+      const response = await fetch(`/api/dashboard/analytics?t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       if (!response.ok) throw new Error('Failed to fetch analytics')
       const result = await response.json()
       return result.data
     },
-    refetchInterval: 1000, // Refresh every 1 second for real-time updates
-    staleTime: 0 // Always consider data stale for immediate updates
+    refetchInterval: 3000, // 3 seconds for Vercel optimization
+    staleTime: 0, // Always consider data stale
+    refetchOnWindowFocus: true,
+    refetchIntervalInBackground: false, // Disable for Vercel performance
+    retry: 2,
+    retryDelay: attemptIndex => Math.min(2000 * 2 ** attemptIndex, 10000)
   })
 
   if (isLoading || !analytics) {

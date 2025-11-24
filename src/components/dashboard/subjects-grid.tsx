@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/use-auth'
 import SubjectCard from './subject-card'
 import { useEffect, useRef } from 'react'
+import { useProductionSync } from '@/hooks/use-production-sync'
 
 interface SubjectSummary {
   id: string
@@ -21,11 +22,12 @@ export default function SubjectsGrid() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const { triggerSync } = useProductionSync()
 
   // Listen for chapter updates and invalidate queries
   useEffect(() => {
     const handleChapterUpdate = () => {
-      // Debounce updates to prevent excessive API calls in production
+      // Reduced debounce for faster updates in production
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current)
       }
@@ -33,7 +35,7 @@ export default function SubjectsGrid() {
         queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
         queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
         queryClient.refetchQueries({ queryKey: ['subjects-dashboard'] })
-      }, process.env.NODE_ENV === 'production' ? 1000 : 100)
+      }, 300) // 300ms for both dev and production
     }
 
     // Listen for custom events from chapter updates
@@ -53,17 +55,26 @@ export default function SubjectsGrid() {
   const { data: subjects = [], isLoading: loading, error } = useQuery<SubjectSummary[]>({
     queryKey: ['subjects-dashboard'],
     queryFn: async () => {
-      const response = await fetch('/api/subjects/dashboard')
+      // Vercel-optimized fetch with cache busting
+      const timestamp = Date.now()
+      const response = await fetch(`/api/subjects/dashboard?t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       if (!response.ok) throw new Error('Failed to fetch subjects')
       return response.json()
     },
-    refetchInterval: process.env.NODE_ENV === 'production' ? 3000 : 500,
-    staleTime: process.env.NODE_ENV === 'production' ? 2000 : 0,
+    refetchInterval: 3000, // 3 seconds for Vercel serverless functions
+    staleTime: 0, // Always consider data stale
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchIntervalInBackground: false,
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
+    refetchIntervalInBackground: false, // Disable for Vercel performance
+    retry: 2, // Reduced retries for Vercel
+    retryDelay: attemptIndex => Math.min(2000 * 2 ** attemptIndex, 10000)
   })
 
   if (loading) {
@@ -140,7 +151,7 @@ export default function SubjectsGrid() {
           </div>
           <button
             onClick={() => {
-              queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
+              triggerSync()
             }}
             className="text-xs px-3 py-1 bg-primary/20 text-primary rounded-full hover:bg-primary/30 transition-colors"
             title="Refresh progress data"
