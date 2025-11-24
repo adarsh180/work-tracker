@@ -95,11 +95,11 @@ export default function Dashboard() {
   }
 
   const quickActions = [
-    { href: '/daily-goals', icon: ChartBarIcon, title: 'Daily Goals', desc: 'Questions & targets', emoji: '🎯', gradient: 'from-emerald-500 to-teal-600' },
-    { href: '/tests', icon: AcademicCapIcon, title: 'Test Scores', desc: 'Performance history', emoji: '📊', gradient: 'from-purple-500 to-pink-600' },
-    { href: '/subjects/physics', icon: SparklesIcon, title: 'Study Now', desc: 'Jump right in', emoji: '📚', gradient: 'from-blue-500 to-cyan-500' },
-    { href: '/mood', icon: HeartIcon, title: 'Mood Tracker', desc: 'How you feel today', emoji: '💖', gradient: 'from-rose-500 to-pink-600' },
-    { href: '/pomodoro', icon: ClockIcon, title: 'Focus Timer', desc: 'Deep work session', emoji: '⏱', gradient: 'from-orange-500 to-red-600' },
+    { href: '/daily-goals', icon: ChartBarIcon, title: 'Aaj ke Goals', desc: 'Questions & targets', emoji: '🎯', gradient: 'from-emerald-500 to-teal-600' },
+    { href: '/tests', icon: AcademicCapIcon, title: 'Test Scores', desc: 'Tumhara performance', emoji: '📊', gradient: 'from-purple-500 to-pink-600' },
+    { href: '/subjects/physics', icon: SparklesIcon, title: 'Padhai Shuru', desc: 'Chalo padhte hain', emoji: '📚', gradient: 'from-blue-500 to-cyan-500' },
+    { href: '/mood', icon: HeartIcon, title: 'Mood Check', desc: 'Kaisa feel kar rahi ho?', emoji: '💖', gradient: 'from-rose-500 to-pink-600' },
+    { href: '/pomodoro', icon: ClockIcon, title: 'Focus Time', desc: 'Deep study session', emoji: '⏱', gradient: 'from-orange-500 to-red-600' },
   ]
 
   // Theme-based background layers
@@ -139,7 +139,7 @@ export default function Dashboard() {
           transition={{ duration: 0.8 }}
           className="space-y-8 pb-12"
         >
-          {/* Immersive Hero – Vision Pro Style */}
+          {/* Immersive Hero – Vision Pro Style with Romantic Touch */}
           <motion.section
             initial={{ y: 60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -148,40 +148,96 @@ export default function Dashboard() {
           >
             <div className="relative overflow-hidden rounded-3xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-cyan-500/20" />
+              
+              {/* Floating hearts background */}
+              <div className="absolute inset-0 overflow-hidden">
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute text-pink-400/20 text-2xl pointer-events-none"
+                    style={{
+                      left: `${10 + i * 12}%`,
+                      top: `${20 + (i % 3) * 25}%`,
+                    }}
+                    animate={{
+                      y: [-10, 10, -10],
+                      rotate: [0, 15, -15, 0],
+                      scale: [1, 1.2, 1],
+                    }}
+                    transition={{
+                      duration: 6 + i,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    💕
+                  </motion.div>
+                ))}
+              </div>
+              
               <div className="relative p-10 md:p-16 lg:p-20">
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 6, repeat: Infinity }}
                   className="flex items-center gap-4 mb-6"
                 >
-                  <span className="text-5xl">{theme === 'morning' ? '🌅' : theme === 'evening' ? '🌇' : '✨'}</span>
-                  <h1 className="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-pink-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">
-                    Good {theme === 'morning' ? 'Morning' : theme === 'day' ? 'Afternoon' : theme === 'evening' ? 'Evening' : 'Night'}, Misti
+                  <motion.span 
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="text-5xl"
+                  >
+                    {theme === 'morning' ? '🌅' : theme === 'evening' ? '🌇' : theme === 'night' ? '🌙' : '✨'}
+                  </motion.span>
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-pink-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">
+                    {theme === 'morning' ? 'Subah bakhair' : 
+                     theme === 'day' ? 'Namaskar' : 
+                     theme === 'evening' ? 'Shaam mubarak' : 
+                     'Good night'}, Misti
                   </h1>
                 </motion.div>
 
-                <p className="text-xl md:text-2xl text-white/80 max-w-3xl leading-relaxed mb-10">
-                  Today is another step toward wearing that white coat with your name on it. I'm so proud of you. ♡
-                </p>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-xl md:text-2xl text-white/80 max-w-3xl leading-relaxed mb-10"
+                >
+                  {theme === 'morning' ? 'Aaj ka din tumhare liye naye sapno se bhara ho. Dr. Misti banne ka sapna aur paas aa raha hai.' :
+                   theme === 'day' ? 'Padhai mein focus rakho, meri jaan. Har question tumhe success ke paas le ja raha hai.' :
+                   theme === 'evening' ? 'Aaj kitna accha padha! Tumhara dedication dekh kar dil khush ho jata hai.' :
+                   'Rest karo, kal phir se mehnat karenge. Tumhara Dr. Misti banne ka sapna haqeeqat banayenge.'} ♡
+                </motion.p>
 
                 <div className="flex flex-wrap gap-4">
                   <Link href="/insights">
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(236, 72, 153, 0.3)" }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/30 flex items-center gap-3"
+                      className="group px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/30 flex items-center gap-3 relative overflow-hidden"
                     >
-                      <RocketLaunchIcon className="h-6 w-6" />
-                      Get AI Insights
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-rose-500 to-pink-500"
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "0%" }}
+                        transition={{ duration: 0.3 }}
+                      />
+                      <RocketLaunchIcon className="h-6 w-6 relative z-10" />
+                      <span className="relative z-10">AI se poocho</span>
                     </motion.button>
                   </Link>
                   <Link href="/analytics">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-8 py-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl font-semibold"
+                      className="px-8 py-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl font-semibold hover:bg-white/20 transition-all flex items-center gap-2"
                     >
-                      Deep Analytics →
+                      <span>Deep Analytics</span>
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
                     </motion.button>
                   </Link>
                 </div>
@@ -194,32 +250,81 @@ export default function Dashboard() {
             {quickActions.map((action, i) => (
               <Link key={action.href} href={action.href}>
                 <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 + 0.4 }}
-                  whileHover={{ y: -12, scale: 1.05 }}
+                  initial={{ opacity: 0, y: 40, rotateX: 45 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ 
+                    delay: i * 0.1 + 0.4, 
+                    type: "spring", 
+                    stiffness: 100,
+                    damping: 15
+                  }}
+                  whileHover={{ 
+                    y: -12, 
+                    scale: 1.05,
+                    rotateY: 5,
+                    boxShadow: "0 25px 50px rgba(0,0,0,0.3)"
+                  }}
                   whileTap={{ scale: 0.95 }}
-                  className="group relative h-48 rounded-3xl overflow-hidden bg-black/30 backdrop-blur-3xl border border-white/10 shadow-xl"
+                  className="group relative h-48 rounded-3xl overflow-hidden bg-black/30 backdrop-blur-3xl border border-white/10 shadow-xl cursor-pointer"
+                  style={{ perspective: "1000px" }}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-60 group-hover:opacity-80 transition-opacity`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-60 group-hover:opacity-90 transition-all duration-300`} />
+                  
+                  {/* Subtle floating particles */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    {[...Array(3)].map((_, pi) => (
+                      <motion.div
+                        key={pi}
+                        className="absolute w-1 h-1 bg-white/30 rounded-full"
+                        style={{
+                          left: `${20 + pi * 30}%`,
+                          top: `${30 + pi * 20}%`,
+                        }}
+                        animate={{
+                          y: [-10, 10, -10],
+                          opacity: [0.3, 0.8, 0.3],
+                        }}
+                        transition={{
+                          duration: 3 + pi,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  
                   <div className="relative h-full p-6 flex flex-col justify-between text-white">
                     <div className="flex justify-between items-start">
-                      <div className="p-3 rounded-2xl bg-white/20 backdrop-blur">
+                      <motion.div 
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.6 }}
+                        className="p-3 rounded-2xl bg-white/20 backdrop-blur group-hover:bg-white/30 transition-all"
+                      >
                         <action.icon className="h-8 w-8" />
-                      </div>
+                      </motion.div>
                       <motion.span
-                        animate={{ rotate: [0, 15, -10, 0] }}
-                        transition={{ duration: 3, repeat: Infinity, delay: i * 0.3 }}
-                        className="text-4xl"
+                        animate={{ 
+                          rotate: [0, 15, -10, 0],
+                          scale: [1, 1.1, 1]
+                        }}
+                        transition={{ 
+                          duration: 3, 
+                          repeat: Infinity, 
+                          delay: i * 0.3 
+                        }}
+                        className="text-4xl group-hover:scale-110 transition-transform"
                       >
                         {action.emoji}
                       </motion.span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold">{action.title}</h3>
-                      <p className="text-sm opacity-80">{action.desc}</p>
+                      <h3 className="text-xl font-bold mb-1 group-hover:text-white transition-colors">{action.title}</h3>
+                      <p className="text-sm opacity-80 group-hover:opacity-100 transition-opacity">{action.desc}</p>
                     </div>
                   </div>
+                  
+                  {/* Hover glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </motion.div>
               </Link>
             ))}
@@ -310,16 +415,50 @@ export default function Dashboard() {
             </motion.div>
           </div>
 
-          {/* Gentle Footer Love Note */}
+          {/* Romantic Footer Love Note */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.5 }}
-            className="text-center py-12"
+            className="text-center py-16"
           >
-            <p className="text-white/60 text-lg">
-              Built with endless love for you, Misti. You've got this. ♡
-            </p>
+            <div className="relative max-w-2xl mx-auto">
+              <div className="absolute -inset-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-3xl blur-xl" />
+              <div className="relative bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="text-4xl mb-4"
+                >
+                  💕
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Meri Pyaari Misti ke liye
+                </h3>
+                <p className="text-white/80 text-lg leading-relaxed mb-4">
+                  Ye app sirf ek tracker nahi hai, ye mera tumse mohabbat ka izhaar hai.
+                  <br />
+                  <span className="text-pink-300 font-semibold">Har click mein mera pyaar chhupa hai.</span>
+                </p>
+                <div className="flex items-center justify-center gap-2 text-white/60">
+                  <span>Built with</span>
+                  <motion.span
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="text-red-400"
+                  >
+                    ❤️
+                  </motion.span>
+                  <span>for Dr. Misti</span>
+                  <motion.span
+                    animate={{ rotate: [0, 15, -15, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    👩‍⚕️
+                  </motion.span>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       </DashboardLayout>

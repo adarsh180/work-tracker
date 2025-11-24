@@ -75,12 +75,17 @@ export default function DailyGoalsCard() {
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <FlagIcon className="h-5 w-5 text-primary" />
-              <span>Daily Goals</span>
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <FlagIcon className="h-5 w-5 text-pink-400" />
+              </motion.div>
+              <span className="bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent font-bold">Aaj ke Sapne</span>
             </div>
             <Link 
               href="/daily-goals"
-              className="text-gray-400 hover:text-primary transition-colors group-hover:translate-x-1 transform duration-200"
+              className="text-gray-400 hover:text-pink-400 transition-colors group-hover:translate-x-1 transform duration-200"
             >
               <ArrowRightIcon className="h-4 w-4" />
             </Link>
@@ -89,15 +94,24 @@ export default function DailyGoalsCard() {
         <CardContent className="space-y-4">
           {/* Today's Performance */}
           {summary && (
-            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-primary/10 to-pink-500/10 rounded-lg border border-primary/20">
-              <div className="flex items-center space-x-3">
-                <span className="text-3xl">{summary.emoji}</span>
-                <div>
-                  <div className="text-lg font-bold text-white">
-                    {summary.totalQuestions} Questions
-                  </div>
-                  <div className="text-sm text-gray-300">
-                    {summary.totalDpp} DPPs • {summary.totalRevision}h Revision
+            <div className="relative overflow-hidden p-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl border border-pink-400/30">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 to-purple-400/10" />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <motion.span 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="text-3xl"
+                  >
+                    {summary.emoji}
+                  </motion.span>
+                  <div>
+                    <div className="text-lg font-bold bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent">
+                      {summary.totalQuestions} Sawal Solve Kiye!
+                    </div>
+                    <div className="text-sm text-pink-200">
+                      {summary.totalDpp} DPPs • {summary.totalRevision}h Revision
+                    </div>
                   </div>
                 </div>
               </div>
@@ -110,7 +124,7 @@ export default function DailyGoalsCard() {
               {/* Weekly Progress */}
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-400">Weekly Progress</span>
+                  <span className="text-pink-300">Is Hafte ka Progress</span>
                   <span className={getProgressColor(stats.weeklyProgress)}>
                     {stats.weekly}/{stats.weeklyGoal}
                   </span>
@@ -128,7 +142,7 @@ export default function DailyGoalsCard() {
               {/* Monthly Progress */}
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-400">Monthly Progress</span>
+                  <span className="text-purple-300">Is Mahine ka Progress</span>
                   <span className={getProgressColor(stats.monthlyProgress)}>
                     {stats.monthly}/{stats.monthlyGoal}
                   </span>
@@ -147,20 +161,20 @@ export default function DailyGoalsCard() {
 
           {/* Quick Stats */}
           {stats && (
-            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-700">
+            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-pink-400/30">
               <div className="text-center">
-                <div className="text-lg font-bold text-white">{stats.daily}</div>
-                <div className="text-xs text-gray-400">Today</div>
+                <div className="text-lg font-bold bg-gradient-to-r from-pink-300 to-rose-300 bg-clip-text text-transparent">{stats.daily}</div>
+                <div className="text-xs text-pink-300">Aaj</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">{stats.weekly}</div>
-                <div className="text-xs text-gray-400">This Week</div>
+                <div className="text-lg font-bold bg-gradient-to-r from-purple-300 to-indigo-300 bg-clip-text text-transparent">{stats.weekly}</div>
+                <div className="text-xs text-purple-300">Is Hafte</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">
+                <div className="text-lg font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
                   {stats.lifetime > 999 ? `${(stats.lifetime / 1000).toFixed(1)}k` : stats.lifetime}
                 </div>
-                <div className="text-xs text-gray-400">Lifetime</div>
+                <div className="text-xs text-cyan-300">Total</div>
               </div>
             </div>
           )}
@@ -177,9 +191,9 @@ export default function DailyGoalsCard() {
           {/* Call to Action */}
           <Link 
             href="/daily-goals"
-            className="block w-full text-center py-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 rounded-lg transition-colors text-sm font-medium"
+            className="block w-full text-center py-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-300 border border-pink-400/30 rounded-xl transition-all text-sm font-medium"
           >
-            Track Today's Progress
+            Aaj ka Progress Track Karo 💕
           </Link>
         </CardContent>
       </Card>
