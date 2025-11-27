@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SubjectRepository } from '@/lib/repositories/subject-repository'
 
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const dashboardSummary = await SubjectRepository.getDashboardSummary()

@@ -27,18 +27,15 @@ export default function SubjectsGrid() {
   // Listen for chapter updates and invalidate queries
   useEffect(() => {
     const handleChapterUpdate = () => {
-      // Reduced debounce for faster updates in production
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current)
       }
       updateTimeoutRef.current = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['subjects-dashboard'] })
-        queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] })
         queryClient.refetchQueries({ queryKey: ['subjects-dashboard'] })
-      }, 300) // 300ms for both dev and production
+      }, 500)
     }
 
-    // Listen for custom events from chapter updates
     window.addEventListener('chapterProgressUpdated', handleChapterUpdate)
     window.addEventListener('lectureCompleted', handleChapterUpdate)
     window.addEventListener('dppCompleted', handleChapterUpdate)
