@@ -196,6 +196,105 @@ export default function SubjectsGrid() {
             />
           </motion.div>
         ))}
+        
+        {/* Hubby's Progress Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: subjects.length * 0.1, type: "spring", stiffness: 100 }}
+          whileHover={{ y: -8, scale: 1.02 }}
+          className="group"
+        >
+          <motion.a
+            href="https://upsc-tracker-adarsh.vercel.app/dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block h-full"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 via-indigo-500/20 to-purple-500/20 backdrop-blur-xl border border-white/10 p-6 h-full transition-all duration-300 hover:border-blue-400/30 hover:shadow-glow">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-indigo-400/10" />
+              
+              {/* Header */}
+              <div className="relative flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                  Your Hubby's Journey
+                </h3>
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="text-2xl"
+                >
+                  👨‍💼
+                </motion.div>
+              </div>
+
+              {/* Progress Circle */}
+              <div className="relative flex justify-center mb-6">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="rgba(59, 130, 246, 0.2)"
+                      strokeWidth="8"
+                      fill="none"
+                    />
+                    <motion.circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="url(#blueGradient)"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray={`${75 * 2.51} ${100 * 2.51}`}
+                      initial={{ strokeDasharray: "0 251" }}
+                      animate={{ strokeDasharray: `${75 * 2.51} ${100 * 2.51}` }}
+                      transition={{ duration: 1.5, delay: subjects.length * 0.1 + 0.5 }}
+                    />
+                    <defs>
+                      <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#3b82f6" />
+                        <stop offset="100%" stopColor="#6366f1" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xl font-bold text-blue-300">UPSC</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="relative text-center space-y-2">
+                <p className="text-white/90 font-medium">
+                  Check Adarsh's Progress
+                </p>
+                <p className="text-white/70 text-sm">
+                  UPSC Preparation Journey
+                </p>
+                <motion.div
+                  className="flex items-center justify-center gap-1 mt-3"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <span className="text-blue-300 text-sm font-medium">Click to visit</span>
+                  <span className="text-blue-300">→</span>
+                </motion.div>
+              </div>
+
+              {/* Love Message */}
+              <div className="relative mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-400/20">
+                <p className="text-blue-200 text-xs text-center">
+                  "Supporting each other's dreams! 💙"
+                </p>
+              </div>
+            </div>
+          </motion.a>
+        </motion.div>
       </div>
 
       {/* Romantic Progress Summary */}
