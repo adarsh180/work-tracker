@@ -6,7 +6,7 @@ import { MoodRepository } from '@/lib/repositories/mood-repository'
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { month: string } }
+  { params }: { params: Promise<{ month: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { month } = params
+    const { month } = await params
     
     // Validate month format (YYYY-MM)
     const monthRegex = /^\d{4}-\d{2}$/

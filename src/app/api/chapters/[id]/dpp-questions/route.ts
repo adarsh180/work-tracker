@@ -5,8 +5,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -20,7 +21,7 @@ export async function PUT(
     const { dppIndex, questionCount } = await request.json()
 
     const chapter = await prisma.chapter.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!chapter) {
@@ -38,7 +39,7 @@ export async function PUT(
     updatedCounts[dppIndex] = questionCount
 
     const updatedChapter = await prisma.chapter.update({
-      where: { id: params.id },
+      where: { id },
       data: { dppQuestionCounts: updatedCounts }
     })
 

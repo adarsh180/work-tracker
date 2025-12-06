@@ -5,7 +5,7 @@ import { ChapterRepository } from '@/lib/repositories/chapter-repository'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -17,7 +17,8 @@ export async function PUT(
       )
     }
 
-    const chapterId = params.id
+    const { id } = await params
+    const chapterId = id
     const { lectureIndex, completed } = await request.json()
 
     // Validate input

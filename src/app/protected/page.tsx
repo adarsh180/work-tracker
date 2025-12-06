@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth'
 import LogoutButton from '@/components/auth/logout-button'
+import Link from 'next/link'
 
 export default function ProtectedPage() {
   const { user } = useAuth()
@@ -20,12 +21,12 @@ export default function ProtectedPage() {
             <p>Email: {user?.email}</p>
           </div>
           <div className="flex space-x-4">
-            <a 
+            <Link 
               href="/" 
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
             >
               Back to Home
-            </a>
+            </Link>
             <LogoutButton />
           </div>
         </div>

@@ -6,7 +6,7 @@ import { ChapterRepository } from '@/lib/repositories/chapter-repository'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -18,7 +18,8 @@ export async function GET(
       )
     }
 
-    const subjectId = params.id
+    const { id } = await params
+    const subjectId = id
 
     // Get subject with chapters
     const subject = await SubjectRepository.getByIdWithChapters(subjectId)

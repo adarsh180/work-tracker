@@ -17,7 +17,7 @@ const chapterUpdateSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -29,6 +29,7 @@ export async function PUT(
       )
     }
 
+    const { id } = await params
     const body = await request.json()
     const validationResult = chapterUpdateSchema.safeParse(body)
     
@@ -39,7 +40,7 @@ export async function PUT(
       )
     }
 
-    const updatedChapter = await RealTimeSyncService.syncChapterProgress(params.id, validationResult.data)
+    const updatedChapter = await RealTimeSyncService.syncChapterProgress(id, validationResult.data)
 
     return NextResponse.json({
       success: true,
