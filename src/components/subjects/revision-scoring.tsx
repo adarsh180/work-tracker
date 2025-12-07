@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Star, TrendingDown, TrendingUp, Sparkles, Zap } from 'lucide-react'
 
 interface RevisionScoringProps {
   chapterId: string
@@ -21,217 +22,191 @@ export default function RevisionScoring({
     try {
       setLoading(true)
       setCurrentScore(newScore)
-      
+
       const response = await fetch(`/api/chapters/${chapterId}/revision`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          revisionScore: newScore
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ revisionScore: newScore })
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to update revision score')
-      }
-
-      // Trigger parent component update
+      if (!response.ok) throw new Error('Failed to update')
       onUpdate()
     } catch (error) {
-      console.error('Error updating revision score:', error)
-      // Revert to previous score on error
+      console.error('Error:', error)
       setCurrentScore(revisionScore)
-      // TODO: Add toast notification for error
     } finally {
       setLoading(false)
     }
   }
 
-  const getScoreColor = (score: number) => {
-    if (score < 6) return 'text-red-400'
-    return 'text-green-400'
+  // Dynamic theme based on score
+  const getTheme = (score: number) => {
+    if (score <= 3) return {
+      gradient: 'from-rose-500 to-red-600',
+      text: 'text-rose-400',
+      bg: 'bg-rose-500/15',
+      border: 'border-rose-500/20',
+      label: 'Needs Work',
+      icon: TrendingDown
+    }
+    if (score <= 5) return {
+      gradient: 'from-amber-500 to-orange-600',
+      text: 'text-amber-400',
+      bg: 'bg-amber-500/15',
+      border: 'border-amber-500/20',
+      label: 'Building Up',
+      icon: Zap
+    }
+    if (score <= 7) return {
+      gradient: 'from-yellow-500 to-lime-500',
+      text: 'text-lime-400',
+      bg: 'bg-lime-500/15',
+      border: 'border-lime-500/20',
+      label: 'Good Progress',
+      icon: TrendingUp
+    }
+    return {
+      gradient: 'from-emerald-500 to-teal-500',
+      text: 'text-teal-400',
+      bg: 'bg-teal-500/15',
+      border: 'border-teal-500/20',
+      label: 'Mastered',
+      icon: Sparkles
+    }
   }
 
-  const getScoreStatus = (score: number) => {
-    if (score < 6) return { text: 'Needs Improvement', color: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/30' }
-    return { text: 'Good', color: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/30' }
-  }
-
-  const scoreStatus = getScoreStatus(currentScore)
-  const shouldAnimate = currentScore === 10
+  const theme = getTheme(currentScore)
+  const Icon = theme.icon
+  const progressPercent = (currentScore / 10) * 100
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h4 className="text-lg font-semibold text-white flex items-center">
-          <span className="text-yellow-400 mr-2">📚</span>
-          Revision Quality Score
-        </h4>
-        <div className="text-right">
-          <div className="text-sm text-gray-400">Current Score</div>
-          <div className={`text-2xl font-bold ${getScoreColor(currentScore)} flex items-center`}>
-            {currentScore}/10
-            {shouldAnimate && (
-              <motion.span
-                className="ml-2 text-pink-400"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 10, -10, 0]
-                }}
-                transition={{
-                  duration: 0.6,
-                  repeat: Infinity,
-                  repeatDelay: 2
-                }}
-              >
-                😘
-              </motion.span>
-            )}
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-xl ${theme.bg} border ${theme.border}`}>
+            <Star className={`w-5 h-5 ${theme.text}`} />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-white">Revision Quality</h4>
+            <span className={`text-xs ${theme.text}`}>{theme.label}</span>
           </div>
         </div>
-      </div>
-
-      {/* Score Status Badge */}
-      <div className={`inline-flex items-center px-3 py-1 rounded-full border ${scoreStatus.bg} ${scoreStatus.border}`}>
-        <div className={`w-2 h-2 rounded-full ${scoreStatus.color.replace('text-', 'bg-')} mr-2`} />
-        <span className={`text-sm font-medium ${scoreStatus.color}`}>
-          {scoreStatus.text}
-        </span>
-      </div>
-
-      {/* Score Slider */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm text-gray-400">
-          <span>Poor (1)</span>
-          <span>Excellent (10)</span>
-        </div>
-        
-        <div className="relative">
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={currentScore}
-            onChange={(e) => {
-              const newScore = parseInt(e.target.value)
-              setCurrentScore(newScore)
-            }}
-            onMouseUp={(e) => {
-              const newScore = parseInt((e.target as HTMLInputElement).value)
-              if (newScore !== revisionScore) {
-                handleScoreUpdate(newScore)
-              }
-            }}
-            onTouchEnd={(e) => {
-              const newScore = parseInt((e.target as HTMLInputElement).value)
-              if (newScore !== revisionScore) {
-                handleScoreUpdate(newScore)
-              }
-            }}
-            disabled={loading}
-            className={`
-              w-full h-2 rounded-lg appearance-none cursor-pointer
-              ${currentScore < 6 ? 'bg-red-400/20' : 'bg-green-400/20'}
-              slider
-            `}
-            style={{
-              background: `linear-gradient(to right, 
-                ${currentScore < 6 ? '#ef4444' : '#22c55e'} 0%, 
-                ${currentScore < 6 ? '#ef4444' : '#22c55e'} ${(currentScore / 10) * 100}%, 
-                #374151 ${(currentScore / 10) * 100}%, 
-                #374151 100%)`
-            }}
-          />
-          
-          {/* Score markers */}
-          <div className="flex justify-between mt-1">
-            {Array.from({ length: 10 }, (_, i) => (
-              <div
-                key={i + 1}
-                className={`text-xs ${
-                  i + 1 <= currentScore 
-                    ? (currentScore < 6 ? 'text-red-400' : 'text-green-400')
-                    : 'text-gray-600'
-                }`}
-              >
-                {i + 1}
-              </div>
-            ))}
-          </div>
+        <div className={`text-2xl font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent`}>
+          {currentScore}<span className="text-lg text-zinc-500">/10</span>
         </div>
       </div>
 
-      {/* Quick Score Buttons */}
-      <div className="grid grid-cols-5 gap-2">
-        {[2, 4, 6, 8, 10].map((score) => (
-          <button
-            key={score}
-            onClick={() => handleScoreUpdate(score)}
+      {/* Slider Track */}
+      <div className="relative py-3">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2 rounded-full bg-white/5" />
+        <motion.div
+          className={`absolute top-1/2 -translate-y-1/2 left-0 h-2 rounded-full bg-gradient-to-r ${theme.gradient}`}
+          initial={{ width: 0 }}
+          animate={{ width: `${progressPercent}%` }}
+          transition={{ duration: 0.3 }}
+          style={{ boxShadow: `0 0 12px ${theme.text.includes('rose') ? 'rgba(244,63,94,0.5)' : theme.text.includes('amber') ? 'rgba(245,158,11,0.5)' : theme.text.includes('lime') ? 'rgba(132,204,22,0.5)' : 'rgba(20,184,166,0.5)'}` }}
+        />
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={currentScore}
+          onChange={(e) => setCurrentScore(parseInt(e.target.value))}
+          onMouseUp={(e) => {
+            const val = parseInt((e.target as HTMLInputElement).value)
+            if (val !== revisionScore) handleScoreUpdate(val)
+          }}
+          onTouchEnd={(e) => {
+            const val = parseInt((e.target as HTMLInputElement).value)
+            if (val !== revisionScore) handleScoreUpdate(val)
+          }}
+          disabled={loading}
+          className="relative w-full h-2 appearance-none bg-transparent cursor-pointer z-10
+                     [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 
+                     [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white 
+                     [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab
+                     [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white/30
+                     [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full 
+                     [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0"
+        />
+      </div>
+
+      {/* Score Markers */}
+      <div className="flex justify-between">
+        {Array.from({ length: 10 }, (_, i) => (
+          <motion.button
+            key={i + 1}
+            onClick={() => handleScoreUpdate(i + 1)}
             disabled={loading}
-            className={`
-              py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200
-              ${currentScore === score
-                ? (score < 6 ? 'bg-red-400 text-white' : 'bg-green-400 text-white')
-                : (score < 6 
-                    ? 'bg-red-400/20 text-red-400 hover:bg-red-400/30' 
-                    : 'bg-green-400/20 text-green-400 hover:bg-green-400/30'
-                  )
-              }
-              ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-            `}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            className={`w-7 h-7 rounded-full text-xs font-medium transition-all
+              ${i + 1 === currentScore
+                ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg`
+                : i + 1 <= currentScore
+                  ? `${theme.bg} ${theme.text} border ${theme.border}`
+                  : 'bg-white/5 text-zinc-600 hover:bg-white/10 hover:text-zinc-400'
+              }`}
           >
-            {score}
-          </button>
+            {i + 1}
+          </motion.button>
         ))}
       </div>
 
-      {/* Loading Indicator */}
+      {/* Quick Presets */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { score: 2, label: 'Weak', emoji: '😰' },
+          { score: 5, label: 'Fair', emoji: '🤔' },
+          { score: 7, label: 'Good', emoji: '😊' },
+          { score: 10, label: 'Perfect', emoji: '🔥' },
+        ].map(({ score, label, emoji }) => {
+          const btnTheme = getTheme(score)
+          const isActive = currentScore === score
+
+          return (
+            <motion.button
+              key={score}
+              onClick={() => handleScoreUpdate(score)}
+              disabled={loading}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className={`
+                py-2.5 px-2 rounded-xl text-center transition-all overflow-hidden
+                ${isActive
+                  ? `bg-gradient-to-r ${btnTheme.gradient} text-white shadow-lg`
+                  : 'bg-white/5 border border-white/10 hover:border-white/20'
+                }
+              `}
+            >
+              <span className="text-lg">{emoji}</span>
+              <div className={`text-[10px] font-medium mt-0.5 ${isActive ? 'text-white' : 'text-zinc-400'}`}>
+                {label}
+              </div>
+            </motion.button>
+          )
+        })}
+      </div>
+
+      {/* Loading */}
       {loading && (
-        <div className="flex items-center justify-center py-2">
-          <div className="w-4 h-4 border border-primary border-t-transparent rounded-full animate-spin mr-2" />
-          <span className="text-sm text-gray-400">Updating score...</span>
+        <div className="flex items-center justify-center gap-2 py-2">
+          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <span className="text-xs text-zinc-400">Saving...</span>
         </div>
       )}
 
-      {/* Score Descriptions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-red-400/10 border border-red-400/30 rounded-lg p-3">
-          <div className="flex items-start space-x-2">
-            <div className="text-red-400 text-sm">⚠️</div>
-            <div className="text-xs text-red-400">
-              <strong>Needs Improvement (1-5):</strong> Chapter requires more revision. 
-              Consider reviewing concepts, solving more problems, or seeking help.
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-green-400/10 border border-green-400/30 rounded-lg p-3">
-          <div className="flex items-start space-x-2">
-            <div className="text-green-400 text-sm">✅</div>
-            <div className="text-xs text-green-400">
-              <strong>Good (6-10):</strong> Chapter is well-revised and understood. 
-              You&apos;re confident with the concepts and problem-solving approach.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Revision Tips */}
-      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
-        <div className="flex items-start space-x-2">
-          <div className="text-yellow-400 text-sm">💡</div>
-          <div className="text-xs text-yellow-400">
-            <strong>Revision Tips:</strong>
-            <ul className="mt-1 space-y-1 list-disc list-inside">
-              <li>Score 1-3: Start with basic concepts and theory</li>
-              <li>Score 4-5: Practice more problems and identify weak areas</li>
-              <li>Score 6-7: Focus on advanced problems and time management</li>
-              <li>Score 8-9: Perfect your approach and solve challenging questions</li>
-              <li>Score 10: Maintain your level with periodic review</li>
-            </ul>
-          </div>
+      {/* Tip */}
+      <div className={`p-3 rounded-xl ${theme.bg} border ${theme.border}`}>
+        <div className="flex items-start gap-2">
+          <Icon className={`w-4 h-4 ${theme.text} mt-0.5`} />
+          <p className={`text-xs ${theme.text}`}>
+            {currentScore <= 3 && "Focus on core concepts first. Review theory before problems."}
+            {currentScore > 3 && currentScore <= 5 && "You're building momentum! Practice more to strengthen."}
+            {currentScore > 5 && currentScore <= 7 && "Great progress! Focus on edge cases to level up."}
+            {currentScore > 7 && "Excellent mastery! Maintain with periodic quick revisions."}
+          </p>
         </div>
       </div>
     </div>

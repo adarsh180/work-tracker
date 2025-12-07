@@ -16,11 +16,13 @@ export default function SyncIndicator() {
   // Track sync status with dashboard queries
   const { isFetching: subjectsFetching } = useQuery({
     queryKey: ['subjects-dashboard'],
+    queryFn: () => null,
     enabled: false // Don't auto-fetch, just track status
   })
 
   const { isFetching: analyticsFetching } = useQuery({
     queryKey: ['dashboard-analytics'],
+    queryFn: () => null,
     enabled: false // Don't auto-fetch, just track status
   })
 
